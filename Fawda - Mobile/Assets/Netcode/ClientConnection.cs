@@ -12,12 +12,19 @@ public class ClientConnection : MonoBehaviour
    [SerializeField] TMP_InputField code;
    [SerializeField] TMP_Text status;
    [SerializeField] TMP_Text addr_text;
-   public Dictionary<string,UnityEvent> serverEvents;
+   private Dictionary<string,UnityEvent> serverEvents;
+   private Dictionary<string,UnityAction<byte[]>> remoteProcCalls  = new Dictionary<string, UnityAction<byte[]>>();
+   private Queue<NetMessage> rpcQueue = new Queue<NetMessage>();
+   private short playerIdx;
 
     void Start(){
         client = new SynapseClient();
         status.text = "Not Connected";
         Debug.Log("LET ME SEE THIS");
+    }
+
+    void Update(){
+        FlushRPCQueue();
     }
 
     private void Awake(){
@@ -27,6 +34,7 @@ public class ClientConnection : MonoBehaviour
             singleton = this;
             serverEvents = new Dictionary<string, UnityEvent>();
             serverEvents["connect"] = new UnityEvent();
+            RegisterRPC("INDEX", SetPlayerIndex);
         }
     }
 
@@ -63,8 +71,7 @@ public class ClientConnection : MonoBehaviour
 
     public void Connect(){
         status.text = "Connecting";
-        //string addr = ParseRoomCode(code.text);
-        string addr = code.text.Trim();
+        string addr = ParseRoomCode(code.text);
         addr_text.text = addr;
         client.kickoff(addr);
     }
@@ -73,9 +80,12 @@ public class ClientConnection : MonoBehaviour
         print(string.Format("<color=#FFBF00>Synapse Client: </color>{0}",_message));
     }
 
-    public void SendMessageToServer(OpCode _opCode, byte _val){
+    public void SendMessageToServer(OpCode _opCode, byte[] _val){
         NetMessage msg = new NetMessage(_opCode, _val);
         client.QueueMessage(msg);
+    }
+    public void SendMessageToServer(OpCode _opCode, int _val){
+        SendMessageToServer(_opCode, new byte[]{(byte)_val});
     }
 
     public void TriggerServerEvent(string _event){
@@ -86,5 +96,30 @@ public class ClientConnection : MonoBehaviour
 
     public void OnDestroy(){
         client.Kill();
+    }
+
+    public void RegisterServerEventListener(string _eventName, UnityAction _function){
+        if(!serverEvents.ContainsKey(_eventName)) serverEvents[_eventName] = new UnityEvent();
+        serverEvents[_eventName].AddListener(_function);
+    }
+
+    public void RegisterRPC(string _key, UnityAction<byte[]> _func){
+        PrintWrap("Registering " + _key);
+        remoteProcCalls[_key] = _func;
+    }
+
+    private void FlushRPCQueue(){
+        while(rpcQueue.Count > 0){
+            NetMessage msg = rpcQueue.Dequeue();
+            remoteProcCalls[Enum.GetName(typeof(OpCode), msg.opCode)](msg.val);
+        }
+    }
+
+    public void QueueRPC(NetMessage _netMessage){
+        rpcQueue.Enqueue(_netMessage);
+    }
+
+    void SetPlayerIndex(byte[] _data){
+        playerIdx = (short)_data[0];
     }
 }

@@ -7,18 +7,20 @@ public class SynapseClient
 {
     Thread clientThread;
     TcpClient client;
+    UdpClient udpClient;
     bool connected;
     int idx;
+    string addr;
     ConcurrentQueue<NetMessage> messageQueue = new ConcurrentQueue<NetMessage>();
 
     public void QueueMessage(NetMessage _netMessage){
-        ClientConnection.singleton.PrintWrap("Message Queued");
+        ClientConnection.singleton.PrintWrap("Message Queued - " + Enum.GetName(typeof(OpCode), _netMessage.opCode));
         messageQueue.Enqueue(_netMessage);    
         ClientConnection.singleton.PrintWrap(String.Format("Queue size: {0}", messageQueue.Count));
     }
     
     void ConnectToServer(){
-        
+
         while(connected){
             NetworkStream stream = client.GetStream();
             if(stream.CanRead && stream.CanWrite){
@@ -30,10 +32,12 @@ public class SynapseClient
                     stream.Write(sendBytes,0,sendBytes.Length);
                 }
                 if(stream.DataAvailable){
-                    int lengthOfIncoming = stream.ReadByte();
-                    ClientConnection.singleton.PrintWrap(string.Format("{0} of with {1} bytes of data",Enum.GetName(typeof(OpCode),stream.ReadByte()),lengthOfIncoming));
-                    int val = stream.ReadByte();
-                    ClientConnection.singleton.PrintWrap(string.Format("val: {0} ", idx));
+                    int size = stream.ReadByte();
+                    OpCode code = (OpCode)stream.ReadByte();
+                    byte[] recievedBytes = new byte[size];
+                    stream.Read(recievedBytes, 0, size);
+                    NetMessage msg = new NetMessage(code, recievedBytes);
+                    ClientConnection.singleton.QueueRPC(msg);
                 }                
             }else if (!stream.CanRead){
                 ClientConnection.singleton.PrintWrap("Cannot Read");
@@ -47,9 +51,17 @@ public class SynapseClient
     }
 
 
+
+    public void FloodUDPMessage(byte[] _data){
+        udpClient = new UdpClient();
+        NetMessage msg = new NetMessage(OpCode.UDP_INPUT, _data);
+        byte[] udpBytes = SynapseMessageFormatter.EncodeMessage(msg);
+        udpClient.Send(udpBytes, udpBytes.Length, addr, 10922);
+    }
     
     public void kickoff(string _address)
     {
+        addr = _address;
         client = new TcpClient(_address, 23722);
         ClientConnection.singleton.PrintWrap("Connected!");
         connected = true;

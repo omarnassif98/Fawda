@@ -3,7 +3,7 @@ public enum OpCode{
     INDEX = 0,
     PROFILE_PAYLOAD = 1,
     MENU_CONTROL = 2,
-    UDP_ENGAGE = 3
+    UDP_INPUT = 3
 }
 
 public struct NetMessage{
