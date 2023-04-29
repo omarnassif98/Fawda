@@ -13,6 +13,10 @@ public class SynapseClient
     string addr;
     ConcurrentQueue<NetMessage> messageQueue = new ConcurrentQueue<NetMessage>();
 
+
+    ////////
+    // Unified
+    ////////
     public void QueueMessage(NetMessage _netMessage){
         ClientConnection.singleton.PrintWrap("Message Queued - " + Enum.GetName(typeof(OpCode), _netMessage.opCode));
         messageQueue.Enqueue(_netMessage);    
@@ -20,8 +24,34 @@ public class SynapseClient
     }
     
     void ConnectToServer(){
-
         while(connected){
+            UpdateTCPStream();
+        }
+        ClientConnection.singleton.PrintWrap("Client exited");
+    }
+
+    public void kickoff(string _address)
+    {
+        addr = _address;
+        client = new TcpClient(_address, 23722);
+        ClientConnection.singleton.PrintWrap("Connected!");
+        connected = true;
+        ClientConnection.singleton.TriggerServerEvent("connect");
+        ThreadStart kickoff = new ThreadStart(ConnectToServer);
+        clientThread= new Thread(kickoff);
+        clientThread.Start();        
+    }
+
+    public void Kill(){
+        connected = false;
+    }
+
+
+    ///////
+    // TCP
+    ///////
+
+    private void UpdateTCPStream(){
             NetworkStream stream = client.GetStream();
             if(stream.CanRead && stream.CanWrite){
                 if(messageQueue.Count > 0){
@@ -46,32 +76,18 @@ public class SynapseClient
                 ClientConnection.singleton.PrintWrap("Cannot Write");
                 client.Close();
             }
-        }
-        ClientConnection.singleton.PrintWrap("Client exited");
     }
 
+    //////
+    //UDP
+    //////
 
-
-    public void FloodUDPMessage(byte[] _data){
+    public void FlashUDPMessage(byte[] _data){
         udpClient = new UdpClient();
         NetMessage msg = new NetMessage(OpCode.UDP_INPUT, _data);
         byte[] udpBytes = SynapseMessageFormatter.EncodeMessage(msg);
         udpClient.Send(udpBytes, udpBytes.Length, addr, 10922);
     }
-    
-    public void kickoff(string _address)
-    {
-        addr = _address;
-        client = new TcpClient(_address, 23722);
-        ClientConnection.singleton.PrintWrap("Connected!");
-        connected = true;
-        ClientConnection.singleton.TriggerServerEvent("connect");
-        ThreadStart kickoff = new ThreadStart(ConnectToServer);
-        clientThread= new Thread(kickoff);
-        clientThread.Start();        
-    }
 
-    public void Kill(){
-        connected = false;
-    }
+
 }

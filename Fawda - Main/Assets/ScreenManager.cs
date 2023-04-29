@@ -15,7 +15,9 @@ public class ScreenManager : MonoBehaviour
     [SerializeField]
     private int activeButtonIdx = 0;
     [SerializeField]
-    private UnityEvent screenAction;
+    private UnityEvent introductionAction;
+    [SerializeField]
+    private UnityEvent outroAction;
     void Start(){
         buttons[activeButtonIdx].SetBool("focused",true);
         ConnectionManager.singleton.RegisterRPC("MENU_CONTROL", ManipulateMenu);
@@ -42,15 +44,15 @@ public class ScreenManager : MonoBehaviour
     }
 
     public void IntroduceScreen(){
+        introductionAction.Invoke();
+        if(buttons.Length == 0) return;
         IEnumerator first = RevealButton(0);
         StartCoroutine(first);
     }
 
-    public void PerformScreenAction(){
-        screenAction.Invoke();
-    }
-
     public void DismissScreen(bool linger = true){
+        outroAction.Invoke();
+        if(buttons.Length == 0) return;
         for(short i = 0;  i < buttons.Length; i++){
             if(linger == true && buttons[i].GetBool("focused") == true){
                 IEnumerator delay = HideLingeringButton(i);

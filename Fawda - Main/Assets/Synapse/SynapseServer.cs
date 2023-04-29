@@ -57,6 +57,7 @@ public class SynapseServer
         udpServer = new UdpClient(10922);
         string room_code = GetRoomCode();
         ConnectionManager.singleton.SetRoomCode(room_code);
+        serverIsListening = true;
         ConnectionManager.singleton.TriggerServerEvent("listen");
         ConnectionManager.singleton.PrintWrap("LISTENING");
         ThreadStart listenThreadStart = new ThreadStart(TcpListen);
@@ -66,7 +67,6 @@ public class SynapseServer
         UIManager.debugSystems.SetDebug_Server_Status(true);
         serverListenThread.Start();
         udpListenThread.Start();
-        serverIsListening = true;
         ThreadStart tickThreadStart = new ThreadStart(Tick);
         serverTickThread = new Thread(tickThreadStart);
         serverTickThread.Start();
@@ -80,14 +80,10 @@ public class SynapseServer
             for (int i = 0; i < tcpClients.Length; i++)
             {
                 UIManager.debugSystems.SetDebug_Client_Status(i, tcpClients[i].Connected);
-                if (!tcpClients[i].Connected)
-                {
-                    continue;
-                }
+                if (!tcpClients[i].Connected) continue;
                 try
                 {
                     UpdateTcpStream(i);
-                    
                 }
                 catch (Exception e)
                 {

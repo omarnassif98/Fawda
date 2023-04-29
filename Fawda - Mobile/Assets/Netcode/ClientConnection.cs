@@ -111,6 +111,7 @@ public class ClientConnection : MonoBehaviour
     private void FlushRPCQueue(){
         while(rpcQueue.Count > 0){
             NetMessage msg = rpcQueue.Dequeue();
+            PrintWrap(Enum.GetName(typeof(OpCode),msg.opCode));
             remoteProcCalls[Enum.GetName(typeof(OpCode), msg.opCode)](msg.val);
         }
     }

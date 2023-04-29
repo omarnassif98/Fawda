@@ -17,8 +17,4 @@ public class SynapseMessageFormatter
     public byte[] EncodeMessage(){
         return null;
     }
-
-    public static void GetSize(byte d){
-
-    }
 }
