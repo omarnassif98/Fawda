@@ -88,6 +88,11 @@ public class ClientConnection : MonoBehaviour
         SendMessageToServer(_opCode, new byte[]{(byte)_val});
     }
 
+    public void FlashMessageToServer(OpCode _opCode, byte[] _val){
+        NetMessage msg = new NetMessage(_opCode, _val);
+        client.FlashUDPMessage(msg);
+    }
+
     public void TriggerServerEvent(string _event){
         if(serverEvents.ContainsKey(_event)){
             serverEvents[_event].Invoke();

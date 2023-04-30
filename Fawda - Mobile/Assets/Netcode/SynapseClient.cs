@@ -82,11 +82,9 @@ public class SynapseClient
     //UDP
     //////
 
-    public void FlashUDPMessage(byte[] _data){
+    public void FlashUDPMessage(NetMessage _msg){
         udpClient = new UdpClient();
-        NetMessage msg = new NetMessage(OpCode.UDP_INPUT, _data);
-        byte[] udpBytes = SynapseMessageFormatter.EncodeMessage(msg);
-        udpClient.Send(udpBytes, udpBytes.Length, addr, 10922);
+        udpClient.Send(_msg.val, _msg.size, addr, 10922);
     }
 
 
