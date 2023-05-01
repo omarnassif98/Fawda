@@ -94,6 +94,7 @@ public class ClientConnection : MonoBehaviour
     }
 
     public void TriggerServerEvent(string _event){
+        print("FIRE EVENT: " + _event);
         if(serverEvents.ContainsKey(_event)){
             serverEvents[_event].Invoke();
         }
@@ -104,6 +105,7 @@ public class ClientConnection : MonoBehaviour
     }
 
     public void RegisterServerEventListener(string _eventName, UnityAction _function){
+        print("REGISTER EVENT: " + _eventName);
         if(!serverEvents.ContainsKey(_eventName)) serverEvents[_eventName] = new UnityEvent();
         serverEvents[_eventName].AddListener(_function);
     }
@@ -117,7 +119,7 @@ public class ClientConnection : MonoBehaviour
         while(rpcQueue.Count > 0){
             NetMessage msg = rpcQueue.Dequeue();
             PrintWrap(Enum.GetName(typeof(OpCode),msg.opCode));
-            remoteProcCalls[Enum.GetName(typeof(OpCode), msg.opCode)](msg.val);
+            if(remoteProcCalls.ContainsKey(Enum.GetName(typeof(OpCode), msg.opCode))) remoteProcCalls[Enum.GetName(typeof(OpCode), msg.opCode)](msg.val);
         }
     }
 

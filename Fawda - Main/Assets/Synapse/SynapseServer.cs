@@ -32,7 +32,7 @@ public class SynapseServer
         {
             for (short i = 0; i < clientQuantity; i++)
             {
-                messageQueue[_idx].Enqueue(_netMessage);
+                messageQueue[i].Enqueue(_netMessage);
             }
         }
     }
@@ -131,7 +131,8 @@ public class SynapseServer
                 stream.Read(recieveBytes, 0, size);
                 ConnectionManager.singleton.PrintWrap(string.Format("Client {0} - OPCODE: {1} - rawVal: {2}", _idx, Enum.GetName(typeof(OpCode), code), (short)recieveBytes[0]));
                 NetMessage recreatedMsg =new NetMessage(code, recieveBytes);
-                ConnectionManager.singleton.QueueRPC(recreatedMsg);
+                DirectedNetMessage finalizedMessage = new DirectedNetMessage(recreatedMsg, _idx);
+                ConnectionManager.singleton.QueueRPC(finalizedMessage);
             }
 
         }
@@ -180,7 +181,8 @@ public class SynapseServer
             IPEndPoint endPoint = new IPEndPoint(IPAddress.Any, 10922);
             byte[] receivedBytes = udpServer.Receive(ref endPoint);
             string receivedString = Encoding.ASCII.GetString(receivedBytes);
-            ConnectionManager.singleton.PrintWrap(string.Format("UDP: {0}", receivedString));
+            /////TODO: INDEX UDP MESSAGES AND REMOVE INDEX FROM RPCS
+            //ConnectionManager.singleton.QueueRPC
         }
     }
 

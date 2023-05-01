@@ -14,14 +14,12 @@ public class TouchStickInput : MonoBehaviour, IPointerDownHandler, IPointerUpHan
     public void OnPointerDown(PointerEventData _eventData)
     {
         // Handle click event
-        print("Pointer DOWN");
         print(_eventData.pointerId);
         tracking = true;
         pointer_id = _eventData.pointerId;
     }
 
     public void OnPointerUp(PointerEventData _eventData){
-        print("Pointer UP");
         tracking = false;
         cursorTransform.localPosition = Vector2.zero;
     }
@@ -31,9 +29,6 @@ public class TouchStickInput : MonoBehaviour, IPointerDownHandler, IPointerUpHan
             Vector3 offset = pointer_id == -1 ? Input.mousePosition - transform.position: Vector3.zero;
             offset = Vector2.ClampMagnitude(offset,radius);
             float angle = Vector2.Angle(transform.right, offset);
-            // Convert the angle from degrees to radians
-
-            // Use the Quaternion class to rotate the vector by the specified angle
             Quaternion rotation = Quaternion.Euler(0, 0, 90);
             Vector2 rotatedVector = rotation * offset;
             cursorTransform.position = transform.position + offset;

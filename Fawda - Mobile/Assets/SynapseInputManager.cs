@@ -5,7 +5,7 @@ using System;
 public class SynapseInputManager : MonoBehaviour
 {
     public static SynapseInputManager singleton;
-    short inputMode = -1;
+    int inputMode = -1;
 
     [SerializeField]
     TouchStickInput touchStickInput;
@@ -21,7 +21,7 @@ public class SynapseInputManager : MonoBehaviour
         }
     }
 
-    public void ChangeInputMode(short _newMode){
+    public void ChangeInputMode(int _newMode){
         inputMode = _newMode;
     }
 
@@ -30,6 +30,7 @@ public class SynapseInputManager : MonoBehaviour
         switch (inputMode)
         {
             case 0:
+                print("WE POLLING");
                 ClientConnection.singleton.FlashMessageToServer(OpCode.UDP_GAMEPAD_INPUT, PollForInput());
                 break;
         }

@@ -18,12 +18,9 @@ public class ScreenManager : MonoBehaviour
     private UnityEvent introductionAction;
     [SerializeField]
     private UnityEvent outroAction;
-    void Start(){
-        buttons[activeButtonIdx].SetBool("focused",true);
-        ConnectionManager.singleton.RegisterRPC("MENU_CONTROL", ManipulateMenu);
-    }
+
     
-    void ManipulateMenu(byte[] _data){
+    void ManipulateMenu(byte[] _data, int _idx){
         short dir = (short) _data[0];
         switch(dir){
             case 1:
@@ -45,6 +42,12 @@ public class ScreenManager : MonoBehaviour
 
     public void IntroduceScreen(){
         introductionAction.Invoke();
+        if(buttons.Length == 0){
+            UIManager.singleton.screenFillEvent.Invoke();
+            return;
+        }
+        buttons[activeButtonIdx].SetBool("focused",true);
+        ConnectionManager.singleton.RegisterRPC("MENU_CONTROL", ManipulateMenu);
         if(buttons.Length == 0) return;
         IEnumerator first = RevealButton(0);
         StartCoroutine(first);
@@ -52,6 +55,11 @@ public class ScreenManager : MonoBehaviour
 
     public void DismissScreen(bool linger = true){
         outroAction.Invoke();
+        if(buttons.Length == 0){
+            UIManager.singleton.screenClearEvent.Invoke();
+            gameObject.SetActive(false);
+            return;
+        }
         if(buttons.Length == 0) return;
         for(short i = 0;  i < buttons.Length; i++){
             if(linger == true && buttons[i].GetBool("focused") == true){
@@ -76,7 +84,7 @@ public class ScreenManager : MonoBehaviour
             IEnumerator next = RevealButton(_idx);
             StartCoroutine(next);
         }else{
-            IEnumerator delay = WaitAndInvoke(UIManager.singleton.screenFillEvent, BUTTON_INTRO_LENGTH);
+            IEnumerator delay = WaitAndInvoke(UIManager.singleton.screenFillEvent, BUTTON_INTRO_LENGTH, true);
             StartCoroutine(delay);
         }
     }
@@ -88,8 +96,9 @@ public class ScreenManager : MonoBehaviour
         StartCoroutine(delay);
     }
 
-    private IEnumerator WaitAndInvoke(UnityEvent _event, float _waitTime){
+    private IEnumerator WaitAndInvoke(UnityEvent _event, float _waitTime, bool _remainActive = false){
         yield return new WaitForSeconds(_waitTime);
         _event.Invoke();
+        gameObject.SetActive(_remainActive);
     }
 }

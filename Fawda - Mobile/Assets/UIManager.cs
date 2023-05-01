@@ -1,11 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using System;
 public class UIManager : MonoBehaviour
 {
-
-    [SerializeField] GameObject[] screens;
+    [SerializeField]
+    int idx = 0;
+    [SerializeField] ScreenManager[] screens;
     public static UIManager singleton;
       private void Awake(){
         if(singleton != null && singleton != this){
@@ -17,11 +18,22 @@ public class UIManager : MonoBehaviour
     
     public void Start(){
         ClientConnection.singleton.RegisterServerEventListener("connect",kickoff);
+        ClientConnection.singleton.RegisterRPC(Enum.GetName(typeof(OpCode), OpCode.UDP_TOGGLE), ToggleControls);
     }
 
-    public void kickoff(){
-        screens[0].SetActive(false);
-        screens[1].SetActive(true);
+    private void ToggleControls(byte[] _data){
+        SwitchScreens(BitConverter.ToBoolean(_data,0)?2:1);
+    }
+
+    private void kickoff(){
+        SwitchScreens(1);
+    }
+
+    public void SwitchScreens(int _newIdx){
+        print("SWITCH NEEDED");
+        screens[idx].DismissScreen();
+        screens[_newIdx].IntroduceScreen();
+        idx = _newIdx;
     }
 
     public void ManipulateMenu(int dir){

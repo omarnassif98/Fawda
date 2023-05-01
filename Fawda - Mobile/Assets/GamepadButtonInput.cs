@@ -1,22 +1,21 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
-
+using UnityEngine.UI;
 public class GamepadButtonInput : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 {
     private bool pressed;
-
+    [SerializeField]
+    private Color idleColor, pressedColor;
     public void OnPointerDown(PointerEventData _eventData)
     {
         // Handle click event
-        print("Pointer DOWN");
         pressed = true;
+        gameObject.GetComponent<Image>().color = pressedColor;
     }
 
     public void OnPointerUp(PointerEventData _eventData){
-        print("Pointer UP");
         pressed = false;
+        gameObject.GetComponent<Image>().color = idleColor;
     }
 
     public bool PollInput(){

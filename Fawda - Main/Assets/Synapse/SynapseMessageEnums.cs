@@ -3,7 +3,8 @@ public enum OpCode{
     INDEX = 0,
     PROFILE_PAYLOAD = 1,
     MENU_CONTROL = 2,
-    UDP_INPUT = 3
+    UDP_TOGGLE = 3,
+    UDP_GAMEPAD_INPUT = 4
 }
 
 public struct NetMessage{
@@ -19,8 +20,8 @@ public struct NetMessage{
 
 public struct DirectedNetMessage{
     public NetMessage msg;
-    public short client;
-    public DirectedNetMessage(NetMessage _msg, short _client){
+    public int client;
+    public DirectedNetMessage(NetMessage _msg, int _client){
         this.msg = _msg;
         this.client = _client;
     }

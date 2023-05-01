@@ -10,6 +10,7 @@ public class UIManager : MonoBehaviour
     public static DebugSystemsManager debugSystems;
     [SerializeField]
     private ScreenManager[] screens;
+    [SerializeField]
     private short currentScreen = 0;
 
     [SerializeField]
@@ -43,6 +44,7 @@ public class UIManager : MonoBehaviour
         if(_newidx == -1) return;
         if(_push) screenStack.Push(currentScreen);
         screens[currentScreen].DismissScreen();
+        screens[_newidx].gameObject.SetActive(true);
         currentScreen = _newidx;
     }
 

@@ -371,6 +371,7 @@ GameObject:
   - component: {fileID: 2755813306538119464}
   - component: {fileID: 6293354165811195342}
   - component: {fileID: 8675673814922512363}
+  - component: {fileID: 9081493874455895139}
   m_Layer: 5
   m_Name: DEBUG_Player_Control_Suite
   m_TagString: Untagged
@@ -439,6 +440,24 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &9081493874455895139
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7419784548323081959}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ad3605a39a2eb24d87e9f6e421de44e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  joystick: {fileID: 6781722164430050223}
+  cursor: {fileID: 2731657027253250336}
+  buttonIndicator: {fileID: 7776440646469776803}
+  pulseIndicator: {fileID: 6263668022340451933}
+  idleColor: {r: 1, g: 1, b: 1, a: 0.39215687}
+  activeColor: {r: 0.18212414, g: 1, b: 0, a: 0.79607844}
 --- !u!1 &8276620023801396930
 GameObject:
   m_ObjectHideFlags: 0

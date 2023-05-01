@@ -8,8 +8,8 @@ public class ConnectionManager : MonoBehaviour
     public static ConnectionManager singleton;
     SynapseServer server;
     private Dictionary<string,UnityEvent> serverEvents  = new Dictionary<string, UnityEvent>();
-    private Dictionary<string,UnityAction<byte[]>> remoteProcCalls  = new Dictionary<string, UnityAction<byte[]>>();
-    private Queue<NetMessage> rpcQueue = new Queue<NetMessage>();
+    private Dictionary<string,UnityAction<byte[], int>> remoteProcCalls  = new Dictionary<string, UnityAction<byte[], int>>();
+    private Queue<DirectedNetMessage> rpcQueue = new Queue<DirectedNetMessage>();
     private string room_code;
     private PlayerProfile[] playerProfiles = new PlayerProfile[5];
     private short live_players = 0;
@@ -40,6 +40,10 @@ public class ConnectionManager : MonoBehaviour
 
     public void SetRoomCode(string _code){
         room_code = _code;
+    }
+
+    public void SendMessageToClients(NetMessage _msg){
+        server.QueueMessageToClient(_msg);
     }
 
     public string GetRoomCode(){
@@ -78,19 +82,19 @@ public class ConnectionManager : MonoBehaviour
         if(live_players == 0) queuedEvents.Enqueue("sleep");
     }
 
-    public void RegisterRPC(string _key, UnityAction<byte[]> _func){
+    public void RegisterRPC(string _key, UnityAction<byte[], int> _func){
         PrintWrap("Registering " + _key);
         remoteProcCalls[_key] = _func;
     }
 
     private void FlushRPCQueue(){
         while(rpcQueue.Count > 0){
-            NetMessage msg = rpcQueue.Dequeue();
-            remoteProcCalls[Enum.GetName(typeof(OpCode), msg.opCode)](msg.val);
+            DirectedNetMessage msg = rpcQueue.Dequeue();
+            remoteProcCalls[Enum.GetName(typeof(OpCode), msg.msg.opCode)](msg.msg.val, msg.client);
         }
     }
 
-    public void QueueRPC(NetMessage _netMessage){
+    public void QueueRPC(DirectedNetMessage _netMessage){
         rpcQueue.Enqueue(_netMessage);
     }
 }
