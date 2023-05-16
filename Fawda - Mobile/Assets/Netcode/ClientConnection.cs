@@ -34,7 +34,6 @@ public class ClientConnection : MonoBehaviour
             singleton = this;
             serverEvents = new Dictionary<string, UnityEvent>();
             serverEvents["connect"] = new UnityEvent();
-            RegisterRPC("INDEX", SetPlayerIndex);
         }
     }
 
@@ -127,7 +126,4 @@ public class ClientConnection : MonoBehaviour
         rpcQueue.Enqueue(_netMessage);
     }
 
-    void SetPlayerIndex(byte[] _data){
-        playerIdx = (short)_data[0];
-    }
 }

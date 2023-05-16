@@ -180,9 +180,16 @@ public class SynapseServer
         while(serverIsRunning){
             IPEndPoint endPoint = new IPEndPoint(IPAddress.Any, 10922);
             byte[] receivedBytes = udpServer.Receive(ref endPoint);
-            string receivedString = Encoding.ASCII.GetString(receivedBytes);
-            /////TODO: INDEX UDP MESSAGES AND REMOVE INDEX FROM RPCS
-            //ConnectionManager.singleton.QueueRPC
+            ConnectionManager.singleton.PrintWrap("Message Received");
+            short length = receivedBytes[0];
+            OpCode opCode = (OpCode)receivedBytes[1];
+            short idx = receivedBytes[receivedBytes.Length - 1];
+            ConnectionManager.singleton.PrintWrap(string.Format("RPC QUEUE: {0} of length {1} from player {2}", Enum.GetName(typeof(OpCode), opCode), length, idx));
+            byte[] data = new byte[length];
+            Buffer.BlockCopy(receivedBytes,2,data,0,length);
+            NetMessage reconstruction = new NetMessage(opCode, data);
+            DirectedNetMessage directedMsg = new DirectedNetMessage(reconstruction, idx);
+            ConnectionManager.singleton.QueueRPC(directedMsg);
         }
     }
 

@@ -45,6 +45,7 @@ public class SynapseInputManager : MonoBehaviour
         Buffer.BlockCopy(xBytes,0,gamepadBytes,0,xBytes.Length);
         Buffer.BlockCopy(yBytes,0,gamepadBytes,xBytes.Length,yBytes.Length);
         Buffer.BlockCopy(press,0,gamepadBytes,xBytes.Length+yBytes.Length,press.Length);
+        print(gamepadBytes.Length);
         return gamepadBytes;
     }
 }

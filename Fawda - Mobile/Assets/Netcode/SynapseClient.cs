@@ -9,7 +9,7 @@ public class SynapseClient
     TcpClient client;
     UdpClient udpClient;
     bool connected;
-    int idx;
+    short idx;
     string addr;
     ConcurrentQueue<NetMessage> messageQueue = new ConcurrentQueue<NetMessage>();
 
@@ -67,6 +67,7 @@ public class SynapseClient
                     byte[] recievedBytes = new byte[size];
                     stream.Read(recievedBytes, 0, size);
                     NetMessage msg = new NetMessage(code, recievedBytes);
+                    if(code == OpCode.INDEX) idx = recievedBytes[0];
                     ClientConnection.singleton.QueueRPC(msg);
                 }                
             }else if (!stream.CanRead){
@@ -84,7 +85,11 @@ public class SynapseClient
 
     public void FlashUDPMessage(NetMessage _msg){
         udpClient = new UdpClient();
-        udpClient.Send(_msg.val, _msg.size, addr, 10922);
+        byte[] encodedMessage = SynapseMessageFormatter.EncodeMessage(_msg);
+        byte[] signedMessage = new byte[encodedMessage.Length+1];
+        Buffer.BlockCopy(encodedMessage,0,signedMessage,0,encodedMessage.Length);
+        signedMessage[signedMessage.Length - 1] = (byte) idx;
+        udpClient.Send(signedMessage, signedMessage.Length, addr, 10922);
     }
 
 

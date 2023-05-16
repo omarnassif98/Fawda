@@ -23,6 +23,9 @@ public class DebugSystemsManager : MonoBehaviour
     [SerializeField]
     private GameObject debug_bar;
 
+    [SerializeField]
+    private DebugGamepadVisualization[] visualizations;
+
     public void SetDebug_Client_Status(int _idx, bool _connected){
         string status = _connected?"<color=#55FF00>Connected</color>":"<color=#FF0090>Disconnected</color>";
         DEBUG_Client_Status_Texts[_idx] = string.Format("Client {0}: {1}", _idx + 1, status);
@@ -46,7 +49,11 @@ public class DebugSystemsManager : MonoBehaviour
         DEBUG_SERVER_LISTEN.text = DEBUG_SERVER_LISTEN_TEXT;
     }
 
-    
+    public void ToggleGamepadVisualizations(bool _state){
+        for(int i = 0; i < visualizations.Length; i++){
+            visualizations[i].SetTrackingState(_state);
+        }
+    }
     void Update()
     {
         RefreshDebugInfo();

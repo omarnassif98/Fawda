@@ -14,7 +14,6 @@ public class TouchStickInput : MonoBehaviour, IPointerDownHandler, IPointerUpHan
     public void OnPointerDown(PointerEventData _eventData)
     {
         // Handle click event
-        print(_eventData.pointerId);
         tracking = true;
         pointer_id = _eventData.pointerId;
     }
@@ -22,18 +21,18 @@ public class TouchStickInput : MonoBehaviour, IPointerDownHandler, IPointerUpHan
     public void OnPointerUp(PointerEventData _eventData){
         tracking = false;
         cursorTransform.localPosition = Vector2.zero;
+        stickVal = Vector2.zero;
     }
 
     void Update(){
-        if(tracking){
-            Vector3 offset = pointer_id == -1 ? Input.mousePosition - transform.position: Vector3.zero;
-            offset = Vector2.ClampMagnitude(offset,radius);
-            float angle = Vector2.Angle(transform.right, offset);
-            Quaternion rotation = Quaternion.Euler(0, 0, 90);
-            Vector2 rotatedVector = rotation * offset;
-            cursorTransform.position = transform.position + offset;
-            stickVal = offset * 1/radius;
-        }
+        if(!tracking) return;
+        Vector3 offset = pointer_id == -1 ? Input.mousePosition - transform.position: Vector3.zero;
+        offset = Vector2.ClampMagnitude(offset,radius);
+        float angle = Vector2.Angle(transform.right, offset);
+        Quaternion rotation = Quaternion.Euler(0, 0, 90);
+        Vector2 rotatedVector = rotation * offset;
+        cursorTransform.position = transform.position + offset;
+        stickVal = offset * 1/radius;
     }
 
     public Vector2 PollInput(){
