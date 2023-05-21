@@ -3,19 +3,24 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using System;
+// FAWDA LAYER
+// Object is basically a bridge between the game and the actual Synapse network
+// Used for most all of communication that manifests as any change in the program these are delivered mostly by 
+// - Emitted events for TCP
+// - RPCs with data payloads for UDP
+//   *these are both dicts of callable objs, queuedEvents / rpcQueue is for staging since they run on their own threads
 public class ConnectionManager : MonoBehaviour
 {
     public static ConnectionManager singleton;
     SynapseServer server;
     private Dictionary<string,UnityEvent> serverEvents  = new Dictionary<string, UnityEvent>();
     private Dictionary<string,UnityAction<byte[], int>> remoteProcCalls  = new Dictionary<string, UnityAction<byte[], int>>();
+    Queue<string> queuedEvents = new Queue<string>();
     private Queue<DirectedNetMessage> rpcQueue = new Queue<DirectedNetMessage>();
     private string room_code;
     private PlayerProfile[] playerProfiles = new PlayerProfile[5];
     private short live_players = 0;
-    Queue<string> queuedEvents = new Queue<string>();
 
-    // Start is called before the first frame update
     void Awake()
     {
         if (singleton != null && singleton != this){
@@ -26,6 +31,7 @@ public class ConnectionManager : MonoBehaviour
     }
 
     void Start(){
+        // The Synapse component is a CHILD of this one. Not a singleton.
         server = new SynapseServer();
         server.KickoffServer();
     }
@@ -36,6 +42,43 @@ public class ConnectionManager : MonoBehaviour
         }
 
         FlushRPCQueue();
+    }
+
+
+    //////
+    // STAGING
+    //////
+
+    public void RegisterServerEventListener(string _eventName, UnityAction _function){
+        if(!serverEvents.ContainsKey(_eventName)) serverEvents[_eventName] = new UnityEvent();
+        serverEvents[_eventName].AddListener(_function);
+    }
+
+    public void RegisterRPC(string _key, UnityAction<byte[], int> _func){
+        PrintWrap("Registering " + _key);
+        remoteProcCalls[_key] = _func;
+    }
+
+    public void QueueRPC(DirectedNetMessage _netMessage){
+        rpcQueue.Enqueue(_netMessage);
+    }
+
+
+    /////
+    // ACTUAL EXECUTION
+    /////
+
+    public void TriggerServerEvent(string _event){
+        if(serverEvents.ContainsKey(_event)){
+            serverEvents[_event].Invoke();
+        }
+    }
+
+    private void FlushRPCQueue(){
+        while(rpcQueue.Count > 0){
+            DirectedNetMessage msg = rpcQueue.Dequeue();
+            remoteProcCalls[Enum.GetName(typeof(OpCode), msg.msg.opCode)](msg.msg.val, msg.client);
+        }
     }
 
     public void SetRoomCode(string _code){
@@ -59,15 +102,7 @@ public class ConnectionManager : MonoBehaviour
         PrintWrap("Quit");
     }
 
-    public void RegisterServerEventListener(string _eventName, UnityAction _function){
-        if(!serverEvents.ContainsKey(_eventName)) serverEvents[_eventName] = new UnityEvent();
-        serverEvents[_eventName].AddListener(_function);
-    }
-    public void TriggerServerEvent(string _event){
-        if(serverEvents.ContainsKey(_event)){
-            serverEvents[_event].Invoke();
-        }
-    }
+
 
     public void HandlePlayerConnect(int _idx){
         PrintWrap("Connection");
@@ -82,19 +117,7 @@ public class ConnectionManager : MonoBehaviour
         if(live_players == 0) queuedEvents.Enqueue("sleep");
     }
 
-    public void RegisterRPC(string _key, UnityAction<byte[], int> _func){
-        PrintWrap("Registering " + _key);
-        remoteProcCalls[_key] = _func;
-    }
 
-    private void FlushRPCQueue(){
-        while(rpcQueue.Count > 0){
-            DirectedNetMessage msg = rpcQueue.Dequeue();
-            remoteProcCalls[Enum.GetName(typeof(OpCode), msg.msg.opCode)](msg.msg.val, msg.client);
-        }
-    }
 
-    public void QueueRPC(DirectedNetMessage _netMessage){
-        rpcQueue.Enqueue(_netMessage);
-    }
+
 }

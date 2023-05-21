@@ -16,6 +16,7 @@ public struct JoypadState{
 public class InputManager : MonoBehaviour
 {
     public static InputManager singleton;
+    [SerializeField]
     private JoypadState[] joypadStates = new JoypadState[5];
 
     private UnityAction<Vector2,bool>[] gamepadPollEvents = new UnityAction<Vector2,bool>[5]; 
@@ -36,10 +37,10 @@ public class InputManager : MonoBehaviour
         ConnectionManager.singleton.RegisterRPC(Enum.GetName(typeof(OpCode), OpCode.UDP_GAMEPAD_INPUT), ReceivePoll);
     }
     public void ReceivePoll(byte[] _data, int _idx){
-        float xInput = BitConverter.ToSingle(_data,0);
-        float yInput = BitConverter.ToSingle(_data,4);
+        float dirInput = BitConverter.ToSingle(_data,0);
+        float distInput = BitConverter.ToSingle(_data,4);
         bool buttonInput = BitConverter.ToBoolean(_data,8);
-        Vector2 stick = new Vector2(xInput, yInput);
+        Vector2 stick = new Vector2(Mathf.Cos(dirInput), Mathf.Sin(dirInput)) * distInput;
         print(stick);
         joypadStates[_idx] = new JoypadState(stick, buttonInput);
     }

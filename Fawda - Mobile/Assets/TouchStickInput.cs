@@ -2,40 +2,56 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
-public class TouchStickInput : MonoBehaviour, IPointerDownHandler, IPointerUpHandler{
+public class TouchStickInput : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDragHandler{
     [SerializeField]
-    private RectTransform cursorTransform;
+    private RectTransform cursorTransform, orientationTransform, debug_shower;
     private Vector2 stickVal;
     private bool tracking = false;
-    private int pointer_id;
-    static float radius = 40;
-
+    float radius = 40;
+    private float[] stickData = new float[2];
+    private Vector3 pointerLocation;
     public void OnPointerDown(PointerEventData _eventData)
     {
         // Handle click event
         tracking = true;
-        pointer_id = _eventData.pointerId;
+        OnDrag(_eventData);
     }
 
     public void OnPointerUp(PointerEventData _eventData){
         tracking = false;
         cursorTransform.localPosition = Vector2.zero;
         stickVal = Vector2.zero;
+        stickData[0] = stickData[1] = 0;
+        
     }
 
-    void Update(){
+    public void OnDrag(PointerEventData _eventData){
+        pointerLocation = _eventData.position;
+    }
+
+    void Start(){
+        radius = Mathf.Abs(Vector2.Distance(transform.position, orientationTransform.position));      
+        print(radius);
+    }
+    void Update(){      
         if(!tracking) return;
-        Vector3 offset = pointer_id == -1 ? Input.mousePosition - transform.position: Vector3.zero;
+        Vector3 offset = pointerLocation - transform.position;
         offset = Vector2.ClampMagnitude(offset,radius);
-        float angle = Vector2.Angle(transform.right, offset);
-        Quaternion rotation = Quaternion.Euler(0, 0, 90);
+        print(offset);
+        float angle = Mathf.Deg2Rad * Vector2.SignedAngle(transform.right, offset);
+        stickData[0] = angle;
+        debug_shower.position = orientationTransform.position;
+        Quaternion rotation = Quaternion.Euler(0, 0, angle);
         Vector2 rotatedVector = rotation * offset;
         cursorTransform.position = transform.position + offset;
-        stickVal = offset * 1/radius;
+        stickData[1] = Mathf.Abs(Vector2.Distance(cursorTransform.position,transform.position)/radius);
+        stickVal = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle));
+        //print(string.Format("Angle: {0}, val: {1}",angle, stickVal));
     }
 
-    public Vector2 PollInput(){
-        return stickVal;
+    public float[] PollInput(){
+        return stickData;
     }
 }

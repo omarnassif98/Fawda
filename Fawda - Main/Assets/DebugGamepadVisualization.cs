@@ -5,20 +5,24 @@ using UnityEngine.UI;
 public class DebugGamepadVisualization : MonoBehaviour
 {
     [SerializeField]
-    RectTransform joystick, cursor;
+    RectTransform joystick, cursor, orientation;
     [SerializeField]
-    Image buttonIndicator, pulseIndicator;
+    Image buttonIndicator;
     [SerializeField]
     Color idleColor, activeColor;
     [SerializeField]
     short playerIdx;
 
     bool trackingState = false;
+    private float radius;
 
-    private float radius = 40;
+    public void Start(){
+        //Radius calculated with invisible object
+        radius = Mathf.Abs(Vector2.Distance(transform.GetChild(1).position,  orientation.position)); 
+    }
 
     public void SetTrackingState(bool _state){
-        print("TRACKING");
+        //basically is the stick touched
         trackingState = _state; 
     }
 
@@ -27,20 +31,9 @@ public class DebugGamepadVisualization : MonoBehaviour
     }
 
     public void UpdateVisualization(JoypadState _controls){
-        FlickerIndicator();
         Vector2 _joystickInput = _controls.analog * radius;
         bool _buttonInput = _controls.action;
         cursor.position = new Vector2(joystick.position.x + _joystickInput.x, joystick.position.y + _joystickInput.y);
         buttonIndicator.color = _buttonInput?activeColor:idleColor;
-    }
-
-    void FlickerIndicator(){
-        pulseIndicator.color = activeColor;
-        StartCoroutine(switch_off_indicator());
-    }
-
-    IEnumerator switch_off_indicator(){
-        yield return new WaitForSeconds(0.05f);
-        pulseIndicator.color = idleColor;
     }
 }

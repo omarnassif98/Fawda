@@ -37,15 +37,15 @@ public class SynapseInputManager : MonoBehaviour
     }
 
     public byte[] PollForInput(){
-        Vector2 stickVal = touchStickInput.PollInput();
-        byte[] xBytes = BitConverter.GetBytes(stickVal.x);
-        byte[] yBytes = BitConverter.GetBytes(stickVal.y);
+        float[] stickVal = touchStickInput.PollInput();
+        byte[] dirBytes = BitConverter.GetBytes(stickVal[0]);
+        byte[] distBytes = BitConverter.GetBytes(stickVal[1]);
         byte[] press = BitConverter.GetBytes(gamepadButtonInput.PollInput());
-        byte[] gamepadBytes = new byte[xBytes.Length + yBytes.Length + press.Length];
-        Buffer.BlockCopy(xBytes,0,gamepadBytes,0,xBytes.Length);
-        Buffer.BlockCopy(yBytes,0,gamepadBytes,xBytes.Length,yBytes.Length);
-        Buffer.BlockCopy(press,0,gamepadBytes,xBytes.Length+yBytes.Length,press.Length);
-        print(gamepadBytes.Length);
+        byte[] gamepadBytes = new byte[dirBytes.Length + distBytes.Length + press.Length];
+        Buffer.BlockCopy(dirBytes,0,gamepadBytes,0,dirBytes.Length);
+        Buffer.BlockCopy(distBytes,0,gamepadBytes,dirBytes.Length,distBytes.Length);
+        Buffer.BlockCopy(press,0,gamepadBytes,dirBytes.Length+distBytes.Length,press.Length);
+        //print(gamepadBytes.Length);
         return gamepadBytes;
     }
 }
