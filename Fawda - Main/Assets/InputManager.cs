@@ -19,7 +19,9 @@ public class InputManager : MonoBehaviour
     [SerializeField]
     private JoypadState[] joypadStates = new JoypadState[5];
 
-    private UnityAction<Vector2,bool>[] gamepadPollEvents = new UnityAction<Vector2,bool>[5]; 
+    private UnityAction<Vector2,bool>[] gamepadPollEvents = new UnityAction<Vector2,bool>[5];
+    float pollStartTime;
+    int[] messageHist = new int[5];
     
     void Awake(){
         if(singleton != null){
@@ -30,9 +32,13 @@ public class InputManager : MonoBehaviour
     }
     
     public void RegisterPollEvent(UnityAction<Vector2,bool> _gamepadPollEvent, int _idx){
+        print("we register poll events??");
         gamepadPollEvents[_idx] = _gamepadPollEvent;
     }
 
+    public void BeginTiming(){
+        pollStartTime = Time.time;
+    }
     public void Start(){
         ConnectionManager.singleton.RegisterRPC(Enum.GetName(typeof(OpCode), OpCode.UDP_GAMEPAD_INPUT), ReceivePoll);
     }
@@ -41,11 +47,15 @@ public class InputManager : MonoBehaviour
         float distInput = BitConverter.ToSingle(_data,4);
         bool buttonInput = BitConverter.ToBoolean(_data,8);
         Vector2 stick = new Vector2(Mathf.Cos(dirInput), Mathf.Sin(dirInput)) * distInput;
-        print(stick);
+        messageHist[_idx]++;
         joypadStates[_idx] = new JoypadState(stick, buttonInput);
     }
 
     public JoypadState PullJoypadState(short _idx){
         return joypadStates[_idx];
+    }
+
+    public float GetIndexHertz(int _idx){
+        return messageHist[_idx]/(Time.time - pollStartTime);
     }
 }

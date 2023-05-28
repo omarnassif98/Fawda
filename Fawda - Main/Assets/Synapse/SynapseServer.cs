@@ -22,14 +22,18 @@ public class SynapseServer
     ////////
     //Unified
     ////////
+
+    //Puts TCP Message in queue in seperate thread, the queue will be flushed on the main thread
     public void QueueMessageToClient(NetMessage _netMessage, short _idx = -1)
     {
         try
         {
+            //Is directed to a client
             messageQueue[_idx].Enqueue(_netMessage);
         }
         catch (Exception)
         {
+            //Is not directed to a client
             for (short i = 0; i < clientQuantity; i++)
             {
                 messageQueue[i].Enqueue(_netMessage);
@@ -37,6 +41,7 @@ public class SynapseServer
         }
     }
 
+    //Sets up the backend to be ready to receive connections
     private void InitializeBackend()
     {
         ConnectionManager.singleton.PrintWrap("Kicking Off");
@@ -49,6 +54,7 @@ public class SynapseServer
         }
     }
 
+    //Begins Listening, generates room code
     public void KickoffServer()
     {
         InitializeBackend();
@@ -73,6 +79,7 @@ public class SynapseServer
         serverIsRunning = true;
     }
 
+    //A tick function, executes continuosly
     void Tick()
     {
         while (serverIsRunning)
@@ -95,6 +102,7 @@ public class SynapseServer
         }
     }
 
+    //Kill Server, called when abrupt quit
     public void Kill()
     {
         serverIsListening = false;
@@ -108,6 +116,8 @@ public class SynapseServer
     //TCP
     ///////////
 
+    //Called by Tick Function, checks outbound message queue, sends them
+    //Then reads and executes any pending messages.
     void UpdateTcpStream(int _idx)
     {
         NetworkStream stream = tcpClients[_idx].GetStream();
@@ -146,6 +156,7 @@ public class SynapseServer
         }
     }
 
+    //A listen thread, constantly listens and blocks until connection is made
     void TcpListen()
     {
         while (serverIsListening)
@@ -175,6 +186,7 @@ public class SynapseServer
     //UDP
     /////////
 
+    //UDP is connectionless, it listens to a single port for UDP messages from anyone and executes them
     void UdpListen(){
         ConnectionManager.singleton.PrintWrap("UDP IS UP!");
         while(serverIsRunning){
@@ -197,6 +209,8 @@ public class SynapseServer
     ////////////
     //HELPER
     ////////////
+
+    //Turns IP address into 5-7 character room code
      public string GetRoomCode()
     {
         foreach (NetworkInterface ni in NetworkInterface.GetAllNetworkInterfaces())

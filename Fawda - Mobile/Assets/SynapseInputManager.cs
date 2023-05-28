@@ -21,19 +21,25 @@ public class SynapseInputManager : MonoBehaviour
         }
     }
 
+    //C
     public void ChangeInputMode(int _newMode){
         inputMode = _newMode;
+        StartCoroutine(FlashInput());
     }
 
 
-    public void Update(){
-        switch (inputMode)
-        {
-            case 0:
-                print("WE POLLING");
-                ClientConnection.singleton.FlashMessageToServer(OpCode.UDP_GAMEPAD_INPUT, PollForInput());
-                break;
+    IEnumerator FlashInput(){
+        while(inputMode != -1){
+            switch (inputMode)
+            {
+                case 0:
+                    ClientConnection.singleton.FlashMessageToServer(OpCode.UDP_GAMEPAD_INPUT, PollForInput());
+                    break;
+            }
+            yield return new WaitForSeconds(1.0f/60);
         }
+        print("Input stream break");
+        yield return null;
     }
 
     public byte[] PollForInput(){

@@ -23,6 +23,7 @@ public class UIManager : MonoBehaviour
 
     private void ToggleControls(byte[] _data){
         SwitchScreens(BitConverter.ToBoolean(_data,0)?2:1);
+        print("Controls: " + ((bool)BitConverter.ToBoolean(_data,0)).ToString());
     }
 
     private void kickoff(){

@@ -102,8 +102,6 @@ public class ConnectionManager : MonoBehaviour
         PrintWrap("Quit");
     }
 
-
-
     public void HandlePlayerConnect(int _idx){
         PrintWrap("Connection");
         playerProfiles[_idx] = new PlayerProfile();
@@ -118,6 +116,20 @@ public class ConnectionManager : MonoBehaviour
     }
 
 
+    /////
+    // Information
+    /////
 
+    //Pulls in the CONNECTION idx of each player
+    public short[] GetPlayerIdxs(){
+        short[] idxs = new short[live_players];
+        short ret_idx = 0;
+        for(short i = 0; i<playerProfiles.Length;i++){
+            if(playerProfiles[i] == null) continue;
+            idxs[ret_idx] = i;
+            ret_idx++;
+        }
+        return idxs;
+    }
 
 }

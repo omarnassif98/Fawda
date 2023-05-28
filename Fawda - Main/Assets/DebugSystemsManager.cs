@@ -49,11 +49,6 @@ public class DebugSystemsManager : MonoBehaviour
         DEBUG_SERVER_LISTEN.text = DEBUG_SERVER_LISTEN_TEXT;
     }
 
-    public void ToggleGamepadVisualizations(bool _state){
-        for(int i = 0; i < visualizations.Length; i++){
-            visualizations[i].SetTrackingState(_state);
-        }
-    }
     void Update()
     {
         RefreshDebugInfo();

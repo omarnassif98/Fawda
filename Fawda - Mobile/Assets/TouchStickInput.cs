@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 public class TouchStickInput : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDragHandler{
     [SerializeField]
-    private RectTransform cursorTransform, orientationTransform, debug_shower;
+    private RectTransform cursorTransform, orientationTransform;
     private Vector2 stickVal;
     private bool tracking = false;
     float radius = 40;
@@ -42,7 +42,6 @@ public class TouchStickInput : MonoBehaviour, IPointerDownHandler, IPointerUpHan
         print(offset);
         float angle = Mathf.Deg2Rad * Vector2.SignedAngle(transform.right, offset);
         stickData[0] = angle;
-        debug_shower.position = orientationTransform.position;
         Quaternion rotation = Quaternion.Euler(0, 0, angle);
         Vector2 rotatedVector = rotation * offset;
         cursorTransform.position = transform.position + offset;

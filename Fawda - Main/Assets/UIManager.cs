@@ -35,17 +35,18 @@ public class UIManager : MonoBehaviour
     void Start()
     {
         ConnectionManager.singleton.RegisterServerEventListener("listen", UpdateRoomCode);
-        ConnectionManager.singleton.RegisterServerEventListener("wakeup", FillScreen);
-        screenClearEvent.AddListener(FillScreen);
+        ConnectionManager.singleton.RegisterServerEventListener("wakeup", FillNextScreen);
+        screenClearEvent.AddListener(FillNextScreen);
         screenFillEvent.AddListener(onScreenFill);
     }
 
     public void SwitchScreens(short _newidx, bool _push = true){
         if(_newidx == -1) return;
         if(_push) screenStack.Push(currentScreen);
-        screens[currentScreen].DismissScreen();
-        screens[_newidx].gameObject.SetActive(true);
+        short oldIdx = currentScreen;
         currentScreen = _newidx;
+        screens[currentScreen].gameObject.SetActive(true);
+        screens[oldIdx].DismissScreen();
     }
 
     public void PopScreen(){
@@ -54,7 +55,8 @@ public class UIManager : MonoBehaviour
         SwitchScreens(prev, false);
     }
 
-    private void FillScreen(){
+    private void FillNextScreen(){
+        print("SCREEN FILL EVENT CALLED FOR SCREEN " + currentScreen.ToString());
         screens[currentScreen].IntroduceScreen();
         navLock = true;
     }

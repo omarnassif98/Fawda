@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 public class DebugGamepadVisualization : MonoBehaviour
 {
     [SerializeField]
@@ -13,21 +14,21 @@ public class DebugGamepadVisualization : MonoBehaviour
     [SerializeField]
     short playerIdx;
 
-    bool trackingState = false;
+    [SerializeField]
+    TMP_Text hertzDisplay;
     private float radius;
 
-    public void Start(){
+    public void Initialize(short _idx){
         //Radius calculated with invisible object
-        radius = Mathf.Abs(Vector2.Distance(transform.GetChild(1).position,  orientation.position)); 
+        radius = Mathf.Abs(Vector2.Distance(transform.GetChild(1).position,  orientation.position));
+        playerIdx = _idx; 
     }
 
-    public void SetTrackingState(bool _state){
-        //basically is the stick touched
-        trackingState = _state; 
-    }
+
 
     void Update(){
-        if(trackingState) UpdateVisualization(InputManager.singleton.PullJoypadState(playerIdx));
+        UpdateVisualization(InputManager.singleton.PullJoypadState(playerIdx));
+        hertzDisplay.text = string.Format("{0} Hz", InputManager.singleton.GetIndexHertz(playerIdx).ToString("F2"));
     }
 
     public void UpdateVisualization(JoypadState _controls){
