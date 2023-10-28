@@ -4,6 +4,22 @@ using UnityEngine;
 using System;
 public class LobbyManager : MonoBehaviour
 {
+    public static LobbyManager singleton;
+    MinigameManager currentMinigame;
+
+    List<short> gamepadPlayers;
+    
+    List<short> phonePlayers;
+    
+    void Start(){
+        if(singleton != null){
+            Destroy(this);
+        }else{
+            singleton = this;
+        }
+        phonePlayers = new List<short>();
+        gamepadPlayers = new List<short>();
+    }
     [SerializeField]
     GameObject[] gameModePrefabs;
     public void TogglePlayerControls(bool _engage){
@@ -12,7 +28,8 @@ public class LobbyManager : MonoBehaviour
     }
 
     public void SetupMinigame(int _mode){
-        GameObject minigame = GameObject.Instantiate(gameModePrefabs[_mode],Vector3.zero, Quaternion.identity, transform);
-        minigame.GetComponent<MinigameManager>().SetupGame();
+         
+
     }
+
 }

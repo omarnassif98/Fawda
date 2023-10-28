@@ -4,7 +4,8 @@ public enum OpCode{
     PROFILE_PAYLOAD = 1,
     MENU_CONTROL = 2,
     UDP_TOGGLE = 3,
-    UDP_GAMEPAD_INPUT = 4
+    UDP_GAMEPAD_INPUT = 4,
+    INPUT_SETUP = 5
 }
 
 public struct NetMessage{

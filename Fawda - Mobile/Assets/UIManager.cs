@@ -22,12 +22,12 @@ public class UIManager : MonoBehaviour
     }
 
     private void ToggleControls(byte[] _data){
-        SwitchScreens(BitConverter.ToBoolean(_data,0)?2:1);
+        SwitchScreens(BitConverter.ToBoolean(_data,0)?3:2);
         print("Controls: " + ((bool)BitConverter.ToBoolean(_data,0)).ToString());
     }
 
     private void kickoff(){
-        SwitchScreens(1);
+        SwitchScreens(2);
     }
 
     public void SwitchScreens(int _newIdx){

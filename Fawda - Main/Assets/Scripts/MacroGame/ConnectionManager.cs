@@ -18,7 +18,6 @@ public class ConnectionManager : MonoBehaviour
     Queue<string> queuedEvents = new Queue<string>();
     private Queue<DirectedNetMessage> rpcQueue = new Queue<DirectedNetMessage>();
     private string room_code;
-    private PlayerProfile[] playerProfiles = new PlayerProfile[5];
     private short live_players = 0;
 
     void Awake()
@@ -34,6 +33,7 @@ public class ConnectionManager : MonoBehaviour
         // The Synapse component is a CHILD of this one. Not a singleton.
         server = new SynapseServer();
         server.KickoffServer();
+        
     }
 
     void Update(){
@@ -104,13 +104,11 @@ public class ConnectionManager : MonoBehaviour
 
     public void HandlePlayerConnect(int _idx){
         PrintWrap("Connection");
-        playerProfiles[_idx] = new PlayerProfile();
         live_players++;
         if(live_players == 1) queuedEvents.Enqueue("wakeup");
     }
 
     public void HandlePlayerDisconnect(int _idx){
-        playerProfiles[_idx] = null;
         live_players--;
         if(live_players == 0) queuedEvents.Enqueue("sleep");
     }
@@ -122,14 +120,8 @@ public class ConnectionManager : MonoBehaviour
 
     //Pulls in the CONNECTION idx of each player
     public short[] GetPlayerIdxs(){
-        short[] idxs = new short[live_players];
-        short ret_idx = 0;
-        for(short i = 0; i<playerProfiles.Length;i++){
-            if(playerProfiles[i] == null) continue;
-            idxs[ret_idx] = i;
-            ret_idx++;
-        }
-        return idxs;
+        print("GOTTA FIX");
+        return null;
     }
 
 }
