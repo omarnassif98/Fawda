@@ -49,16 +49,24 @@ public class ConnectionManager : MonoBehaviour
     // STAGING
     //////
 
-    public void RegisterServerEventListener(string _eventName, UnityAction _function){
+    // Registers events that will be fired when clients send specific messages - basically a websocket Emit()
+    // The _func is literally a void
+    // Triggering an event trips ALL (one to many) functions (actions) listening for that event
+    public void RegisterServerEventListener(string _eventName, UnityAction _func){
         if(!serverEvents.ContainsKey(_eventName)) serverEvents[_eventName] = new UnityEvent();
-        serverEvents[_eventName].AddListener(_function);
+        serverEvents[_eventName].AddListener(_func);
     }
 
+    // What makes RPCs special is that you can pass parameters along from the client
+    // The _func is literally a void
+    // Ideal for rapid input
     public void RegisterRPC(string _key, UnityAction<byte[], int> _func){
-        PrintWrap("Registering " + _key);
+        PrintWrap("Registering RPC for " + _key);
         remoteProcCalls[_key] = _func;
     }
 
+    // Again called by the server - both TCP and UDP
+    // Remember it runs on its own thread so RPCs can't be really remotely executed explicitly
     public void QueueRPC(DirectedNetMessage _netMessage){
         rpcQueue.Enqueue(_netMessage);
     }

@@ -11,7 +11,6 @@ public class ClientConnection : MonoBehaviour
    SynapseClient client;
    [SerializeField] TMP_InputField code;
    [SerializeField] TMP_Text status;
-   [SerializeField] TMP_Text addr_text;
    private Dictionary<string,UnityEvent> serverEvents;
    private Dictionary<string,UnityAction<byte[]>> remoteProcCalls  = new Dictionary<string, UnityAction<byte[]>>();
    private Queue<NetMessage> rpcQueue = new Queue<NetMessage>();
@@ -20,7 +19,6 @@ public class ClientConnection : MonoBehaviour
     void Start(){
         client = new SynapseClient();
         status.text = "Not Connected";
-        Debug.Log("LET ME SEE THIS");
     }
 
     void Update(){
@@ -71,7 +69,6 @@ public class ClientConnection : MonoBehaviour
     public void Connect(){
         status.text = "Connecting";
         string addr = ParseRoomCode(code.text);
-        addr_text.text = addr;
         client.kickoff(addr);
     }
 

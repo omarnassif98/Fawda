@@ -4,6 +4,7 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using System;
 public class MenuCursorManager : MonoBehaviour
 {
     public static MenuCursorManager singleton;
@@ -15,6 +16,7 @@ public class MenuCursorManager : MonoBehaviour
     float lastInteractionTime = 0;
     int occupierIdx;
     SelectableMenuOption target;
+    Vector2 joypadState;
 
     
     void Awake(){
@@ -23,11 +25,12 @@ public class MenuCursorManager : MonoBehaviour
         }else{
             singleton = this;
         }
-        
     }
     // Start is called before the first frame update
     void Start()
     {
+        ConnectionManager.singleton.RegisterRPC(Enum.GetName(typeof(OpCode), OpCode.MENU_CONTROL), UpdateJoypad);
+        ConnectionManager.singleton.RegisterRPC(Enum.GetName(typeof(OpCode), OpCode.MENU_OCCUPY),LockCursor);
         mainGraphicImage = transform.Find("Graphic").GetComponent<Image>();
         radialProgressImage = transform.Find("Graphic/Radial").GetComponent<Image>();
         radialProgressImage.fillAmount = 0;
@@ -36,14 +39,16 @@ public class MenuCursorManager : MonoBehaviour
         ResourceManager.GetColors();
     }
 
-    public void LockCursor(int playerIdx){
+    public void LockCursor(byte[] _data, int _idx){
         occupied = true;
-        occupierIdx = playerIdx;
+        occupierIdx = _idx;
         lastInteractionTime = Time.time;
+        joypadState = Vector2.zero;
         ToggleGraphic(); 
     }
 
     public void ReleaseCursor(){
+        joypadState = Vector2.zero;
         occupied = false;
         ToggleGraphic();
         radialProgressImage.fillAmount = 0;
@@ -55,11 +60,17 @@ public class MenuCursorManager : MonoBehaviour
         radialProgressImage.gameObject.SetActive(occupied);
     }
 
-    public void MoveCursor(Vector2 _input){
-        if(_input == Vector2.zero) return;
-            /// FIX
-            transform.Translate(_input * 100 * Time.deltaTime);
-            lastInteractionTime = Time.time;
+
+    public void UpdateJoypad(byte[] _data, int _idx){
+        if(occupierIdx != _idx) return;
+        float dirInput = BitConverter.ToSingle(_data,0);
+        float distInput = BitConverter.ToSingle(_data,4);
+        joypadState = new Vector2(Mathf.Cos(dirInput), Mathf.Sin(dirInput)) * distInput;
+    }
+
+    private void MoveCursor(){
+        transform.Translate(joypadState * 100 * Time.deltaTime);
+        lastInteractionTime = Time.time;
     }
 
     private void ProbeUI(){
@@ -72,11 +83,9 @@ public class MenuCursorManager : MonoBehaviour
         EventSystem.current.RaycastAll(eventData, raycastResult);
         for (int i = 0; i < raycastResult.Count; i++)
         {
-            print("I mean we got one");
             if(raycastResult[i].gameObject.GetComponent<SelectableMenuOption>()){
                 radialFillDelta = 0;
                 if (Time.time - lastInteractionTime < 0.2f) return;
-                print("Filling");
                 radialFillDelta = RADIAL_INFLATE_SECONDS;
                 target = raycastResult[i].gameObject.GetComponent<SelectableMenuOption>();
                 return;
@@ -90,7 +99,6 @@ public class MenuCursorManager : MonoBehaviour
         radialFillAmount += 1/radialFillDelta * Time.deltaTime;
         radialFillAmount = Mathf.Clamp(radialFillAmount,0,1);
         radialProgressImage.fillAmount = radialFillAmount;
-        print(radialFillAmount);
         if(radialFillAmount < 1) return;
         target.ActivateMenuOption();
         radialFillAmount = 0;
@@ -101,5 +109,6 @@ public class MenuCursorManager : MonoBehaviour
         //if(!occupied) return;
         ProbeUI();
         ProgressRadial();
+        MoveCursor();
     }
 }

@@ -17,7 +17,6 @@ public class UIManager : MonoBehaviour
     private TMP_Text room_code_text;
     public UnityEvent screenFillEvent = new UnityEvent();
     public UnityEvent screenClearEvent = new UnityEvent();
-    private bool navLock = true;
    
     void Awake(){
         if(singleton == null){

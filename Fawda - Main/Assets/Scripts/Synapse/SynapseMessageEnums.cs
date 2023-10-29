@@ -2,10 +2,11 @@ public enum OpCode{
     QUIT = -1,
     INDEX = 0,
     PROFILE_PAYLOAD = 1,
-    MENU_CONTROL = 2,
-    UDP_TOGGLE = 3,
-    UDP_GAMEPAD_INPUT = 4,
-    INPUT_SETUP = 5
+    MENU_OCCUPY = 2,
+    MENU_CONTROL = 3,
+    UDP_TOGGLE = 4,
+    UDP_GAMEPAD_INPUT = 5,
+    INPUT_SETUP = 6
 }
 
 public struct NetMessage{
