@@ -24,7 +24,7 @@ public class SynapseServer
     ////////
 
     //Puts TCP Message in queue in seperate thread, the queue will be flushed on the main thread
-    public void QueueMessageToClient(NetMessage _netMessage, short _idx = -1)
+    public void QueueMessageToClient(NetMessage _netMessage, int _idx = -1)
     {
         try
         {

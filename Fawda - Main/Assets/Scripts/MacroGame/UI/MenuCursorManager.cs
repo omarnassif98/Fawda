@@ -5,6 +5,7 @@ using TMPro;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using System;
+using System.Data.Odbc;
 public class MenuCursorManager : MonoBehaviour
 {
     public static MenuCursorManager singleton;
@@ -14,7 +15,7 @@ public class MenuCursorManager : MonoBehaviour
     static float RADIAL_DEFLATE_SECONDS = -1.2f, RADIAL_INFLATE_SECONDS = 3.6f;
     bool occupied = false;
     float lastInteractionTime = 0;
-    int occupierIdx;
+    int occupierIdx = -1;
     SelectableMenuOption target;
     Vector2 joypadState;
 
@@ -29,8 +30,9 @@ public class MenuCursorManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        ConnectionManager.singleton.RegisterRPC(Enum.GetName(typeof(OpCode), OpCode.MENU_CONTROL), UpdateJoypad);
-        ConnectionManager.singleton.RegisterRPC(Enum.GetName(typeof(OpCode), OpCode.MENU_OCCUPY),LockCursor);
+        ConnectionManager.singleton.RegisterRPC( OpCode.MENU_CONTROL, UpdateJoypad);
+        ConnectionManager.singleton.RegisterRPC( OpCode.MENU_OCCUPY,LockCursor);
+        ConnectionManager.singleton.RegisterRPC(OpCode.MENU_OCCUPATION_STATUS,GetCursorOccupancy);
         mainGraphicImage = transform.Find("Graphic").GetComponent<Image>();
         radialProgressImage = transform.Find("Graphic/Radial").GetComponent<Image>();
         radialProgressImage.fillAmount = 0;
@@ -39,12 +41,24 @@ public class MenuCursorManager : MonoBehaviour
         ResourceManager.GetColors();
     }
 
+    public void GetCursorOccupancy(byte[] _data = null, int _idx = -1){
+        byte[] occBytes = BitConverter.GetBytes(occupied);
+        byte[] idxBytes = BitConverter.GetBytes(occupierIdx);
+        byte[] resBytes = new byte[occBytes.Length + idxBytes.Length];
+        print(string.Format("Cursor Occ: {0} bytes ", resBytes.Length));
+        Buffer.BlockCopy(occBytes, 0, resBytes,0,occBytes.Length);
+        Buffer.BlockCopy(idxBytes, 0, resBytes, occBytes.Length,idxBytes.Length);
+        NetMessage ans = new NetMessage(OpCode.MENU_OCCUPATION_STATUS, resBytes);
+        ConnectionManager.singleton.SendMessageToClients(ans, _idx);
+        }
+
     public void LockCursor(byte[] _data, int _idx){
         occupied = true;
         occupierIdx = _idx;
         lastInteractionTime = Time.time;
         joypadState = Vector2.zero;
         ToggleGraphic(); 
+        GetCursorOccupancy();
     }
 
     public void ReleaseCursor(){

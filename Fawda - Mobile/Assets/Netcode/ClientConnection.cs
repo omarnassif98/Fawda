@@ -19,6 +19,7 @@ public class ClientConnection : MonoBehaviour
     void Start(){
         client = new SynapseClient();
         status.text = "Not Connected";
+        RegisterRPC(OpCode.INDEX, SetPlayerIdx);
     }
 
     void Update(){
@@ -76,12 +77,20 @@ public class ClientConnection : MonoBehaviour
         print(string.Format("<color=#FFBF00>Synapse Client: </color>{0}",_message));
     }
 
+    void SetPlayerIdx(byte[] _data){
+        playerIdx = (short)_data[0];
+    }
+    //TCP
     public void SendMessageToServer(OpCode _opCode, byte[] _val){
         NetMessage msg = new NetMessage(_opCode, _val);
         client.QueueMessage(msg);
     }
     public void SendMessageToServer(OpCode _opCode, int _val){
         SendMessageToServer(_opCode, new byte[]{(byte)_val});
+    }
+    
+    public void SendMessageToServer(OpCode _opCode){
+        SendMessageToServer(_opCode, new byte[]{(byte)0});
     }
 
     public void FlashMessageToServer(OpCode _opCode, byte[] _val){
@@ -106,11 +115,19 @@ public class ClientConnection : MonoBehaviour
         serverEvents[_eventName].AddListener(_function);
     }
 
+    //Registers Listeners to RPCs
     public void RegisterRPC(string _key, UnityAction<byte[]> _func){
         PrintWrap("Registering " + _key);
         remoteProcCalls[_key] = _func;
     }
 
+        public void RegisterRPC(OpCode _opCode, UnityAction<byte[]> _func){
+        string opCode = Enum.GetName(typeof(OpCode), _opCode);
+        PrintWrap("Registering " + opCode);
+        remoteProcCalls[opCode] = _func;
+    }
+
+    //Flushes all RPCs, executing them all in FIFO order
     private void FlushRPCQueue(){
         while(rpcQueue.Count > 0){
             NetMessage msg = rpcQueue.Dequeue();
