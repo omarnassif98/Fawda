@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using System;
+
 // FAWDA LAYER
 // Object is basically a bridge between the game and the actual Synapse network
-// Used for most all of communication that manifests as any change in the program these are delivered mostly by 
-// - Emitted events for TCP
-// - RPCs with data payloads for UDP
+// Used for all of communication that manifests as any change in the program these are delivered mostly by
+// - Emitted events
+// - RPCs with data payloads
 //   *these are both dicts of callable objs, queuedEvents / rpcQueue is for staging since they run on their own threads
 public class ConnectionManager : MonoBehaviour
 {
@@ -33,7 +34,7 @@ public class ConnectionManager : MonoBehaviour
         // The Synapse component is a CHILD of this one. Not a singleton.
         server = new SynapseServer();
         server.KickoffServer();
-        
+
     }
 
     void Update(){
@@ -76,6 +77,10 @@ public class ConnectionManager : MonoBehaviour
     public void QueueRPC(DirectedNetMessage _netMessage){
         rpcQueue.Enqueue(_netMessage);
     }
+
+    //////
+    // COMMUNICATION
+    /////
 
 
     /////
