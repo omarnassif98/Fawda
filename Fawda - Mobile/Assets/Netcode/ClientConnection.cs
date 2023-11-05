@@ -139,5 +139,8 @@ public class ClientConnection : MonoBehaviour
     public void QueueRPC(NetMessage _netMessage){
         rpcQueue.Enqueue(_netMessage);
     }
+    public short GetPlayerIdx(){
+        return playerIdx;
+    }
 
 }

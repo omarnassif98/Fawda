@@ -39,7 +39,7 @@ public class TouchStickInput : MonoBehaviour, IPointerDownHandler, IPointerUpHan
         if(!tracking) return;
         Vector3 offset = pointerLocation - transform.position;
         offset = Vector2.ClampMagnitude(offset,radius);
-        print(offset);
+        //print(offset);
         float angle = Mathf.Deg2Rad * Vector2.SignedAngle(transform.right, offset);
         stickData[0] = angle;
         Quaternion rotation = Quaternion.Euler(0, 0, angle);

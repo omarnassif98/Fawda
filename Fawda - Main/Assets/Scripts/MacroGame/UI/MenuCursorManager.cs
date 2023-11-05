@@ -18,7 +18,7 @@ public class MenuCursorManager : MonoBehaviour
     int occupierIdx = -1;
     SelectableMenuOption target;
     Vector2 joypadState;
-
+    
     
     void Awake(){
         if(singleton != null){
@@ -31,13 +31,12 @@ public class MenuCursorManager : MonoBehaviour
     void Start()
     {
         ConnectionManager.singleton.RegisterRPC( OpCode.MENU_CONTROL, UpdateJoypad);
-        ConnectionManager.singleton.RegisterRPC( OpCode.MENU_OCCUPY,LockCursor);
+        ConnectionManager.singleton.RegisterRPC( OpCode.MENU_OCCUPY,HandleClientOccupation);
         ConnectionManager.singleton.RegisterRPC(OpCode.MENU_OCCUPATION_STATUS,GetCursorOccupancy);
         mainGraphicImage = transform.Find("Graphic").GetComponent<Image>();
         radialProgressImage = transform.Find("Graphic/Radial").GetComponent<Image>();
         radialProgressImage.fillAmount = 0;
-        //mainGraphicImage.gameObject.SetActive(false);
-        //radialProgressImage.gameObject.SetActive(false);
+        ToggleGraphic();
         ResourceManager.GetColors();
     }
 
@@ -52,22 +51,24 @@ public class MenuCursorManager : MonoBehaviour
         ConnectionManager.singleton.SendMessageToClients(ans, _idx);
         }
 
-    public void LockCursor(byte[] _data, int _idx){
-        occupied = true;
+    public void HandleClientOccupation(byte[] _data, int _idx){
+        bool occ = BitConverter.ToBoolean(_data,0);
+        if (occ && occupied) {
+            GetCursorOccupancy();
+            return;
+        }
+        
+        occupied = occ;
         occupierIdx = _idx;
+        print(string.Format("occ = {0} idx = {1}",occ,occupierIdx));
         lastInteractionTime = Time.time;
         joypadState = Vector2.zero;
+        radialProgressImage.fillAmount = 0;
+        GetComponent<RectTransform>().position = new Vector2(Screen.width/2,Screen.height/2);
         ToggleGraphic(); 
         GetCursorOccupancy();
     }
 
-    public void ReleaseCursor(){
-        joypadState = Vector2.zero;
-        occupied = false;
-        ToggleGraphic();
-        radialProgressImage.fillAmount = 0;
-        mainGraphicImage.rectTransform.position = Vector3.zero;
-    }
 
     void ToggleGraphic(){
         mainGraphicImage.gameObject.SetActive(occupied);
@@ -76,6 +77,7 @@ public class MenuCursorManager : MonoBehaviour
 
 
     public void UpdateJoypad(byte[] _data, int _idx){
+        print(string.Format("occ = {0} idx = {1}",occupierIdx,_idx));
         if(occupierIdx != _idx) return;
         float dirInput = BitConverter.ToSingle(_data,0);
         float distInput = BitConverter.ToSingle(_data,4);
@@ -120,7 +122,7 @@ public class MenuCursorManager : MonoBehaviour
 
     void Update(){
 
-        //if(!occupied) return;
+        if(!occupied) return;
         ProbeUI();
         ProgressRadial();
         MoveCursor();
