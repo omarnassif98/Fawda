@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.UI;
 public class ModalManager : MonoBehaviour
 {
     Animation backdropAnimator;
@@ -34,4 +35,5 @@ public class ModalManager : MonoBehaviour
         dismissEvent.Invoke();
         dismissEvent.RemoveAllListeners();
     }
+
 }

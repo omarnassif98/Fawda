@@ -12,13 +12,13 @@ public class MenuCursorManager : MonoBehaviour
     TMP_Text cursorOperatorText;
     Image mainGraphicImage, radialProgressImage;
     float radialFillAmount = 0, radialFillDelta = 0;
-    static float RADIAL_DEFLATE_SECONDS = -1.2f, RADIAL_INFLATE_SECONDS = 3.6f;
+    static float RADIAL_DEFLATE_SECONDS = -1.2f, RADIAL_INFLATE_SECONDS = 3.6f, MOVE_SPEED = 500;
     bool occupied = false;
     float lastInteractionTime = 0;
     int occupierIdx = -1;
     SelectableMenuOption target;
     Vector2 joypadState;
-    
+
     
     void Awake(){
         if(singleton != null){
@@ -85,7 +85,8 @@ public class MenuCursorManager : MonoBehaviour
     }
 
     private void MoveCursor(){
-        transform.Translate(joypadState * 100 * Time.deltaTime);
+        if (joypadState == Vector2.zero) return;
+        transform.Translate(joypadState * MOVE_SPEED * Time.deltaTime);
         lastInteractionTime = Time.time;
     }
 
@@ -112,10 +113,11 @@ public class MenuCursorManager : MonoBehaviour
     }
 
     private void ProgressRadial(){
-        radialFillAmount += 1/radialFillDelta * Time.deltaTime;
+        radialFillAmount += (radialFillDelta == 0?0:(1/radialFillDelta)) * Time.deltaTime;
         radialFillAmount = Mathf.Clamp(radialFillAmount,0,1);
+        print(string.Format("1/fillDelta = {0} fill={1}", (radialFillDelta == 0?0:(1/radialFillDelta)), radialFillAmount));
         radialProgressImage.fillAmount = radialFillAmount;
-        if(radialFillAmount < 1) return;
+        if(radialFillAmount < 1 || target == null) return;
         target.ActivateMenuOption();
         radialFillAmount = 0;
     }

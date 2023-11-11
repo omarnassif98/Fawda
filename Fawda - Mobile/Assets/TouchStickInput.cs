@@ -24,7 +24,6 @@ public class TouchStickInput : MonoBehaviour, IPointerDownHandler, IPointerUpHan
         cursorTransform.localPosition = Vector2.zero;
         stickVal = Vector2.zero;
         stickData[0] = stickData[1] = 0;
-        
     }
 
     public void OnDrag(PointerEventData _eventData){
