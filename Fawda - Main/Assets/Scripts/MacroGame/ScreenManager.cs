@@ -25,6 +25,7 @@ public class ScreenManager : MonoBehaviour
     public void FireButtonCallback(short _idx){
         menuNavigationOptions[_idx].action.Invoke();
         if (!menuNavigationOptions[_idx].destination) return;
+        UIManager.singleton.SwitchScreen();
         menuNavigationOptions[_idx].destination.gameObject.SetActive(true);
         gameObject.SetActive(false);
     }

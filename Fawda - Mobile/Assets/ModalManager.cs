@@ -17,11 +17,11 @@ public class ModalManager : MonoBehaviour
         singleton = this;
     }
     // Start is called before the first frame update
-    public void SummonModal(int _screenIdx){
+    public void SummonModal(int _screenIdx, string _animation = "Modal_Intro"){
         print("Bringing up modal with " + modalSubscreens[_screenIdx].name + " screen");
         modalSubscreens[activeScreen].SetActive(false);
         modalSubscreens[_screenIdx].SetActive(true);
-        backdropAnimator.Play("Modal_Intro");
+        backdropAnimator.Play(_animation);
         activeScreen = _screenIdx;
     }
 

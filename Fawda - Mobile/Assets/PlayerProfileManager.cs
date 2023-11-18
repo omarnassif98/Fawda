@@ -4,39 +4,55 @@ using UnityEngine;
 using System;
 using System.Text;
 
+
+[System.Serializable]
+public class ProfileData{
+    public string name;
+    public int colorSelection;
+    public int topCustomization;
+    public int midCustomization;
+    public int botCustomization;
+
+    public ProfileData(string _name, int _colorSelection){
+        this.name = _name;
+        this.colorSelection = _colorSelection;
+        this.topCustomization = -1;
+        this.midCustomization = -1;
+        this.botCustomization = -1;
+    }
+}
+
 public class PlayerProfileManager : MonoBehaviour
 {
-    private string playerName;
-    private short playerColor;
+    [SerializeField]
+    private ProfileData PlayerProfile;
     public static PlayerProfileManager singleton;
-
+    SaveFileHandler profileHandler;
     void Awake()
     {
-        if (singleton == null)
-        {
-            singleton = this;
-        }
-        else
-        {
-            Destroy(this);
-        }
+        if (singleton != null) Destroy(this);
+        singleton = this;
+        profileHandler = new SaveFileHandler(Application.persistentDataPath, "prof.json");
     }
 
-    public void SetPlayerColor(short _playerColor){
-        playerColor = _playerColor;
+    void Start(){
+    if (!LoadProfile()){
+        ModalManager.singleton.SummonModal(1, "PlayerProfile_Intro");
+    } 
+    }
+    public bool LoadProfile(){
+        PlayerProfile = profileHandler.Load();
+        bool existing = PlayerProfile != null;
+        return existing;
     }
 
-    public void SetPlayerName(string _playerName){
-        playerName = _playerName;
+    public void SaveProfile(){
+        profileHandler.Save(PlayerProfile);
     }
 
-    public byte[] GetProfilePayload(){
-        byte[] nameBytes = Encoding.ASCII.GetBytes(playerName);
-        
-        NetMessage payload = new NetMessage(OpCode.PROFILE_PAYLOAD, nameBytes);
-        return null;
+    public void StartNewProfile(ProfileData _profile){
+        PlayerProfile = _profile;
     }
-
     public Color[] GetColors(){
         TextAsset colors = Resources.Load("sProfile/CharColors") as TextAsset;
         List<Color> vals = new List<Color>();

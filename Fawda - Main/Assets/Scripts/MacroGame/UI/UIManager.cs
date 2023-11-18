@@ -5,6 +5,7 @@ using System.Collections.Generic;
 
 public class UIManager : MonoBehaviour
 {
+    public BackgroundBehaviour backgroundBehaviour;
 
     public static UIManager singleton;
     public static DebugSystemsManager debugSystems;
@@ -15,8 +16,7 @@ public class UIManager : MonoBehaviour
 
     [SerializeField]
     private TMP_Text room_code_text;
-    public UnityEvent screenFillEvent = new UnityEvent();
-    public UnityEvent screenClearEvent = new UnityEvent();
+    public UnityEvent screenTransitionEvent = new UnityEvent();
    
     void Awake(){
         if(singleton == null){
@@ -26,7 +26,6 @@ public class UIManager : MonoBehaviour
             Destroy(this);
         }
     }
-
     void UpdateRoomCode(){
         room_code_text.text = ConnectionManager.singleton.GetRoomCode();
     }
@@ -34,6 +33,9 @@ public class UIManager : MonoBehaviour
     void Start()
     {
         ConnectionManager.singleton.RegisterServerEventListener("listen", UpdateRoomCode);
+    }
+    public void SwitchScreen(){
+        screenTransitionEvent.Invoke();
     }
 
 

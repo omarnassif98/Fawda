@@ -380,7 +380,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 35a2935a96c57b842b560941e8ddb284, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  drift: {x: 0, y: 75}
+  idealDriftSpeed: 40
+  realDriftSpeed: 0
+  idealDriftAngle: 35
+  realDriftAngle: 0
   backgroundImage: {fileID: 21300000, guid: f6abd57f774dfef469164da550f27bc6, type: 3}
   images:
   - {fileID: 1450935621}
@@ -2446,12 +2449,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd61fe3fa8445f5459230b18d33c825d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  backgroundBehaviour: {fileID: 104436516}
   currentScreen: 0
   room_code_text: {fileID: 169617350}
-  screenFillEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  screenClearEvent:
+  screenTransitionEvent:
     m_PersistentCalls:
       m_Calls: []
 --- !u!224 &1194617039
