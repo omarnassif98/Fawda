@@ -38,4 +38,9 @@ public class SaveFileHandler
             }
         }
     }
+
+    public void Delete(){
+        string inPath = Path.Combine(filePath,fileName);
+        File.Delete(inPath);
+    }
 }

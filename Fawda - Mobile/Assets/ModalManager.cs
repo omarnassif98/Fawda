@@ -21,7 +21,7 @@ public class ModalManager : MonoBehaviour
         print("Bringing up modal with " + modalSubscreens[_screenIdx].name + " screen");
         modalSubscreens[activeScreen].SetActive(false);
         modalSubscreens[_screenIdx].SetActive(true);
-        backdropAnimator.Play(_animation);
+        PlayAnimation(_animation);
         activeScreen = _screenIdx;
     }
 
@@ -36,4 +36,7 @@ public class ModalManager : MonoBehaviour
         dismissEvent.RemoveAllListeners();
     }
 
+    public void PlayAnimation(string _animName){
+        backdropAnimator.Play(_animName);
+    }
 }

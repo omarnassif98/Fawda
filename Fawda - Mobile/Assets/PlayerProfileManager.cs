@@ -1,8 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using System;
 using System.Text;
+using UnityEngine.Events;
 
 
 [System.Serializable]
@@ -28,6 +30,9 @@ public class PlayerProfileManager : MonoBehaviour
     private ProfileData PlayerProfile;
     public static PlayerProfileManager singleton;
     SaveFileHandler profileHandler;
+
+    public UnityEvent loadEvent = new UnityEvent(), saveEvent = new UnityEvent(), createEvent = new UnityEvent();
+
     void Awake()
     {
         if (singleton != null) Destroy(this);
@@ -35,23 +40,36 @@ public class PlayerProfileManager : MonoBehaviour
         profileHandler = new SaveFileHandler(Application.persistentDataPath, "prof.json");
     }
 
-    void Start(){
-    if (!LoadProfile()){
-        ModalManager.singleton.SummonModal(1, "PlayerProfile_Intro");
-    } 
-    }
     public bool LoadProfile(){
         PlayerProfile = profileHandler.Load();
         bool existing = PlayerProfile != null;
+        if(existing) loadEvent.Invoke(); 
+        else createEvent.Invoke();
         return existing;
     }
 
     public void SaveProfile(){
         profileHandler.Save(PlayerProfile);
+        saveEvent.Invoke();
+        loadEvent.Invoke();
     }
 
     public void StartNewProfile(ProfileData _profile){
         PlayerProfile = _profile;
+    }
+
+    public void DeleteProfile(){
+        profileHandler.Delete();
+        PlayerProfile = null;
+    }
+
+    public ProfileData GetProfileData(){
+        return PlayerProfile;
+    }
+
+    public void SetProfileData(ProfileData _newProfile){
+        PlayerProfile = _newProfile;
+        SaveProfile();
     }
     public Color[] GetColors(){
         TextAsset colors = Resources.Load("sProfile/CharColors") as TextAsset;
