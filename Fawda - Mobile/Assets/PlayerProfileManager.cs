@@ -22,6 +22,16 @@ public class ProfileData{
         this.midCustomization = -1;
         this.botCustomization = -1;
     }
+
+    public ArrayList PackData(){
+        ArrayList data = new ArrayList();
+        data.Add(this.name);
+        data.Add(this.colorSelection);
+        data.Add(this.topCustomization);
+        data.Add(this.midCustomization);
+        data.Add(this.botCustomization);
+        return data;
+    }
 }
 
 public class PlayerProfileManager : MonoBehaviour
@@ -40,11 +50,26 @@ public class PlayerProfileManager : MonoBehaviour
         profileHandler = new SaveFileHandler(Application.persistentDataPath, "prof.json");
     }
 
+    public void Start(){
+        ClientConnection.singleton.RegisterServerEventListener("connect",SendProfilePayload);
+    }
+
+    void SendProfilePayload(){
+        if (PlayerProfile == null) {
+            Debug.LogError("WOAH NO PROFILE AND CONNECT?");
+            return;
+        }
+        byte[] data = SynapseMessageFormatter.GetPackedDataBytes(PlayerProfile.PackData());
+        NetMessage msg = new NetMessage(OpCode.PROFILE_PAYLOAD, data);
+    }
+
     public bool LoadProfile(){
         PlayerProfile = profileHandler.Load();
         bool existing = PlayerProfile != null;
         if(existing) loadEvent.Invoke(); 
         else createEvent.Invoke();
+        byte[] data = SynapseMessageFormatter.GetPackedDataBytes(PlayerProfile.PackData());
+        print(data.Length);
         return existing;
     }
 
