@@ -60,7 +60,6 @@ public class ConnectionManager : MonoBehaviour
 
     // What makes RPCs special is that you can pass parameters along from the client
     // The _func is literally a void
-    // Ideal for rapid input
     public void RegisterRPC(string _key, UnityAction<byte[], int> _func){
         PrintWrap("Registering RPC for " + _key);
         remoteProcCalls[_key] = _func;
