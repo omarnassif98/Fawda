@@ -1,9 +1,10 @@
 using System;
+using System.CodeDom;
 using System.Collections;
 using System.Text;
 using UnityEngine;
 
-public class SynapseMessageFormatter
+public static class SynapseMessageFormatter
 {
     public static byte[] EncodeMessage(NetMessage _netMessage){
         byte[] msg = new byte[_netMessage.size + 2];
@@ -15,11 +16,7 @@ public class SynapseMessageFormatter
         return msg;
     }
 
-    public byte[] EncodeMessage(){
-        return null;
-    }
-
-     public static byte[] GetPackedDataBytes(ArrayList _packedData){
+    public static byte[] GetPackedDataBytes(ArrayList _packedData){
         int length = 0, lastIdx = 0;
         
         for(int i=0; i<_packedData.Count; i++){
@@ -27,6 +24,7 @@ public class SynapseMessageFormatter
            switch (Type.GetTypeCode(_packedData[i].GetType()))
            {
             case TypeCode.String:
+            
                 length += 12;
                 break;
                     //Strings are to be 12 letters or less
@@ -59,6 +57,8 @@ public class SynapseMessageFormatter
                 lastIdx += 1;
                 break;
             case TypeCode.Single:
+                byte[] singleBytes = BitConverter.GetBytes((float)_packedData[i]);
+                Buffer.BlockCopy(singleBytes,0,resBytes,lastIdx,singleBytes.Length);
                 length += 4;
             break;
            }

@@ -3238,52 +3238,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 834554307}
   m_CullTransparentMesh: 1
---- !u!1 &864549157
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 864549159}
-  - component: {fileID: 864549158}
-  m_Layer: 0
-  m_Name: Input Manager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &864549158
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 864549157}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 61c9bf4ec4b856d4d94a6d8eb83248b0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  touchStickInput:
-  - {fileID: 25403812}
-  gamepadButtonInput: {fileID: 0}
---- !u!4 &864549159
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 864549157}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 6
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &877709734
 GameObject:
   m_ObjectHideFlags: 0
@@ -4013,7 +3967,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1274377539}
         m_TargetAssemblyTypeName: GameScreenManager, Assembly-CSharp
-        m_MethodName: SendMenuOccupation
+        m_MethodName: SendMenuOccupiedupation
         m_Mode: 6
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -5060,6 +5014,7 @@ MonoBehaviour:
   - {fileID: 45911842}
   - {fileID: 1858261258}
   takeMenuControlButton: {fileID: 1005735116}
+  menuStickManager: {fileID: 1628680551}
 --- !u!224 &1274377540
 RectTransform:
   m_ObjectHideFlags: 0
@@ -6096,6 +6051,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1628680550}
+  - component: {fileID: 1628680551}
   m_Layer: 5
   m_Name: Menu Controls
   m_TagString: Untagged
@@ -6125,6 +6081,20 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1628680551
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1628680549}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 61c9bf4ec4b856d4d94a6d8eb83248b0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  touchStickInput: {fileID: 25403812}
+  inputMode: 4
 --- !u!1 &1639990895
 GameObject:
   m_ObjectHideFlags: 0
@@ -6310,15 +6280,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 0}
+  m_Color: {r: 0.31448025, g: 0.3354356, b: 0.3490566, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
-  m_Type: 0
+  m_Sprite: {fileID: 21300000, guid: 17c0a377675072546875bebc20b1a4e5, type: 3}
+  m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -6444,7 +6414,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 7
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1732197120
 MonoBehaviour:
@@ -7360,9 +7330,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   colorPickerPrefab: {fileID: 820177730455290727, guid: 7c4dbc6e8a454604483b8b1afa136109, type: 3}
   profileScreenManager: {fileID: 615357785}
-  buttonPressEvent:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!114 &1988932888
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7917,7 +7884,7 @@ RectTransform:
   - {fileID: 1485323111}
   - {fileID: 2002858102}
   m_Father: {fileID: 0}
-  m_RootOrder: 8
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}

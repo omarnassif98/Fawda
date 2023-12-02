@@ -10,7 +10,7 @@ public class TouchStickInput : MonoBehaviour, IPointerDownHandler, IPointerUpHan
     private Vector2 stickVal;
     private bool tracking = false;
     float radius = 40;
-    private float[] stickData = new float[2];
+    [SerializeField] private float[] stickData = new float[2];
     private Vector3 pointerLocation;
     public void OnPointerDown(PointerEventData _eventData)
     {

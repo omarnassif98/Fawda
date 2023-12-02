@@ -60,7 +60,10 @@ public static class SynapseMessageFormatter
                 ClientConnection.singleton.PrintWrap("1 byte int (0-255)");
                 break;
             case TypeCode.Single:
-                length += 4;
+                byte[] singleBytes = BitConverter.GetBytes((float)_packedData[i]);
+                //ClientConnection.singleton.PrintWrap(string.Format("Packed {0} as {1}", ((float)_packedData[i]).ToString(), BitConverter.ToString(singleBytes)));
+                Buffer.BlockCopy(singleBytes,0,resBytes,lastIdx,singleBytes.Length);
+                lastIdx += 4;
             break;
            }
         }

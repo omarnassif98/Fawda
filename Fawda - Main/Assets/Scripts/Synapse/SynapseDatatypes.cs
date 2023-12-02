@@ -6,7 +6,7 @@ using System.Text;
 public abstract class SynapseDatastruct
 {
     public abstract ArrayList PackData();
-    public byte[] Encode(){
+    public virtual byte[] Encode(){
         return SynapseMessageFormatter.GetPackedDataBytes(PackData());
     }
 }
@@ -45,6 +45,41 @@ public class ProfileData : SynapseDatastruct{
         data.Add(this.midCustomization);
         data.Add(this.botCustomization);
         return data;
+    }
+}
+
+[System.Serializable]
+public class GamepadData : SynapseDatastruct{
+    public float dir, dist;
+    public byte[] additionalInfo = new byte[0];
+
+
+    public GamepadData(float _dir, float _dist){
+        this.dir = _dir;
+        this.dist = _dist;
+    }
+
+    public GamepadData(byte[] _data){
+        this.dir = BitConverter.ToSingle(_data,0);
+        this.dist = BitConverter.ToSingle(_data,4);
+        if(_data.Length - 8 == 0) return;
+        Buffer.BlockCopy(_data, 8, this.additionalInfo, 0, _data.Length - 8);
+    }
+
+    public override ArrayList PackData(){
+        ArrayList data = new ArrayList();
+        data.Add(this.dir);
+        data.Add(this.dist);      
+        return data;
+    }
+
+    public override byte[] Encode(){
+        byte[] baseBytes = base.Encode();
+        if(additionalInfo.Length == 0) return baseBytes;
+        byte[] fullBytes = new byte[baseBytes.Length + additionalInfo.Length];
+        Buffer.BlockCopy(baseBytes,0,fullBytes,0,baseBytes.Length);
+        Buffer.BlockCopy(additionalInfo,0,fullBytes,baseBytes.Length,additionalInfo.Length);
+        return null;
     }
 
 

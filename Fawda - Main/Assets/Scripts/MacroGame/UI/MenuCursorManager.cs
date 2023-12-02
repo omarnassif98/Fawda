@@ -81,6 +81,8 @@ public class MenuCursorManager : MonoBehaviour
         if(occupierIdx != _idx) return;
         float dirInput = BitConverter.ToSingle(_data,0);
         float distInput = BitConverter.ToSingle(_data,4);
+        print(_data.Length);
+        print(BitConverter.ToString(_data));
         joypadState = new Vector2(Mathf.Cos(dirInput), Mathf.Sin(dirInput)) * distInput;
     }
 

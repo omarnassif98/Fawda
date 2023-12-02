@@ -81,6 +81,7 @@ public class ClientConnection : MonoBehaviour
         playerIdx = (short)_data[0];
     }
     //TCP
+
     public void SendMessageToServer(OpCode _opCode, byte[] _val){
         NetMessage msg = new NetMessage(_opCode, _val);
         client.QueueMessage(msg);
