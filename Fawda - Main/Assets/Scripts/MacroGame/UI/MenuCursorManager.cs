@@ -13,7 +13,7 @@ public class MenuCursorManager : MonoBehaviour
     Image mainGraphicImage, radialProgressImage;
     float radialFillAmount = 0, radialFillDelta = 0;
     static float RADIAL_DEFLATE_SECONDS = -1.2f, RADIAL_INFLATE_SECONDS = 3.6f, MOVE_SPEED = 500;
-    bool occupied = false;
+    bool occupied = false, interactionEnabled = false;
     float lastInteractionTime = 0;
     int occupierIdx = -1;
     SelectableMenuOption target;
@@ -33,6 +33,7 @@ public class MenuCursorManager : MonoBehaviour
         ConnectionManager.singleton.RegisterRPC( OpCode.MENU_CONTROL, UpdateJoypad);
         ConnectionManager.singleton.RegisterRPC( OpCode.MENU_OCCUPY,HandleClientOccupation);
         ConnectionManager.singleton.RegisterRPC(OpCode.MENU_OCCUPATION_STATUS,GetCursorOccupancy);
+        cursorOperatorText = transform.Find("playername").GetComponent<TMP_Text>();
         mainGraphicImage = transform.Find("Graphic").GetComponent<Image>();
         radialProgressImage = transform.Find("Graphic/Radial").GetComponent<Image>();
         radialProgressImage.fillAmount = 0;
@@ -60,7 +61,7 @@ public class MenuCursorManager : MonoBehaviour
         
         occupied = occ;
         occupierIdx = _idx;
-        print(string.Format("occ = {0} idx = {1}",occ,occupierIdx));
+        DebugLogger.singleton.Log(string.Format("occ = {0} idx = {1}",occ,occupierIdx));
         lastInteractionTime = Time.time;
         joypadState = Vector2.zero;
         radialProgressImage.fillAmount = 0;
@@ -73,6 +74,7 @@ public class MenuCursorManager : MonoBehaviour
     void ToggleGraphic(){
         mainGraphicImage.gameObject.SetActive(occupied);
         radialProgressImage.gameObject.SetActive(occupied);
+        cursorOperatorText.gameObject.SetActive(occupied);
     }
 
 
@@ -81,14 +83,14 @@ public class MenuCursorManager : MonoBehaviour
         if(occupierIdx != _idx) return;
         float dirInput = BitConverter.ToSingle(_data,0);
         float distInput = BitConverter.ToSingle(_data,4);
-        print(_data.Length);
-        print(BitConverter.ToString(_data));
         joypadState = new Vector2(Mathf.Cos(dirInput), Mathf.Sin(dirInput)) * distInput;
     }
 
     private void MoveCursor(){
         if (joypadState == Vector2.zero) return;
         transform.Translate(joypadState * MOVE_SPEED * Time.deltaTime);
+        //rint(string.Format("pos:{0} scr: {1}", transform.position, transform.wi));
+        transform.position = new Vector3(Mathf.Clamp(transform.position.x,GetComponent<RectTransform>().rect.width/2,Screen.width - GetComponent<RectTransform>().rect.width/2), Mathf.Clamp(transform.position.y,GetComponent<RectTransform>().rect.height/2,Screen.height - GetComponent<RectTransform>().rect.height/2), 0);
         lastInteractionTime = Time.time;
     }
 
@@ -104,9 +106,9 @@ public class MenuCursorManager : MonoBehaviour
         {
             if(raycastResult[i].gameObject.GetComponent<SelectableMenuOption>()){
                 radialFillDelta = 0;
-                if (Time.time - lastInteractionTime < 0.2f) return;
-                radialFillDelta = RADIAL_INFLATE_SECONDS;
                 target = raycastResult[i].gameObject.GetComponent<SelectableMenuOption>();
+                if (Time.time - lastInteractionTime < 0.2f || !interactionEnabled) return;
+                radialFillDelta = RADIAL_INFLATE_SECONDS;
                 return;
             }
         }
@@ -115,13 +117,17 @@ public class MenuCursorManager : MonoBehaviour
     }
 
     private void ProgressRadial(){
+        GetComponent<Animator>().SetBool("Primed", !(target==null));
         radialFillAmount += (radialFillDelta == 0?0:(1/radialFillDelta)) * Time.deltaTime;
         radialFillAmount = Mathf.Clamp(radialFillAmount,0,1);
-        print(string.Format("1/fillDelta = {0} fill={1}", (radialFillDelta == 0?0:(1/radialFillDelta)), radialFillAmount));
         radialProgressImage.fillAmount = radialFillAmount;
         if(radialFillAmount < 1 || target == null) return;
         target.ActivateMenuOption();
         radialFillAmount = 0;
+    }
+
+    public void ToggleCursor(bool _enabled){
+        interactionEnabled = _enabled;
     }
 
     void Update(){

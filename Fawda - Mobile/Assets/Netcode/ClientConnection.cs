@@ -74,6 +74,7 @@ public class ClientConnection : MonoBehaviour
     }
 
     public void PrintWrap(string _message){
+        
         print(string.Format("<color=#FFBF00>Synapse Client: </color>{0}",_message));
     }
 

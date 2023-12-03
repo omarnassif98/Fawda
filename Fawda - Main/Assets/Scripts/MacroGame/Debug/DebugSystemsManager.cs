@@ -21,7 +21,7 @@ public class DebugSystemsManager : MonoBehaviour
 
     private string DEBUG_SERVER_LISTEN_TEXT;
     [SerializeField]
-    private GameObject debug_bar;
+    private GameObject debug_bar, logger;
 
     [SerializeField]
     private DebugGamepadVisualization[] visualizations;
@@ -54,6 +54,7 @@ public class DebugSystemsManager : MonoBehaviour
         RefreshDebugInfo();
         if(Input.GetKeyDown(KeyCode.Space)){
             debug_bar.SetActive(!debug_bar.activeInHierarchy);
+            logger.SetActive(!logger.activeInHierarchy);
         }
     }
 }

@@ -42,7 +42,6 @@ public class SynapseInputManager : MonoBehaviour
     public virtual byte[] PollForInput(){
         float[] stickVal = touchStickInput.PollInput();
         GamepadData gamepadData = new GamepadData(stickVal[0],stickVal[1]);
-        print(BitConverter.ToString(gamepadData.Encode()));
         return gamepadData.Encode();
     }
 }

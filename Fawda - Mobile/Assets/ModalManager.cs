@@ -10,6 +10,8 @@ public class ModalManager : MonoBehaviour
     public static ModalManager singleton;
     private int activeScreen;
     private UnityEvent dismissEvent = new UnityEvent();
+    
+    [SerializeField] Button modalBackgroundDismiss;
 
     void Awake(){
         backdropAnimator = GetComponent<Animation>();
@@ -23,6 +25,7 @@ public class ModalManager : MonoBehaviour
         modalSubscreens[_screenIdx].SetActive(true);
         PlayAnimation(_animation);
         activeScreen = _screenIdx;
+        modalBackgroundDismiss.enabled = true;
     }
 
     public void AddDismissalListener(UnityAction _caller){
@@ -30,6 +33,7 @@ public class ModalManager : MonoBehaviour
     }
 
     public void DismissModal(){
+        modalBackgroundDismiss.enabled = false;
         modalSubscreens[activeScreen].SetActive(false);
         backdropAnimator.Play("Modal_Outro");
         dismissEvent.Invoke();

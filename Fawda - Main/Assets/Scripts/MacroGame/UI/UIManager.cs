@@ -11,12 +11,13 @@ public class UIManager : MonoBehaviour
     public static DebugSystemsManager debugSystems;
     
 
-    [SerializeField]
-    private short currentScreen = 0;
+
 
     [SerializeField]
     private TMP_Text room_code_text;
     public UnityEvent screenTransitionEvent = new UnityEvent();
+
+    [SerializeField] ScreenManager currentScreen;
    
     void Awake(){
         if(singleton == null){
@@ -33,13 +34,12 @@ public class UIManager : MonoBehaviour
     void Start()
     {
         ConnectionManager.singleton.RegisterServerEventListener("listen", UpdateRoomCode);
+        ConnectionManager.singleton.RegisterServerEventListener("wakeup", () => currentScreen.gameObject.SetActive(true));
+
     }
     public void SwitchScreen(){
         screenTransitionEvent.Invoke();
     }
-
-
-
 
 
 

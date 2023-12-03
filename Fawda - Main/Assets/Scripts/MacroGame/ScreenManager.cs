@@ -8,25 +8,28 @@ using UnityEngine.Events;
 public class MenuNavigationOption{
     public SelectableMenuOption button;
     public ScreenManager destination;
-    public UnityEvent action;
 }
 
 public class ScreenManager : MonoBehaviour
 {
     [SerializeField] MenuNavigationOption[] menuNavigationOptions;
-
+    public UnityEvent IntroductionEvent, DismissalEvent;
 
     void Start(){
         for(short i = 0; i < menuNavigationOptions.Length; i++){
             menuNavigationOptions[i].button.SetupButton(this, i);
         }
+        IntroductionEvent.AddListener(()=> MenuCursorManager.singleton.ToggleCursor(true));
+        DismissalEvent.AddListener(()=> MenuCursorManager.singleton.ToggleCursor(false));
+        DismissalEvent.AddListener(()=> UIManager.singleton.SwitchScreen());
+        IntroductionEvent.Invoke();
     }
 
     public void FireButtonCallback(short _idx){
-        menuNavigationOptions[_idx].action.Invoke();
         if (!menuNavigationOptions[_idx].destination) return;
-        UIManager.singleton.SwitchScreen();
+        menuNavigationOptions[_idx].destination.IntroductionEvent.Invoke();
         menuNavigationOptions[_idx].destination.gameObject.SetActive(true);
         gameObject.SetActive(false);
     }
+
 }
