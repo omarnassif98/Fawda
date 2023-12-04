@@ -96,7 +96,7 @@ public class ConnectionManager : MonoBehaviour
         while(rpcQueue.Count > 0){
             DirectedNetMessage msg = rpcQueue.Dequeue();
             string code = Enum.GetName(typeof(OpCode), msg.msg.opCode);
-            print("Executing RPC: " + code);
+            if (msg.msg.opCode != OpCode.MENU_CONTROL) DebugLogger.singleton.Log("Executing RPC: " + code);
             remoteProcCalls[code](msg.msg.val, msg.client);
         }
     }

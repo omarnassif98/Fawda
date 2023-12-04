@@ -7,7 +7,10 @@ public abstract class SynapseDatastruct
 {
     public abstract ArrayList PackData();
     public virtual byte[] Encode(){
-        return SynapseMessageFormatter.GetPackedDataBytes(PackData());
+        DebugLogger.singleton.Log("Packing datatype");
+        byte[] bytes = SynapseMessageFormatter.GetPackedDataBytes(PackData());
+        DebugLogger.singleton.Log(BitConverter.ToString(bytes));
+        return bytes;
     }
 }
 

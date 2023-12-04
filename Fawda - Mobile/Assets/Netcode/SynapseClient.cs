@@ -18,7 +18,7 @@ public class SynapseClient
     // Unified
     ////////
     public void QueueMessage(NetMessage _netMessage){
-        ClientConnection.singleton.PrintWrap("Message Queued - " + Enum.GetName(typeof(OpCode), _netMessage.opCode));
+        DebugLogger.singleton.Log("Message Queued - " + Enum.GetName(typeof(OpCode), _netMessage.opCode));
         messageQueue.Enqueue(_netMessage);    
         ClientConnection.singleton.PrintWrap(String.Format("Queue size: {0}", messageQueue.Count));
     }
@@ -27,14 +27,14 @@ public class SynapseClient
         while(connected){
             UpdateTCPStream();
         }
-        ClientConnection.singleton.PrintWrap("Client exited");
+        DebugLogger.singleton.Log("Client exited");
     }
 
     public void kickoff(string _address)
     {
         addr = _address;
         client = new TcpClient(_address, 23722);
-        ClientConnection.singleton.PrintWrap("Connected!");
+        DebugLogger.singleton.Log("Connected!");
         connected = true;
         ClientConnection.singleton.TriggerServerEvent("connect");
         ThreadStart kickoff = new ThreadStart(ConnectToServer);
@@ -43,6 +43,7 @@ public class SynapseClient
     }
 
     public void Kill(){
+        DebugLogger.singleton.Log("Disconected!");
         connected = false;
     }
 
@@ -55,15 +56,17 @@ public class SynapseClient
             NetworkStream stream = client.GetStream();
             if(stream.CanRead && stream.CanWrite){
                 if(messageQueue.Count > 0){
-                    ClientConnection.singleton.PrintWrap("Message Sent");
+                    DebugLogger.singleton.Log("Message in Queue. Maybe clogged?");
                     NetMessage msg;
                     messageQueue.TryDequeue(out msg);
+                    DebugLogger.singleton.Log(string.Format("{0} Message Sending, not clogged", Enum.GetName(typeof(OpCode), msg.opCode)));
                     byte[] sendBytes = SynapseMessageFormatter.EncodeMessage(msg);
                     stream.Write(sendBytes,0,sendBytes.Length);
                 }
                 if(stream.DataAvailable){
                     int size = stream.ReadByte();
                     OpCode code = (OpCode)stream.ReadByte();
+                    DebugLogger.singleton.Log(string.Format("{0} Message Received", Enum.GetName(typeof(OpCode), code)));
                     byte[] recievedBytes = new byte[size];
                     stream.Read(recievedBytes, 0, size);
                     NetMessage msg = new NetMessage(code, recievedBytes);
@@ -71,10 +74,10 @@ public class SynapseClient
                     ClientConnection.singleton.QueueRPC(msg);
                 }                
             }else if (!stream.CanRead){
-                ClientConnection.singleton.PrintWrap("Cannot Read");
+                DebugLogger.singleton.Log("Cannot Read, closing connection");
                 client.Close();
             }else if (!stream.CanWrite){             
-                ClientConnection.singleton.PrintWrap("Cannot Write");
+                DebugLogger.singleton.Log("Cannot Write, closing connection");
                 client.Close();
             }
     }

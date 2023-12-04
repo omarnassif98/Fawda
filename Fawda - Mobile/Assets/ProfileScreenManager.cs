@@ -11,7 +11,6 @@ public class ProfileScreenManager : ScreenManager
     [SerializeField] PlayerColorPickerManager playerColorPickerManager;
 
     public void Start(){
-        print("From beyond the fucking grave");
         PlayerProfileManager.singleton.loadEvent.AddListener(fillName);
         PlayerProfileManager.singleton.loadEvent.AddListener(FillCharacterColor);
 

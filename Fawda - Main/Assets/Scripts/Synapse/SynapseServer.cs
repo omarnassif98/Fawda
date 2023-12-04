@@ -97,6 +97,7 @@ public class SynapseServer
                     ConnectionManager.singleton.PrintWrap("Client Force Quit");
                     ConnectionManager.singleton.PrintWrap(e.Message);
                     ConnectionManager.singleton.HandlePlayerDisconnect(i);
+                    DebugLogger.singleton.Log("Client Quit");
                 }
             }
         }
@@ -107,6 +108,7 @@ public class SynapseServer
     {
         serverIsListening = false;
         serverIsRunning = false;
+        DebugLogger.singleton.Log("Server Shutdown");
         UIManager.debugSystems.SetDebug_Listen_Status(false);
         UIManager.debugSystems.SetDebug_Server_Status(false);
     }
@@ -130,7 +132,7 @@ public class SynapseServer
                 messageQueue[_idx].TryDequeue(out msg);
                 byte[] outboundBytes = SynapseMessageFormatter.EncodeMessage(msg);
                 stream.Write(outboundBytes, 0, outboundBytes.Length);
-                ConnectionManager.singleton.PrintWrap(string.Format("Message sent to client {0}", _idx + 1));
+                DebugLogger.singleton.Log(string.Format("Message sent to client {0}", _idx + 1));
             }
 
             if (stream.DataAvailable)
@@ -139,7 +141,7 @@ public class SynapseServer
                 OpCode code = (OpCode)stream.ReadByte();
                 byte[] recieveBytes = new byte[size];
                 stream.Read(recieveBytes, 0, size);
-                ConnectionManager.singleton.PrintWrap(string.Format("Client {0} - OPCODE: {1} - rawVal: {2}", _idx, Enum.GetName(typeof(OpCode), code), (short)recieveBytes[0]));
+                DebugLogger.singleton.Log(string.Format("Client {0} - OPCODE: {1} - rawVal: {2}", _idx, Enum.GetName(typeof(OpCode), code), (short)recieveBytes[0]));
                 NetMessage recreatedMsg =new NetMessage(code, recieveBytes);
                 DirectedNetMessage finalizedMessage = new DirectedNetMessage(recreatedMsg, _idx);
                 ConnectionManager.singleton.QueueRPC(finalizedMessage);

@@ -5,8 +5,6 @@ using UnityEngine.EventSystems;
 using System;
 using System.Text;
 using UnityEngine.Events;
-using Unity.Mathematics;
-
 
 public class PlayerProfileManager : MonoBehaviour
 {
@@ -19,18 +17,23 @@ public class PlayerProfileManager : MonoBehaviour
 
     void Awake()
     {
-        if (singleton != null) Destroy(this);
+        if (singleton != null){
+             DebugLogger.singleton.Log("Two profile singletons?");
+             Destroy(this);
+        }
         singleton = this;
         profileHandler = new SaveFileHandler(Application.persistentDataPath, "prof.json");
     }
 
     public void Start(){
+        DebugLogger.singleton.Log("Setting up Profile Payload Connection Callback");
         ClientConnection.singleton.RegisterServerEventListener("connect",SendProfilePayload);
     }
 
     void SendProfilePayload(){
+        DebugLogger.singleton.Log("Profile - Connection Callback");
         if (PlayerProfile == null) {
-            Debug.LogError("WOAH NO PROFILE AND CONNECT?");
+            DebugLogger.singleton.Log("Connecting without profile, aborting");
             return;
         }
         byte[] data = PlayerProfile.Encode();
@@ -42,6 +45,7 @@ public class PlayerProfileManager : MonoBehaviour
         bool existing = PlayerProfile != null;
         if(existing) loadEvent.Invoke(); 
         else createEvent.Invoke();
+        DebugLogger.singleton.Log("Profile Loaded");
         return existing;
     }
 
@@ -49,6 +53,7 @@ public class PlayerProfileManager : MonoBehaviour
         profileHandler.Save(PlayerProfile);
         saveEvent.Invoke();
         loadEvent.Invoke();
+        DebugLogger.singleton.Log("Profile Saved");
     }
 
     public void StartNewProfile(ProfileData _profile){

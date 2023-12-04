@@ -33,7 +33,7 @@ public class GameScreenManager : ScreenManager
     }
 
     public void SendMenuOccupation(bool _occupied){
-        debug.text = _occupied?"RAH":"Normal";
+        DebugLogger.singleton.Log(string.Format("Menu occupation update request: {0}", _occupied));
         ClientConnection.singleton.SendMessageToServer(OpCode.MENU_OCCUPY,BitConverter.GetBytes(_occupied));
     }
 }
