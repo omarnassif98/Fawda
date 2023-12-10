@@ -14,6 +14,7 @@ public class DebugLogger : MonoBehaviour
     }
     // Start is called before the first frame update
     public void Log(string newLine){
+        print(newLine);
         logs.Enqueue(string.Format("\n{0}",newLine));
     }
 

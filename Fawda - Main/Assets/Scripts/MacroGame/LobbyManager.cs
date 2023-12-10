@@ -2,10 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using UnityEngine.Events;
 public class LobbyManager : MonoBehaviour
 {
     public static LobbyManager singleton;
     MinigameManager currentMinigame;
+
+    public UnityEvent<bool> gameStartEvent;
 
     [SerializeField]
     ProfileData[] profiles = new ProfileData[5];
@@ -39,7 +42,6 @@ public class LobbyManager : MonoBehaviour
 
     public void SetupMinigame(int _mode){
          
-
     }
 
 }
