@@ -7,7 +7,7 @@ using UnityEngine.Events;
 [System.Serializable]
 public class MenuNavigationOption{
     public SelectableMenuOption button;
-    public ScreenManager destination;
+    public UnityEvent clickEvent;
 }
 
 public class ScreenManager : MonoBehaviour
@@ -26,10 +26,8 @@ public class ScreenManager : MonoBehaviour
     }
 
     public void FireButtonCallback(short _idx){
-        if (!menuNavigationOptions[_idx].destination) return;
-        menuNavigationOptions[_idx].destination.IntroductionEvent.Invoke();
-        menuNavigationOptions[_idx].destination.gameObject.SetActive(true);
-        gameObject.SetActive(false);
+        print("CALLBACK " + _idx);
+        menuNavigationOptions[_idx].clickEvent.Invoke();
     }
 
 }

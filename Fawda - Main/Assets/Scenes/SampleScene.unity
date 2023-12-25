@@ -853,7 +853,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   menuNavigationOptions:
   - button: {fileID: 1230118828}
-    destination: {fileID: 472273164}
+    clickEvent:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 2068143655}
+          m_TargetAssemblyTypeName: LobbyManager, Assembly-CSharp
+          m_MethodName: IntroduceMinigame
+          m_Mode: 5
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: Haunt
+            m_BoolArgument: 0
+          m_CallState: 2
   IntroductionEvent:
     m_PersistentCalls:
       m_Calls: []
@@ -1050,7 +1064,33 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   menuNavigationOptions:
   - button: {fileID: 947173249}
-    destination: {fileID: 447233810}
+    clickEvent:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 447233808}
+          m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+          m_MethodName: SetActive
+          m_Mode: 6
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 1
+          m_CallState: 2
+        - m_Target: {fileID: 472273163}
+          m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+          m_MethodName: SetActive
+          m_Mode: 6
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
   IntroductionEvent:
     m_PersistentCalls:
       m_Calls: []
@@ -2504,7 +2544,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   menuNavigationOptions:
   - button: {fileID: 0}
-    destination: {fileID: 472273164}
+    clickEvent:
+      m_PersistentCalls:
+        m_Calls: []
   IntroductionEvent:
     m_PersistentCalls:
       m_Calls: []
@@ -2671,7 +2713,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4025956983677791952, guid: 4a0fd9276aa3cbc489bedb0414019d21, type: 3}
       propertyPath: m_Name
-      value: Menu Option
+      value: Haunt Option
       objectReference: {fileID: 0}
     - target: {fileID: 4025956983677791980, guid: 4a0fd9276aa3cbc489bedb0414019d21, type: 3}
       propertyPath: m_Pivot.x
@@ -4259,8 +4301,6 @@ MonoBehaviour:
     topCustomization: 0
     midCustomization: 0
     botCustomization: 0
-  gameModePrefabs:
-  - {fileID: 6548646831618023639, guid: 838bf7bb0fe12484986a194f8802ff44, type: 3}
 --- !u!4 &2068143656
 Transform:
   m_ObjectHideFlags: 0

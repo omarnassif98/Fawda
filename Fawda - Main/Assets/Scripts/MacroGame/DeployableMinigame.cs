@@ -1,16 +1,19 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
-public class DeployableMinigame : MonoBehaviour
+public abstract class DeployableMinigame
 {
-    
-     public virtual void SetupGame(){
-        print("Impliment Setup plz");
-    }
+    UnityEvent GameSetupEvent = new UnityEvent(), GameStartEvent = new UnityEvent(), GameEndEvent = new UnityEvent(), GamePauseEvent = new UnityEvent();
+    public abstract void SetupGame();
 
     public virtual void EndGame(){
-        print("Impliment Game End Situation plz");
+        GameEndEvent.Invoke();
     }
 
+    public void AttachGameEndListener(UnityAction _callback){
+        GameEndEvent.AddListener(_callback);
+    }
 }
