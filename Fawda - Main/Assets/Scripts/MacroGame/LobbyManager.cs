@@ -8,11 +8,12 @@ using UnityEngine.Events;
 public class LobbyManager : MonoBehaviour
 {
     public static LobbyManager singleton;
+    GameObject gameSetupScreen;
 
     public UnityEvent<bool> gameStartEvent;
 
     [SerializeField]
-    ProfileData[] profiles = new ProfileData[5];
+    ProfileData[] players = new ProfileData[5];
 
     DeployableMinigame activeMinigame = null;
     
@@ -23,6 +24,7 @@ public class LobbyManager : MonoBehaviour
             singleton = this;
         }
         ConnectionManager.singleton.RegisterRPC(OpCode.PROFILE_PAYLOAD, JoinPlayer);
+        gameSetupScreen = GameObject.Find("Game Setup Screen");
     }
 
     public void TogglePlayerControls(bool _engage){
@@ -33,17 +35,17 @@ public class LobbyManager : MonoBehaviour
 
     void JoinPlayer(byte[] _data, int idx){
         print("Profile data " + _data.Length.ToString() +" bytes long - " + idx);
-        profiles[idx] = new ProfileData(_data);
+        players[idx] = new ProfileData(_data);
     }
 
     public void IntroduceMinigame(string _mode){
-        
         Type minigameLogic = Type.GetType(string.Format("{0}GameManager",_mode));
         if(minigameLogic == null){
             DebugLogger.singleton.Log(string.Format("{0}GameManager is not a minigame, dipshit", _mode));
             return;
         }
         activeMinigame = (DeployableMinigame)Activator.CreateInstance(minigameLogic);
-        activeMinigame.SetupGame();
-        }
+        gameSetupScreen.transform.Find(_mode).gameObject.SetActive(true);
+        UIManager.singleton.SetRoomCodeVisibility(false);
+    }
 }
