@@ -4,15 +4,12 @@ using UnityEngine;
 
 public class GameSetupBehaviour : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
+    [SerializeField] DeployableMinigame deployableMinigame;
+
+
+    public void ReadyUp(){
+
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+
 }

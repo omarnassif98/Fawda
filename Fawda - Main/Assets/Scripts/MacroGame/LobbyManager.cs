@@ -16,6 +16,8 @@ public class LobbyManager : MonoBehaviour
     ProfileData[] players = new ProfileData[5];
 
     DeployableMinigame activeMinigame = null;
+
+    public UnityEvent playerJoinEvent;
     
     void Start(){
         if(singleton != null){
@@ -36,6 +38,8 @@ public class LobbyManager : MonoBehaviour
     void JoinPlayer(byte[] _data, int idx){
         print("Profile data " + _data.Length.ToString() +" bytes long - " + idx);
         players[idx] = new ProfileData(_data);
+        UIManager.singleton.AddPlayerToRoster(players[idx].name, Color.cyan); //players[idx].colorSelection
+        playerJoinEvent.Invoke();
     }
 
     public void IntroduceMinigame(string _mode){
