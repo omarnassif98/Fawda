@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,23 +6,42 @@ using UnityEngine;
 public class MenuCursorManager : MonoBehaviour
 {
     public static MenuCursorManager singleton;
-    private MenuCursorBehaviour[] cursors = new MenuCursorBehaviour[SynapseServer.MAX_PLAYERS];
+    private MenuCursorBehaviour[] cursors;
     void Awake(){
-        if(singleton != null) return;
+        if(singleton != null){
+            Destroy(this);
+        } 
         singleton = this;
+        cursors = new MenuCursorBehaviour[transform.childCount];
         for(short i = 0; i < cursors.Length; i++){
-            cursors[i] = GameObject.Find("Cursors").transform.GetChild(i).GetComponent<MenuCursorBehaviour>();
+            cursors[i] = transform.GetChild(i).GetComponent<MenuCursorBehaviour>();
         }
     }
 
     void Start()
     {
-
+        ConnectionManager.singleton.RegisterRPC(OpCode.MENU_CONTROL, ControlCursor);
+        ConnectionManager.singleton.RegisterRPC(OpCode.MENU_OCCUPY, HandleClientOccupation);
     }
 
-    // Update is called once per frame
-    void Update()
-    {
+    public void UpdateCursorPlayer(ProfileData _player, int _idx){
+        cursors[_idx].UpdateGraphics(_player.name, Color.gray); //_player.colorSelection
+    }
 
+    public void SetCursorInteractivities(bool _newStatus){
+        for(int i = 0; i < cursors.Length; i++){
+            cursors[i].ToggleCursorInteractivity(_newStatus);
+        }
+    }
+
+    private void HandleClientOccupation(byte[] _data, int _idx){
+        bool occ = BitConverter.ToBoolean(_data,0);
+        cursors[_idx].HandleOccupation(occ);
+    }
+
+    private void ControlCursor(byte[] _data, int _idx){
+        float dirInput = BitConverter.ToSingle(_data,0);
+        float distInput = BitConverter.ToSingle(_data,4);
+        cursors[_idx].UpdateJoypad(dirInput,distInput);
     }
 }

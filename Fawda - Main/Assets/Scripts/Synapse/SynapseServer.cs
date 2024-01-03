@@ -8,7 +8,6 @@ using System;
 
 public class SynapseServer
 {
-    public static const int MAX_PLAYERS = 5;
     short clientQuantity = 5;
     TcpListener tcpServer;
     UdpClient udpServer;

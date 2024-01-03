@@ -54,7 +54,10 @@ public class ConnectionManager : MonoBehaviour
     // The _func is literally a void
     // Triggering an event trips ALL (one to many) functions (actions) listening for that event
     public void RegisterServerEventListener(string _eventName, UnityAction _func){
-        if(!serverEvents.ContainsKey(_eventName)) serverEvents[_eventName] = new UnityEvent();
+        if(!serverEvents.ContainsKey(_eventName)){
+            serverEvents[_eventName] = new UnityEvent();
+            DebugLogger.singleton.Log(string.Format("Registering Server Event: {0}", _eventName));
+        } 
         serverEvents[_eventName].AddListener(_func);
     }
 
@@ -87,6 +90,7 @@ public class ConnectionManager : MonoBehaviour
     /////
 
     public void TriggerServerEvent(string _event){
+        print(_event);
         if(serverEvents.ContainsKey(_event)){
             serverEvents[_event].Invoke();
         }

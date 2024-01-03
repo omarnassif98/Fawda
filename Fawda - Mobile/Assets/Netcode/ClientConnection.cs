@@ -87,6 +87,11 @@ public class ClientConnection : MonoBehaviour
         NetMessage msg = new NetMessage(_opCode, _val);
         client.QueueMessage(msg);
     }
+
+    public void SendMessageToServer(OpCode _opCode, bool _val){
+        NetMessage msg = new NetMessage(_opCode, BitConverter.GetBytes(_val));
+        client.QueueMessage(msg);
+    }
     public void SendMessageToServer(OpCode _opCode, int _val){
         SendMessageToServer(_opCode, new byte[]{(byte)_val});
     }

@@ -26,7 +26,7 @@ public class UIManager : MonoBehaviour
     public UnityEvent screenTransitionEvent = new UnityEvent();
     private Animator roomCodeAnimator;
     private TMP_Text roomCodeText;
-    ScreenManager currentScreen;
+    private GameObject startScreen;
     private PlayerLobbyRosterSlot[] rosterPlayers;
     private short occupationCount = 0;
     void Awake(){
@@ -35,6 +35,7 @@ public class UIManager : MonoBehaviour
         }
         singleton= this;
         debugSystems = gameObject.GetComponent<DebugSystemsManager>();
+        startScreen = transform.Find("Screens").Find("Main Menu Screen").gameObject;
         roomCodeAnimator = transform.Find("Room Code").GetComponent<Animator>();
         roomCodeText = roomCodeAnimator.transform.Find("Room Code Text").GetComponent<TMP_Text>();
         rosterPlayers = new PlayerLobbyRosterSlot[transform.Find("Lobby Roster").childCount];
@@ -46,9 +47,10 @@ public class UIManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        print("Hello?");
         ConnectionManager.singleton.RegisterServerEventListener("listen", UpdateRoomCode);
         ConnectionManager.singleton.RegisterServerEventListener("listen", () => SetRoomCodeVisibility(true));
-        ConnectionManager.singleton.RegisterServerEventListener("wakeup", () => currentScreen.gameObject.SetActive(true));
+        ConnectionManager.singleton.RegisterServerEventListener("wakeup", () => startScreen.SetActive(true));
 
     }
     public void SwitchScreen(){
