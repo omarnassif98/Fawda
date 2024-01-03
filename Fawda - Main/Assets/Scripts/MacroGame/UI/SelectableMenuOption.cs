@@ -45,7 +45,7 @@ public class SelectableMenuOption : MonoBehaviour
         radialFillAmount = 0;
     }
 
-    
+
     public void SelectionEventCallback(){
         if(idx == -1){
             Debug.LogError("EYYO DIPSHIT... UNCONFIGURED BUTTON");
