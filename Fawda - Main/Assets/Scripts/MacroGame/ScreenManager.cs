@@ -15,16 +15,16 @@ public class ScreenManager : MonoBehaviour
     [SerializeField] MenuNavigationOption[] menuNavigationOptions;
     public UnityEvent IntroductionEvent, DismissalEvent;
 
-    void Start(){
+    void Awake(){
         for(short i = 0; i < menuNavigationOptions.Length; i++){
             menuNavigationOptions[i].button.SetupButton(this, i);
         }
-        IntroductionEvent.AddListener(()=> MenuCursorManager.singleton.SetCursorInteractivities(true));
-        DismissalEvent.AddListener(()=> MenuCursorManager.singleton.SetCursorInteractivities(false));
-        DismissalEvent.AddListener(()=> UIManager.singleton.SwitchScreen());
-        IntroductionEvent.Invoke();
     }
 
+    void OnEnable(){
+        IntroductionEvent.Invoke();
+    }
+    
     public void FireButtonCallback(short _idx){
         print("CALLBACK " + _idx);
         menuNavigationOptions[_idx].clickEvent.Invoke();

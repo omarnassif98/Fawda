@@ -6,8 +6,7 @@ public class SelectableMenuOption : MonoBehaviour
 {
     private short idx = -1;
     private ScreenManager controller;
-
-    public bool frozen = false;
+    private bool frozen = false;
 
     [SerializeField]
     TMP_Text label;
@@ -19,11 +18,19 @@ public class SelectableMenuOption : MonoBehaviour
     TMP_Text occupancyIndicator;
 
 
-    static float RADIAL_DEFLATE_SECONDS = -1.2f, RADIAL_INFLATE_SECONDS = 3.6f;
-    float radialFillAmount = 0, radialFillDelta = RADIAL_DEFLATE_SECONDS;
+    [SerializeField]
+    float RADIAL_DEFLATE_SECONDS = -1.2f, RADIAL_INFLATE_SECONDS = 3.6f;
+    
+    float radialFillAmount = 0, radialFillDelta = -1;
+    
+    [SerializeField]
+    int occupiersNeeded = 1;
+
     int occupierCount = 0;
 
+    
     public void Update(){
+        if (frozen) return;
         Fill();
     }
 
@@ -31,46 +38,55 @@ public class SelectableMenuOption : MonoBehaviour
     public void SetupButton(ScreenManager _controller, short _idx){
         controller = _controller;
         idx = _idx;
+        controller.IntroductionEvent.AddListener(ResetButton);
         controller.DismissalEvent.AddListener(ScreenTransitionEventCallback);
     }
-    public void ActivateMenuOption(){
-        frozen = true;
-        controller.DismissalEvent.Invoke();
-    }
 
-    void ScreenTransitionEventCallback(){
-        frozen = GetComponent<Animator>().GetBool("Selected");
-        GetComponent<Animator>().SetTrigger("Fire");
+    //When screen is (re)introduced 
+    public void ResetButton(){
+        frozen = false;
+        occupierCount = 0;
         radialFillAmount = 0;
+        radialFillDelta = -1;
     }
 
+    //First thing fired upon selection
+    //Triggered when a button fills to 100%
+    //It triggers an event which hits all siblings
+    public void ScreenTransitionEventCallback(){
+        GetComponent<Animator>().SetTrigger("Fire");
+        frozen = true;
+    }
 
-    public void SelectionEventCallback(){
+    //Called by the variant of the fade out animation for the selected button
+    //Nasically a callback from the last last last keyframe
+    private void SelectionEventCallback(){
         if(idx == -1){
             Debug.LogError("EYYO DIPSHIT... UNCONFIGURED BUTTON");
             return;
         }
 
         controller.FireButtonCallback(idx);
-        occupierCount = 0;
         GetComponent<Animator>().SetBool("Selected", false);
-        frozen = false;
     }
 
 
+    //fired by cursors
     public void SetTarget(bool _occupancy){
-        if(frozen) return;
         occupierCount += _occupancy?1:-1;
         occupierCount = occupierCount < 0?0:occupierCount;
-        occupancyIndicator.text = occupierCount.ToString();
+        occupancyIndicator.text = string.Format("{0}/{1}",occupierCount.ToString(), occupiersNeeded.ToString());
+        occupancyIndicator.color = occupierCount >= occupiersNeeded ? Color.white : Color.gray;
+        radialFillDelta = occupierCount >= occupiersNeeded ? RADIAL_INFLATE_SECONDS:RADIAL_DEFLATE_SECONDS;
         GetComponent<Animator>().SetBool("Selected", occupierCount > 0);
-        radialFillDelta = occupierCount > 0? RADIAL_INFLATE_SECONDS:RADIAL_DEFLATE_SECONDS;
     }
 
     public void Fill(){
-        radialFillAmount += (frozen?0:(1/radialFillDelta)) * Time.deltaTime;
+        radialFillAmount +=(1/radialFillDelta) * Time.deltaTime;
         radialFillAmount = Mathf.Clamp(radialFillAmount,0,1);
         background.fillAmount = radialFillAmount;
-        if(radialFillAmount >= 1) ActivateMenuOption();
+        if(radialFillAmount < 1) return;
+        MenuCursorManager.singleton.SetCursorInteractivities(false);
+        controller.DismissalEvent.Invoke();
     }
 }

@@ -8,7 +8,7 @@ using UnityEngine.Events;
 public class LobbyManager : MonoBehaviour
 {
     public static LobbyManager singleton;
-    GameObject gameSetupScreen;
+    Transform gameSetupScreen;
 
     public UnityEvent<bool> gameStartEvent;
 
@@ -26,7 +26,7 @@ public class LobbyManager : MonoBehaviour
             singleton = this;
         }
         ConnectionManager.singleton.RegisterRPC(OpCode.PROFILE_PAYLOAD, JoinPlayer);
-        gameSetupScreen = GameObject.Find("Game Setup Screen");
+        gameSetupScreen = GameObject.Find("Screens").transform.Find("Game Setup Screen");
     }
 
     public void TogglePlayerControls(bool _engage){
@@ -50,7 +50,7 @@ public class LobbyManager : MonoBehaviour
             return;
         }
         activeMinigame = (DeployableMinigame)Activator.CreateInstance(minigameLogic);
-        gameSetupScreen.transform.Find(_mode).gameObject.SetActive(true);
+        gameSetupScreen.Find(_mode).gameObject.SetActive(true);
         UIManager.singleton.SetRoomCodeVisibility(false);
     }
 }

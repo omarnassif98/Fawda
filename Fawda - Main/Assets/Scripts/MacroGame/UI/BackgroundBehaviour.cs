@@ -6,7 +6,8 @@ using UnityEngine.UI;
 public class BackgroundBehaviour : MonoBehaviour
 {
     Vector2 driftDir;
-    [SerializeField]float idealDriftSpeed = 75, realDriftSpeed, idealDriftAngle = 35, realDriftAngle;
+    [SerializeField]float idealDriftSpeed = 75, idealDriftAngle = 35, checkerboardResolution = 4;
+    float realDriftAngle, realDriftSpeed;
     Vector2 posOffset;
     [SerializeField] Sprite backgroundImage;
     // 3x3 grid
@@ -30,7 +31,6 @@ public class BackgroundBehaviour : MonoBehaviour
         UIManager.singleton.screenTransitionEvent.AddListener(() => StartCoroutine(JoltBackground()));
         for(int i = 0; i < images.Length; i++){
             images[i].sprite = backgroundImage;
-            images[i].pixelsPerUnitMultiplier = 4;
             images[i].GetComponent<RectTransform>().sizeDelta = posOffset;
         }
     }
@@ -41,6 +41,7 @@ public class BackgroundBehaviour : MonoBehaviour
         yield return new WaitForSeconds(0.95f);
         idealDriftSpeed = 75;
     }
+
     void RestructureScreens(){
         Image[] temp = new Image[3];
         if (center.anchoredPosition.x >= posOffset.x/2){
@@ -104,6 +105,7 @@ public class BackgroundBehaviour : MonoBehaviour
         Vector2 up = center.up;
         center.anchoredPosition += driftDir * realDriftSpeed * Time.deltaTime;
         for(int i = 0; i < images.Length; i++){
+            images[i].pixelsPerUnitMultiplier = checkerboardResolution;
             images[i].GetComponent<RectTransform>().up = up;
             images[i].GetComponent<RectTransform>().anchoredPosition = center.anchoredPosition + right * Vector2.Scale(offsetMultipliers[i],posOffset).x + up * Vector2.Scale(offsetMultipliers[i],posOffset).y;
         }

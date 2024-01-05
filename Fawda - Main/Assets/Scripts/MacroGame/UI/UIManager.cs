@@ -6,7 +6,6 @@ using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour
 {
-
     struct PlayerLobbyRosterSlot{
         public TMP_Text playerNameText;
         public Image playerColorImage;
@@ -19,7 +18,7 @@ public class UIManager : MonoBehaviour
             occupied = false;
         }
     }
-
+    private ScreenManager currentScreen = null;
     public BackgroundBehaviour backgroundBehaviour;
     public static UIManager singleton;
     public static DebugSystemsManager debugSystems;
@@ -28,12 +27,16 @@ public class UIManager : MonoBehaviour
     private TMP_Text roomCodeText;
     private GameObject startScreen;
     private PlayerLobbyRosterSlot[] rosterPlayers;
+    
     private short occupationCount = 0;
+
+    
     void Awake(){
         if(singleton != null){
             Destroy(this);
         }
         singleton= this;
+
         debugSystems = gameObject.GetComponent<DebugSystemsManager>();
         startScreen = transform.Find("Screens").Find("Main Menu Screen").gameObject;
         roomCodeAnimator = transform.Find("Room Code").GetComponent<Animator>();
@@ -50,7 +53,7 @@ public class UIManager : MonoBehaviour
         print("Hello?");
         ConnectionManager.singleton.RegisterServerEventListener("listen", UpdateRoomCode);
         ConnectionManager.singleton.RegisterServerEventListener("listen", () => SetRoomCodeVisibility(true));
-        ConnectionManager.singleton.RegisterServerEventListener("wakeup", () => startScreen.SetActive(true));
+        ConnectionManager.singleton.RegisterServerEventListener("wakeup", () => ChangeScreen("Main Menu Screen"));
 
     }
     public void SwitchScreen(){
@@ -125,6 +128,15 @@ public class UIManager : MonoBehaviour
         rosterPlayers[_idx].occupied = _occupationStatus;
     }
 
+    public void ChangeScreen(string _screenName){
+        if(currentScreen != null){
+            currentScreen.gameObject.SetActive(false);
+        }
+        ScreenManager newScreen = GameObject.Find("Screens").transform.Find(_screenName).GetComponent<ScreenManager>();
+        newScreen.gameObject.SetActive(true);
+        currentScreen = newScreen;
+        MenuCursorManager.singleton.SetCursorInteractivities(true);
+    }
     
 
     // Update is called once per frame
