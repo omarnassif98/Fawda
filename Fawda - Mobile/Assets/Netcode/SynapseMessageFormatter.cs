@@ -32,6 +32,7 @@ public static class SynapseMessageFormatter
                     //Strings are to be 12 letters or less
             case TypeCode.Int32:
             case TypeCode.Int16:
+            case TypeCode.Boolean:
                 DebugLogger.singleton.Log("INT");
                 length += 1;
                 break;
@@ -54,7 +55,7 @@ public static class SynapseMessageFormatter
                 byte[] stringBytes = System.Text.Encoding.ASCII.GetBytes(fixedString);
                 Buffer.BlockCopy(stringBytes,0,resBytes,lastIdx,stringBytes.Length);
                 lastIdx += stringBytes.Length;
-                DebugLogger.singleton.Log(String.Format("{0} byte string", stringBytes.Length.ToString()));
+                DebugLogger.singleton.Log(String.Format("{0} byte string, name sent as {1}", stringBytes.Length.ToString(),fixedString));
                 break;
                     //Strings are to be 9 letters or less
             case TypeCode.Int32:
@@ -69,7 +70,13 @@ public static class SynapseMessageFormatter
                 DebugLogger.singleton.Log(string.Format("Packed {0} as {1}", ((float)_packedData[i]).ToString(), BitConverter.ToString(singleBytes)));
                 Buffer.BlockCopy(singleBytes,0,resBytes,lastIdx,singleBytes.Length);
                 lastIdx += 4;
-            break;
+                break;
+            case TypeCode.Boolean:
+                byte[] boolBytes = BitConverter.GetBytes((bool)_packedData[i]);
+                DebugLogger.singleton.Log(string.Format("Packed {0} as {1}", ((bool)_packedData[i]).ToString(), BitConverter.ToString(boolBytes)));
+                Buffer.BlockCopy(boolBytes,0,resBytes,lastIdx,boolBytes.Length);
+                lastIdx += boolBytes.Length;                
+                break;
            }
         }
         return resBytes;

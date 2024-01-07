@@ -7,6 +7,7 @@ public class Orchestrator : MonoBehaviour
 {
     public void Start (){
         PlayerProfileManager.singleton.LoadProfile();
+        DebugLogger.singleton.Log(string.Format("FYI a bool is {0} bytes long", BitConverter.GetBytes(true).Length));
         print("ORCHESTRA");
     }
 

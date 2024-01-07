@@ -11,11 +11,8 @@ public class LobbyManager : MonoBehaviour
     Transform gameSetupScreen;
 
     public UnityEvent<bool> gameStartEvent;
-
-    [SerializeField]
+    
     ProfileData[] players = new ProfileData[5];
-
-    DeployableMinigame activeMinigame = null;
 
     public UnityEvent playerJoinEvent;
     
@@ -38,6 +35,7 @@ public class LobbyManager : MonoBehaviour
     void JoinPlayer(byte[] _data, int idx){
         print("Profile data " + _data.Length.ToString() +" bytes long - " + idx);
         players[idx] = new ProfileData(_data);
+        print(players[idx].name);
         UIManager.singleton.AddPlayerToRoster(players[idx].name, Color.cyan); //players[idx].colorSelection
         MenuCursorManager.singleton.UpdateCursorPlayer(players[idx], idx);
         playerJoinEvent.Invoke();
@@ -49,8 +47,16 @@ public class LobbyManager : MonoBehaviour
             DebugLogger.singleton.Log(string.Format("{0}GameManager is not a minigame, dipshit", _mode));
             return;
         }
-        activeMinigame = (DeployableMinigame)Activator.CreateInstance(minigameLogic);
         gameSetupScreen.Find(_mode).gameObject.SetActive(true);
+        ConnectionManager.singleton.SendMessageToClients(OpCode.GAMESETUP, (int)Enum.Parse(typeof(GameCodes), _mode.ToUpper()));
         UIManager.singleton.SetRoomCodeVisibility(false);
+    }
+
+    public int GetLobbySize(){
+        int size = 0;
+        for(int i = 0; i < players.Length; i++){
+            if(players[i] != null) size += 1;
+        }
+        return size;
     }
 }

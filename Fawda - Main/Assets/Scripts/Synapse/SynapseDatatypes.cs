@@ -1,15 +1,19 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Text;
+using System.Numerics;
 
 public abstract class SynapseDatastruct
 {
     public abstract ArrayList PackData();
     public virtual byte[] Encode(){
-        return SynapseMessageFormatter.GetPackedDataBytes(PackData());
+        DebugLogger.singleton.Log("Packing datatype");
+        byte[] bytes = SynapseMessageFormatter.GetPackedDataBytes(PackData());
+        DebugLogger.singleton.Log(BitConverter.ToString(bytes));
+        return bytes;
     }
 }
+
 
 
 
@@ -30,11 +34,13 @@ public class ProfileData : SynapseDatastruct{
     }
 
     public ProfileData(byte[] _data){
-        this.name = Encoding.UTF8.GetString(_data,0,12).Trim();
+        this.name = BitConverter.ToString(_data,0,12).Trim();
         this.colorSelection = BitConverter.ToInt32(_data,12);
         this.topCustomization = _data[13];
         this.midCustomization = _data[14];
         this.botCustomization = _data[15];
+        
+
     }
 
     public override ArrayList PackData(){
@@ -46,7 +52,14 @@ public class ProfileData : SynapseDatastruct{
         data.Add(this.botCustomization);
         return data;
     }
+
+
 }
+
+public enum InputType{
+    Menu = OpCode.MENU_CONTROL,
+    Joypad = OpCode.UDP_GAMEPAD_INPUT
+} 
 
 [System.Serializable]
 public class GamepadData : SynapseDatastruct{
@@ -72,15 +85,24 @@ public class GamepadData : SynapseDatastruct{
         data.Add(this.dist);      
         return data;
     }
-
-    public override byte[] Encode(){
-        byte[] baseBytes = base.Encode();
-        if(additionalInfo.Length == 0) return baseBytes;
-        byte[] fullBytes = new byte[baseBytes.Length + additionalInfo.Length];
-        Buffer.BlockCopy(baseBytes,0,fullBytes,0,baseBytes.Length);
-        Buffer.BlockCopy(additionalInfo,0,fullBytes,baseBytes.Length,additionalInfo.Length);
-        return null;
-    }
-
-
 }
+
+    public class PlayerGameConfigData : SynapseDatastruct
+    {
+        bool ready;
+        ArrayList additionalData;
+        public PlayerGameConfigData(bool _ready, ArrayList _additionalData = null){
+            ready = _ready;
+            additionalData = _additionalData;
+        }
+        public override ArrayList PackData()
+        {
+            ArrayList allData = new ArrayList();
+            allData.Add(ready);
+            foreach(object o in allData){
+                allData.Add(o);
+            }
+            return allData;
+        }
+    }
+    

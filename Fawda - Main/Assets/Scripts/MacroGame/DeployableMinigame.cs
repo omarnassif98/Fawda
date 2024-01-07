@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.Events;
 
 
-public abstract class DeployableMinigame
+public abstract class DeployableMinigame : MonoBehaviour
 {
     
     UnityEvent GameSetupEvent = new UnityEvent(), GameStartEvent = new UnityEvent(), GameEndEvent = new UnityEvent(), GamePauseEvent = new UnityEvent();

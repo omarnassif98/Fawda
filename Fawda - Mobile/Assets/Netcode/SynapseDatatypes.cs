@@ -63,8 +63,8 @@ public enum InputType{
 
 [System.Serializable]
 public class GamepadData : SynapseDatastruct{
-    public float dir, dist;
-    public byte[] additionalInfo = new byte[0];
+    float dir, dist;
+    byte[] additionalInfo = new byte[0];
 
 
     public GamepadData(float _dir, float _dist){
@@ -85,15 +85,24 @@ public class GamepadData : SynapseDatastruct{
         data.Add(this.dist);      
         return data;
     }
-
-    public override byte[] Encode(){
-        byte[] baseBytes = base.Encode();
-        if(additionalInfo.Length == 0) return baseBytes;
-        byte[] fullBytes = new byte[baseBytes.Length + additionalInfo.Length];
-        Buffer.BlockCopy(baseBytes,0,fullBytes,0,baseBytes.Length);
-        Buffer.BlockCopy(additionalInfo,0,fullBytes,baseBytes.Length,additionalInfo.Length);
-        return fullBytes;
-    }
-
-
 }
+
+    public class PlayerGameConfigData : SynapseDatastruct
+    {
+        bool ready;
+        ArrayList additionalData;
+        public PlayerGameConfigData(bool _ready, ArrayList _additionalData = null){
+            ready = _ready;
+            additionalData = _additionalData;
+        }
+        public override ArrayList PackData()
+        {
+            ArrayList allData = new ArrayList();
+            allData.Add(ready);
+            foreach(object o in additionalData){
+                allData.Add(o);
+            }
+            return allData;
+        }
+    }
+    

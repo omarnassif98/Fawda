@@ -5,7 +5,7 @@ using UnityEngine.Events;
 public class ScreenManager : MonoBehaviour
 {
     [SerializeField]
-    private GameObject[] subscreens;
+    protected GameObject[] subscreens;
     private int currentSubscreenIdx = 0;
 
     public void SwitchSubscreens(int _newIdx){

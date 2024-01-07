@@ -7,7 +7,13 @@ public enum OpCode{
     MENU_CONTROL = 4,
     UDP_TOGGLE = 5,
     UDP_GAMEPAD_INPUT = 6,
-    INPUT_SETUP = 7
+    INPUT_SETUP = 7,
+    GAMESETUP = 8,
+    READYUP = 9
+}
+
+public enum GameCodes{
+    HAUNT = 0
 }
 
 public struct NetMessage{
