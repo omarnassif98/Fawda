@@ -23,13 +23,18 @@ public class RosterUIBehaviour
     
     private PlayerLobbyRosterSlot[] rosterPlayers;
     private short occupationCount = 0;
-    
+    private Image rosterRoulleteTicker;
     public RosterUIBehaviour(Transform _rosterParent){
         
         rosterPlayers = new PlayerLobbyRosterSlot[_rosterParent.childCount];
         for(int i = 0; i <rosterPlayers.Length; i++){
             rosterPlayers[i] = new PlayerLobbyRosterSlot(_rosterParent.GetChild(i));
         }
+        GameObject roulette = new GameObject();
+        roulette.transform.parent = _rosterParent;
+        rosterRoulleteTicker = roulette.AddComponent<Image>();
+        rosterRoulleteTicker.rectTransform.sizeDelta = new Vector2(30,30);
+        rosterRoulleteTicker.color = Color.red;
         TidyRoster();
     }
 
@@ -55,6 +60,10 @@ public class RosterUIBehaviour
         TidyRoster();
     }
 
+
+    public Transform GetRosterTransform(int _index){
+        return rosterPlayers[_index].rosterAnimator.transform;
+    }
 
     private void TidyRoster(){
         short[] newIdxs = new short[occupationCount];
@@ -90,5 +99,49 @@ public class RosterUIBehaviour
     private void SetRosterSlotOccupationStatus(int _idx, bool _occupationStatus){
         rosterPlayers[_idx].rosterAnimator.SetBool("Occupied", _occupationStatus);
         rosterPlayers[_idx].occupied = _occupationStatus;
+    }
+
+    public void StartReadyupProcess(bool[] _participants){
+        List<Transform> optedRosterSlots = new List<Transform>();
+        for (int i = 0; i<_participants.Length; i++){
+            if(_participants[i]){
+                 optedRosterSlots.Add(GetRosterTransform(i));
+                DebugLogger.singleton.Log(string.Format("Slot {0} opt in", i));
+            }
+        }
+        if (optedRosterSlots.Count == 0)
+        {
+            DebugLogger.singleton.Log("Ummm...");
+            for(int i = 0; i < _participants.Length; i++){
+                optedRosterSlots.Add(GetRosterTransform(i));
+            }   
+        }
+        UIManager.singleton.StartCoroutine(SlotRoulette(optedRosterSlots));
+    }
+
+    IEnumerator SlotRoulette(List<Transform> rosterTransforms){
+        
+        rosterRoulleteTicker.color = Color.red;
+        if (rosterTransforms.Count == 1){
+            yield return null;
+        }
+        int cap = rosterTransforms.Count;
+        int idx = Random.Range(0,cap);
+        int dials = Random.Range(13,18);
+        int turn = 0;
+        float tickTime = 0.05f;
+        while(turn <= dials){
+            SetTickerPosition(rosterTransforms[idx]);
+            yield return new WaitForSeconds(tickTime);
+            tickTime *= 1.2f;
+            idx = (idx + 1) % cap;
+            turn += 1;
+        }
+        yield return new WaitForSeconds(0.4f);
+        rosterRoulleteTicker.color = Color.yellow;
+    }
+
+    private void SetTickerPosition(Transform slotTransform){
+        rosterRoulleteTicker.rectTransform.position = slotTransform.position + (Vector3.up * 45);
     }
 }

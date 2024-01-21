@@ -23,8 +23,10 @@ public class HauntGameSetupBehaviour : GameSetupBehaviour
     public override void ReadyUp()
     {
         ConnectionManager.singleton.VacateRPC("READYUP");
-        
+
     }
+
+
 
     private void InitializeLobbyConfigs(){
         opt_ins = new bool[LobbyManager.singleton.GetLobbySize()];
@@ -33,5 +35,6 @@ public class HauntGameSetupBehaviour : GameSetupBehaviour
             opt_ins[i] = false;
             readies[i] = false;
         }
+        
     }
 }

@@ -31,5 +31,20 @@ public class LobbyMenuTester : Editor
         }
         GUILayout.Space(5);
         EditorGUILayout.EndVertical();
+
+        
+        
+        EditorGUILayout.BeginVertical("helpbox");
+        GUILayout.Space(2);
+        GUILayout.Label("Roullete tester");
+        GUILayout.Space(5);
+        
+        if(GUILayout.Button("Start")){
+            UIManager.RosterManager.StartReadyupProcess(new bool[]{true,false,true,false,true});
+        }
+        GUILayout.Space(5);
+        EditorGUILayout.EndVertical();
+
+        
     }
 }
