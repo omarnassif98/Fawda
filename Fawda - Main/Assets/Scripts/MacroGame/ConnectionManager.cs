@@ -74,6 +74,10 @@ public class ConnectionManager : MonoBehaviour
         remoteProcCalls[opCode] = _func;
     }
 
+    public void VacateRPC(string _key){
+        remoteProcCalls.Remove(_key);
+    }
+
     // Again called by the server - both TCP and UDP
     // Remember it runs on its own thread so RPCs can't be really remotely executed explicitly
     public void QueueRPC(DirectedNetMessage _netMessage){

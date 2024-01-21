@@ -6,6 +6,7 @@ using System.Numerics;
 public abstract class SynapseDatastruct
 {
     public abstract ArrayList PackData();
+    
     public virtual byte[] Encode(){
         DebugLogger.singleton.Log("Packing datatype");
         byte[] bytes = SynapseMessageFormatter.GetPackedDataBytes(PackData());
@@ -34,13 +35,11 @@ public class ProfileData : SynapseDatastruct{
     }
 
     public ProfileData(byte[] _data){
-        this.name = BitConverter.ToString(_data,0,12).Trim();
+        this.name = System.Text.Encoding.ASCII.GetString(_data,0,12).Trim();
         this.colorSelection = BitConverter.ToInt32(_data,12);
         this.topCustomization = _data[13];
         this.midCustomization = _data[14];
         this.botCustomization = _data[15];
-        
-
     }
 
     public override ArrayList PackData(){
@@ -52,8 +51,6 @@ public class ProfileData : SynapseDatastruct{
         data.Add(this.botCustomization);
         return data;
     }
-
-
 }
 
 public enum InputType{

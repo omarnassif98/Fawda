@@ -36,7 +36,7 @@ public class LobbyManager : MonoBehaviour
         print("Profile data " + _data.Length.ToString() +" bytes long - " + idx);
         players[idx] = new ProfileData(_data);
         print(players[idx].name);
-        UIManager.singleton.AddPlayerToRoster(players[idx].name, Color.cyan); //players[idx].colorSelection
+        UIManager.RosterManager.AddPlayerToRoster(players[idx].name, Color.cyan); //players[idx].colorSelection
         MenuCursorManager.singleton.UpdateCursorPlayer(players[idx], idx);
         playerJoinEvent.Invoke();
     }

@@ -11,9 +11,11 @@ public enum OpCode{
     GAMESETUP = 8,
     READYUP = 9
 }
+
 public enum GameCodes{
     HAUNT = 0
 }
+
 public struct NetMessage{
     public byte size;
     public OpCode opCode;

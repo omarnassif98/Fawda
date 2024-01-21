@@ -15,7 +15,7 @@ public class LobbyMenuTester : Editor
         GUILayout.Space(10);
 
         if(GUILayout.Button("Add to roster (debug only UI)")){
-            singleton.AddPlayerToRoster(playerNames[Random.Range(0,playerNames.Length)], playerColors[Random.Range(0,playerColors.Length)]);
+            UIManager.RosterManager.AddPlayerToRoster(playerNames[Random.Range(0,playerNames.Length)], playerColors[Random.Range(0,playerColors.Length)]);
         }
 
         GUILayout.Space(10);
@@ -27,7 +27,7 @@ public class LobbyMenuTester : Editor
         GUILayout.Space(5);
         idx = EditorGUILayout.IntField("idx", idx);
         if(GUILayout.Button("Remove Player")){
-            singleton.RemovePlayerFromRoster((short)idx);
+            UIManager.RosterManager.RemovePlayerFromRoster((short)idx);
         }
         GUILayout.Space(5);
         EditorGUILayout.EndVertical();
