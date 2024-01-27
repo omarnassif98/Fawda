@@ -12,6 +12,7 @@ public enum OpCode{
     READYUP = 9
 }
 
+[System.Serializable]
 public enum GameCodes{
     HAUNT = 0
 }

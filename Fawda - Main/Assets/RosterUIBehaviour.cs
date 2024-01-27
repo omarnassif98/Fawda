@@ -1,11 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using TMPro;
 using UnityEngine.UI;
 public class RosterUIBehaviour
 {
-
+    public UnityEvent<int> rouletteDecisionEvent = new UnityEvent<int>();
     struct PlayerLobbyRosterSlot{
         public TMP_Text playerNameText;
         public Image playerColorImage;
@@ -102,10 +103,10 @@ public class RosterUIBehaviour
     }
 
     public void StartReadyupProcess(bool[] _participants){
-        List<Transform> optedRosterSlots = new List<Transform>();
+        List<(Transform,int)> optedRosterSlots = new List<(Transform,int)>();
         for (int i = 0; i<_participants.Length; i++){
             if(_participants[i]){
-                 optedRosterSlots.Add(GetRosterTransform(i));
+                 optedRosterSlots.Add((GetRosterTransform(i),i));
                 DebugLogger.singleton.Log(string.Format("Slot {0} opt in", i));
             }
         }
@@ -113,17 +114,19 @@ public class RosterUIBehaviour
         {
             DebugLogger.singleton.Log("Ummm...");
             for(int i = 0; i < _participants.Length; i++){
-                optedRosterSlots.Add(GetRosterTransform(i));
+                optedRosterSlots.Add((GetRosterTransform(i),i));
             }   
         }
         UIManager.singleton.StartCoroutine(SlotRoulette(optedRosterSlots));
     }
 
-    IEnumerator SlotRoulette(List<Transform> rosterTransforms){
+    IEnumerator SlotRoulette(List<(Transform, int)> rosterTransforms){
         
         rosterRoulleteTicker.color = Color.red;
         if (rosterTransforms.Count == 1){
-            yield return null;
+            SetTickerPosition(rosterTransforms[0].Item1);
+            rouletteDecisionEvent.Invoke(rosterTransforms[0].Item2);
+            yield break;
         }
         int cap = rosterTransforms.Count;
         int idx = Random.Range(0,cap);
@@ -131,7 +134,7 @@ public class RosterUIBehaviour
         int turn = 0;
         float tickTime = 0.05f;
         while(turn <= dials){
-            SetTickerPosition(rosterTransforms[idx]);
+            SetTickerPosition(rosterTransforms[idx].Item1);
             yield return new WaitForSeconds(tickTime);
             tickTime *= 1.2f;
             idx = (idx + 1) % cap;
@@ -139,6 +142,7 @@ public class RosterUIBehaviour
         }
         yield return new WaitForSeconds(0.4f);
         rosterRoulleteTicker.color = Color.yellow;
+        rouletteDecisionEvent.Invoke(rosterTransforms[idx].Item2);
     }
 
     private void SetTickerPosition(Transform slotTransform){

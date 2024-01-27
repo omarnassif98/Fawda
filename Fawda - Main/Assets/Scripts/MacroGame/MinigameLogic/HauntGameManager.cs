@@ -9,8 +9,9 @@ public class HauntGameManager : DeployableMinigame
         DebugLogger.singleton.Log("Booyah");
 
     }
-    public override void SetupGame()
+
+    public override void SetupGame(int _specialityPlayer = -1)
     {
-        
+       DebugLogger.singleton.Log("HAUNT GAME CONFIGURED OH YEEEEEEEEAAH");
     }
 }

@@ -5,18 +5,15 @@ using UnityEngine;
 using UnityEngine.Events;
 
 
-public abstract class DeployableMinigame : MonoBehaviour
+public abstract class DeployableMinigame
 {
     
-    UnityEvent GameSetupEvent = new UnityEvent(), GameStartEvent = new UnityEvent(), GameEndEvent = new UnityEvent(), GamePauseEvent = new UnityEvent();
-    public abstract void SetupGame();
+    public abstract void SetupGame(int _specialityPlayer = -1);
 
     public virtual void EndGame(){
-        GameEndEvent.Invoke();
+
+
     }
 
-    public void AttachGameEndListener(UnityAction _callback){
-        GameEndEvent.AddListener(_callback);
-    }
-
+    
 }
