@@ -9,8 +9,6 @@ public class LobbyManager : MonoBehaviour
 {
     public static LobbyManager singleton;
     Transform gameSetupScreen;
-
-    public UnityEvent<bool> gameStartEvent;
     
     ProfileData[] players = new ProfileData[5];
 
@@ -59,4 +57,7 @@ public class LobbyManager : MonoBehaviour
         }
         return size;
     }
+
+    public ProfileData[] GetPlayerProfiles() => players;
+
 }
