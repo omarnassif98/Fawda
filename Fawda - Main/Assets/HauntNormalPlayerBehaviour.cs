@@ -7,8 +7,8 @@ using UnityEngine;
 
 public class HauntNormalPlayerBehaviour : PlayerBehaviour
 {
-    const float FOV_ANGLES = 35, FOV_MAX = 40;
-    const int FOV_RAYS = 50;
+    const float FOV_ANGLES = 45, FOV_MAX = 40;
+    const int FOV_RAYS = (int)(FOV_ANGLES * 2.5f);
     MeshFilter playerFOVMesh;
 
     void Awake(){
@@ -36,12 +36,12 @@ public class HauntNormalPlayerBehaviour : PlayerBehaviour
             
             RaycastHit hit;
             if(Physics.Raycast(ray,out hit, FOV_MAX)){
-                arcPoints[i] = hit.collider.gameObject == lastObj || i == 0? hit.point:SettleRayDispute(rayAngle - FOV_ANGLES/FOV_RAYS, rayAngle, Vector3.zero, false);
+                arcPoints[i] = hit.collider.gameObject == lastObj || i == 0? hit.point:SettleRayDispute(rayAngle - FOV_ANGLES/FOV_RAYS, rayAngle, false);
                 lastObj = hit.collider.gameObject;
             }else if(lastObj == null){
                 arcPoints[i] = transform.position + GetAngleDir(rayAngle);
             }else{
-                arcPoints[i] = SettleRayDispute(rayAngle - FOV_ANGLES/FOV_RAYS, rayAngle, Vector3.zero);
+                arcPoints[i] = SettleRayDispute(rayAngle - FOV_ANGLES/FOV_RAYS, rayAngle);
                 lastObj = null; //NOT RESETING MAKES RECURSIVE FUNCTION THROW INFINITE LOOP
             }
 
@@ -66,19 +66,21 @@ public class HauntNormalPlayerBehaviour : PlayerBehaviour
 
     }
 
-    Vector3 SettleRayDispute(float _leftAngle, float _rightAngle, Vector3 biasPoint, bool biasRight = true, int _iter = 1){
+    Vector3 SettleRayDispute(float _leftAngle, float _rightAngle, bool biasRight = true, int _iter = 1, float _biasDist = -1){
         float midAngle = (_leftAngle + _rightAngle)/2;
         Ray midRay = new Ray(transform.position, GetAngleDir(midAngle));
         RaycastHit hit;
         if(Physics.Raycast(midRay,out hit)){
-            return _iter >= 6? hit.point:SettleRayDispute(biasRight?midAngle:_leftAngle, biasRight?_rightAngle:midAngle, hit.point, biasRight,_iter+1);
+            _biasDist = Vector3.Distance(transform.position, hit.point);
+            return _iter >= 3? hit.point:SettleRayDispute(biasRight?midAngle:_leftAngle, biasRight?_rightAngle:midAngle, biasRight,_iter+1,_biasDist);
         }else{
-            return _iter >= 15? biasPoint:SettleRayDispute(biasRight?_leftAngle:midAngle, biasRight?midAngle:_rightAngle, biasPoint, biasRight, _iter+1);
+            return _iter >= 5? transform.position + GetAngleDir(midAngle,_biasDist):SettleRayDispute(biasRight?_leftAngle:midAngle, biasRight?midAngle:_rightAngle, biasRight, _iter+1,_biasDist);
         }
     }
 
-    Vector3 GetAngleDir(float _angle){
-        return new Vector3(Mathf.Sin(_angle * Mathf.Deg2Rad),0,Mathf.Cos(_angle * Mathf.Deg2Rad)) * FOV_MAX;
+    Vector3 GetAngleDir(float _angle, float _dist = -1){
+        if (_dist < -1) print("BIAS DIST: " + _dist);
+        return new Vector3(Mathf.Sin(_angle * Mathf.Deg2Rad),0,Mathf.Cos(_angle * Mathf.Deg2Rad)) * ((_dist == -1)?FOV_MAX:_dist);
     }
 }
 

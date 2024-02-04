@@ -8,17 +8,11 @@ public class HauntGameRoomWallBehaviour : MonoBehaviour
     Renderer[] wallMats = null;
     short occupancy = 0;
     // Start is called before the first frame update
-    void Awake()
-    {
-        wallMats = transform.GetComponentsInChildren<Renderer>();    
-    }
 
     void FixedUpdate(){
         targetOpacity = occupancy == 0? 1 : 0.2f;
-
-
         foreach(Renderer mat in wallMats){
-            mat.material.color = new Color(mat.material.color.r, mat.material.color.g, mat.material.color.b, Mathf.Lerp(mat.material.color.a, targetOpacity, Time.deltaTime));
+            mat.material.color = new Color(mat.material.color.r, mat.material.color.g, mat.material.color.b, Mathf.Lerp(mat.material.color.a, targetOpacity, Time.deltaTime / 2));
         }
     }
 
