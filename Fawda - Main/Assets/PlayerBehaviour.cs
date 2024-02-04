@@ -6,7 +6,7 @@ using UnityEngine;
 
 public abstract class PlayerBehaviour : MonoBehaviour
 {
-
+    [SerializeField] Transform lookAtBall;
     void Update(){
         Move();
         Tick();
@@ -15,6 +15,10 @@ public abstract class PlayerBehaviour : MonoBehaviour
     protected void Move()
     {
         transform.position += new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical")) * Time.deltaTime * 4.5f;    
+        Vector2 rotInput = new Vector2(Input.GetAxisRaw("Debug Horizontal"), Input.GetAxisRaw("Debug Vertical"));
+        if(rotInput == Vector2.zero) return;
+        lookAtBall.position = transform.position + new Vector3(rotInput.x, 0, rotInput.y);
+        transform.LookAt(lookAtBall);
     }
 
     protected abstract void Tick();
