@@ -1,0 +1,7 @@
+from_ref, to_ref, weight, walled
+square, corridor, 5, true
+square, snub, 4, true
+square, square, 2, false
+corridor, snub, 4, true
+corridor, corridor, 1, true
+snub, square, 1, false
