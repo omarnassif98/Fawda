@@ -19,7 +19,6 @@ public class HauntNormalPlayerBehaviour : PlayerBehaviour
 
     protected override void Tick()
     {
-        print("Tik");
         
     }
 
