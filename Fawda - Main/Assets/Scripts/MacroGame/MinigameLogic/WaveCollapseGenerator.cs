@@ -5,29 +5,40 @@ using UnityEngine;
 
 public class WaveCollapseGenerator : MonoBehaviour
 {
-    Dictionary<string, RoomNode> graph = new Dictionary<string, RoomNode>();
-    public struct RoomNodeEdge{
-        public RoomNode neighbor;
-        public int weight;
-        public bool walled;
-        public RoomNodeEdge(RoomNode _neighbor, int _weight, bool _walled){
-            neighbor = _neighbor;
-            weight = _weight;
-            walled = _walled;
-        }
+    Dictionary<RoomCode, RoomNode> proceduralTemplates = new Dictionary<RoomCode, RoomNode>();
+
+    public enum DirCode{
+        UP=1,
+        DOWN=-1,
+        LEFT=-2,
+        RIGHT=2
+    }
+
+    public enum RoomCode{
+        UNSET=0,
+        NORTHWEST=1,
+        NORTH=2,
+        NORTHEAST=3,
+        WEST=4,
+        MID=5,
+        EAST=6,
+        SOUTHWEST=7,
+        SOUTH=8,
+        SOUTHEAST=9
     }
 
     public struct RoomNode{
         public static readonly RoomNode Empty;
-        public float xWidth;
-        public float zHeigth;
         public string name;
-       public List<RoomNodeEdge> connections;
-        public RoomNode(string _name, float _xWidth, float _zHeight){
+        public bool topWall, southWall, leftWall, rightWall;
+        public Dictionary<DirCode,List<RoomCode>> connections;
+        public RoomNode(string _name, bool _topWall, bool _southWall, bool _leftWall, bool _rightWall){
             name = _name;
-            xWidth = _xWidth;
-            zHeigth = _zHeight;
-            connections = new List<RoomNodeEdge>();
+            topWall = _topWall;
+            southWall = _southWall;
+            leftWall = _leftWall;
+            rightWall = _rightWall;
+            connections = new Dictionary<DirCode, List<RoomCode>>();
         }
     }
 
@@ -45,7 +56,7 @@ public class WaveCollapseGenerator : MonoBehaviour
             try
             {
                 string[] vals = row.Split(',');
-                graph[vals[0].Trim()] = new RoomNode(vals[0].Trim(), float.Parse(vals[1].Trim()), float.Parse(vals[2].Trim()));
+                proceduralTemplates[(RoomCode)Enum.Parse(typeof(RoomCode),vals[0].Trim())] = new RoomNode(vals[0].Trim(), bool.Parse(vals[1].Trim()), bool.Parse(vals[2].Trim()), bool.Parse(vals[3].Trim()), bool.Parse(vals[4].Trim()));
                 print("Node Created: " + vals[0]);
             }
             catch (System.Exception)
@@ -61,8 +72,11 @@ public class WaveCollapseGenerator : MonoBehaviour
             try
             {
                 string[] vals = row.Split(',');
-                graph[vals[0].Trim()].connections.Add(new RoomNodeEdge(graph[vals[1].Trim()], int.Parse(vals[2].Trim()), bool.Parse(vals[3].Trim())));
-                print("Edge Created: " + vals[0] + " ->> " + vals[1]);
+                RoomCode from = (RoomCode)Enum.Parse(typeof(RoomCode),vals[0].Trim());
+                RoomCode to = (RoomCode)Enum.Parse(typeof(RoomCode),vals[1].Trim());
+                DirCode dir = (DirCode)Enum.Parse(typeof(DirCode),vals[2].Trim());
+                if (!proceduralTemplates[from].connections.ContainsKey(dir)) proceduralTemplates[from].connections[dir] = new List<RoomCode>();
+                proceduralTemplates[from].connections[dir].Add(to);
             }
             catch (System.Exception)
             {
@@ -72,31 +86,24 @@ public class WaveCollapseGenerator : MonoBehaviour
     }
 
     void Start(){
-        GenerateRoom(graph["square"],WallAnchor.Empty);
-    }
-    void GenerateRoom(RoomNode _preset, WallAnchor _wallAnchor, HauntGameRoomBehaviour _prevRoom = null){
-        HauntGameRoomBehaviour room = new GameObject().AddComponent<HauntGameRoomBehaviour>();
-        room.transform.parent = transform;
-        if (_prevRoom) room.FeedWallAnchor(_wallAnchor,_prevRoom);
-        room.DetermineSize(_preset.xWidth, _preset.zHeigth);
-        room.Generate();
-        foreach(WallAnchor wa in room.GetAnchors()){
-            if(wa.neighbor == null) GenerateRoom(PickRandomNeighborTemplate(_preset),wa,room);
-        }
+        GenerateFloormap();
     }
 
-    RoomNode PickRandomNeighborTemplate(RoomNode _previousNode){
-        int[] weightPool = new int[_previousNode.connections.Count];
-        for(int i = 0; i < weightPool.Length; i++){
-            weightPool[i] = (i==0?0:weightPool[i-1]) + _previousNode.connections[i].weight;
-        }
+    void GenerateFloormap(){
+        RoomCode[,] map = new RoomCode[30,30];
+        Stack<Vector2Int> coordsToCollapse = new Stack<Vector2Int>();
+        map[15,15] = RoomCode.MID;
+        GetEmptyCoords(ref map,new Vector2Int(15,15));
+    
+    }
 
-        int randChoice = UnityEngine.Random.Range(0,weightPool[weightPool.Length-1]);
-
-        for(int i = 0; i < weightPool.Length; i++){
-            if(randChoice < weightPool[i]) return _previousNode.connections[i].neighbor;
-        }
-
+    List<Vector2> GetEmptyCoords(ref RoomCode[,] map, Vector2Int _coord){
+        List<Vector2> l = new List<Vector2>();
+        print(Enum.GetName(typeof(RoomCode), map[_coord.y, _coord.x]));
+        if(_coord.y-1 >= 0) print(string.Format("LEFT IS NULL {0}", map[0,0] == RoomCode.UNSET));
+        return l;
+    }
+    RoomNode PickRandomNeighborTemplate(){
         return RoomNode.Empty;        
     }
 
