@@ -1,111 +1,67 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class WaveCollapseGenerator : MonoBehaviour
 {
-    Dictionary<RoomCode, RoomNode> proceduralTemplates = new Dictionary<RoomCode, RoomNode>();
-
-    public enum DirCode{
-        UP=1,
-        DOWN=-1,
-        LEFT=-2,
-        RIGHT=2
-    }
-
-    public enum RoomCode{
-        UNSET=0,
-        NORTHWEST=1,
-        NORTH=2,
-        NORTHEAST=3,
-        WEST=4,
-        MID=5,
-        EAST=6,
-        SOUTHWEST=7,
-        SOUTH=8,
-        SOUTHEAST=9
-    }
-
+    const int SIZE = 3;
     public struct RoomNode{
-        public static readonly RoomNode Empty;
-        public string name;
-        public bool topWall, southWall, leftWall, rightWall;
-        public Dictionary<DirCode,List<RoomCode>> connections;
-        public RoomNode(string _name, bool _topWall, bool _southWall, bool _leftWall, bool _rightWall){
-            name = _name;
-            topWall = _topWall;
-            southWall = _southWall;
-            leftWall = _leftWall;
-            rightWall = _rightWall;
-            connections = new Dictionary<DirCode, List<RoomCode>>();
-        }
+
     }
 
 
     void Awake(){
-        LoadConfig();
-    }
-
-    void LoadConfig(){
         
-        TextAsset rawNodeData = Resources.Load<TextAsset>("MinigameAssets/Haunt/WaveFunctionRoomNodes");
-        string[] nodeRows = rawNodeData.text.Split('\n');
-        for(int i = 1; i < nodeRows.Length; i++){
-            string row = nodeRows[i];
-            try
-            {
-                string[] vals = row.Split(',');
-                proceduralTemplates[(RoomCode)Enum.Parse(typeof(RoomCode),vals[0].Trim())] = new RoomNode(vals[0].Trim(), bool.Parse(vals[1].Trim()), bool.Parse(vals[2].Trim()), bool.Parse(vals[3].Trim()), bool.Parse(vals[4].Trim()));
-                print("Node Created: " + vals[0]);
-            }
-            catch (System.Exception)
-            {
-                Debug.LogError("Error Loading Node: " + row);
-            }
-        }
-
-        TextAsset rawEdgeData = Resources.Load<TextAsset>("MinigameAssets/Haunt/WaveFunctionNodeEdges");
-        string[] edgeRows = rawEdgeData.text.Split('\n');
-        for(int i = 1; i<edgeRows.Length; i++){
-            string row = edgeRows[i];
-            try
-            {
-                string[] vals = row.Split(',');
-                RoomCode from = (RoomCode)Enum.Parse(typeof(RoomCode),vals[0].Trim());
-                RoomCode to = (RoomCode)Enum.Parse(typeof(RoomCode),vals[1].Trim());
-                DirCode dir = (DirCode)Enum.Parse(typeof(DirCode),vals[2].Trim());
-                if (!proceduralTemplates[from].connections.ContainsKey(dir)) proceduralTemplates[from].connections[dir] = new List<RoomCode>();
-                proceduralTemplates[from].connections[dir].Add(to);
-            }
-            catch (System.Exception)
-            {
-                Debug.LogError("Error Loading Edge: " + row);
-            }
-        }
     }
+
 
     void Start(){
         GenerateFloormap();
     }
 
-    void GenerateFloormap(){
-        RoomCode[,] map = new RoomCode[30,30];
-        Stack<Vector2Int> coordsToCollapse = new Stack<Vector2Int>();
-        map[15,15] = RoomCode.MID;
-        GetEmptyCoords(ref map,new Vector2Int(15,15));
-    
+    public void GenerateFloormap(){
+        int[,] rooms = new int[SIZE,SIZE];
+        bool[,] explored = new bool[SIZE,SIZE];
+        int roomNum = 0;
+        Stack<Vector2Int> ungenerated = new Stack<Vector2Int>();
+        ungenerated.Push(new Vector2Int(SIZE/2,SIZE/2));
+        while(ungenerated.Count > 0){
+            Vector2Int coordToGenerate = ungenerated.Pop();
+            print("Popped " + roomNum);
+            explored[coordToGenerate.y,coordToGenerate.x] = true;
+            int highestNeighbor = GetHighestNeighbor(ref explored, ref rooms, ref ungenerated, coordToGenerate);
+            rooms[coordToGenerate.y, coordToGenerate.x] = (UnityEngine.Random.Range(0.0f,1.0f) < 0.45f)? highestNeighbor:roomNum;
+            roomNum += 1;
+        }
+        string mat = "";
+        for(int i = 0; i < rooms.GetLength(0); i++){
+            for(int j = 0; j < rooms.GetLength(1); j++){
+                mat += rooms[i,j].ToString() + ' ';
+            }
+            mat += '\n';
+        }
+        print(mat);
     }
 
-    List<Vector2> GetEmptyCoords(ref RoomCode[,] map, Vector2Int _coord){
-        List<Vector2> l = new List<Vector2>();
-        print(Enum.GetName(typeof(RoomCode), map[_coord.y, _coord.x]));
-        if(_coord.y-1 >= 0) print(string.Format("LEFT IS NULL {0}", map[0,0] == RoomCode.UNSET));
-        return l;
+    int GetHighestNeighbor(ref bool[,] _explorationMap, ref int[,] roomMap, ref Stack<Vector2Int> _stack, Vector2Int _coordinate){
+        Vector2Int[] potential = new Vector2Int[]{
+            _coordinate + Vector2Int.left,
+            _coordinate + Vector2Int.right,
+            _coordinate + Vector2Int.up,
+            _coordinate + Vector2Int.down
+        };
+        List<int> validNeighborStates = new List<int>();
+        foreach(Vector2Int vec in potential) {
+            if (vec.x <0 || vec.x >= SIZE || vec.y < 0 || vec.y >= SIZE || roomMap[vec.y,vec.x] == -1) continue;
+            if(_explorationMap[vec.y,vec.x]) validNeighborStates.Add(roomMap[vec.y,vec.x]);
+            else{ _stack.Push(vec); roomMap[vec.y,vec.x] = -1;}
+        }
+        return (validNeighborStates.Count > 0)? validNeighborStates.Max():0;
     }
-    RoomNode PickRandomNeighborTemplate(){
-        return RoomNode.Empty;        
-    }
+    
 
 
 
