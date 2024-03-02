@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -11,6 +12,8 @@ public class WaveCollapseGenerator : MonoBehaviour
     const float FLOOR_THICKNESS = 0.4f, ROOM_SIZE = 17.5f, WALL_THICKNESS = 0.45f;
     float depthRatio = 0;
     [SerializeField] Material wallmat;
+    [SerializeField] Material[] floorMats;
+    [SerializeField] GameObject playerPrefab;
 
     void Awake(){
         depthRatio = 1/Mathf.Sin((Camera.main.transform.eulerAngles.x + 25) * Mathf.Deg2Rad);
@@ -36,7 +39,7 @@ public class WaveCollapseGenerator : MonoBehaviour
             explored[coordToGenerate.y,coordToGenerate.x] = true;
             int highestNeighbor = GetHighestNeighbor(ref explored, ref rooms, ref ungenerated, coordToGenerate);
             rooms[coordToGenerate.y, coordToGenerate.x] = (UnityEngine.Random.Range(0.0f,1.0f) < 0.45f)? highestNeighbor:roomNum;
-            roomNum += 1;
+            roomNum = (roomNum + 1)%floorMats.Length;
         }
 
         rooms[UnityEngine.Random.Range(0,ROWS), UnityEngine.Random.Range(0,COLS)] = -1;
@@ -50,10 +53,13 @@ public class WaveCollapseGenerator : MonoBehaviour
                 go.transform.parent = transform;
                 go.transform.localScale = new Vector3(ROOM_SIZE , FLOOR_THICKNESS, ROOM_SIZE * depthRatio);
                 go.transform.position = new Vector3(ROOM_SIZE * (j-1), 0, ROOM_SIZE * depthRatio * (i-1));
+                go.GetComponent<Renderer>().material = floorMats[rooms[i,j]];
             }
             mat += '\n';
         }
         print(mat);
+
+        GameObject pl = GameObject.Instantiate(playerPrefab, new Vector3(0, .5f, 0), Quaternion.identity, transform);
         
     }
 

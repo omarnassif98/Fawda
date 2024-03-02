@@ -7,7 +7,7 @@ using UnityEngine;
 
 public class HauntNormalPlayerBehaviour : PlayerBehaviour
 {
-    const float FOV_ANGLES = 45, FOV_MAX = 40;
+    const float FOV_ANGLES = 45, FOV_MAX = 400;
     const int FOV_RAYS = (int)(FOV_ANGLES * 2.5f);
     MeshFilter playerFOVMesh;
 
@@ -79,7 +79,7 @@ public class HauntNormalPlayerBehaviour : PlayerBehaviour
 
     Vector3 GetAngleDir(float _angle, float _dist = -1){
         if (_dist < -1) print("BIAS DIST: " + _dist);
-        return new Vector3(Mathf.Sin(_angle * Mathf.Deg2Rad),0,Mathf.Cos(_angle * Mathf.Deg2Rad)) * ((_dist == -1)?FOV_MAX:_dist);
+        return new Vector3(Mathf.Sin(_angle * Mathf.Deg2Rad),0,Mathf.Cos(_angle * Mathf.Deg2Rad)) * ((_dist == -1 || _dist > FOV_MAX)?FOV_MAX:_dist);
     }
 }
 
