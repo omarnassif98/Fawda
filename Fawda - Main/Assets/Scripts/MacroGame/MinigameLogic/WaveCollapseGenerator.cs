@@ -9,7 +9,7 @@ using UnityEngine.Rendering;
 public class WaveCollapseGenerator : MonoBehaviour
 {
     const int ROWS = 3, COLS = 3;
-    const float FLOOR_THICKNESS = 0.4f, ROOM_SIZE = 17.5f, WALL_THICKNESS = 0.45f;
+    const float FLOOR_THICKNESS = 0.4f, ROOM_SIZE = 12f, WALL_THICKNESS = 0.45f, DOOR_WIDTH = 3.0f;
     float depthRatio = 0;
     [SerializeField] Material wallmat;
     [SerializeField] Material[] floorMats;
@@ -54,6 +54,7 @@ public class WaveCollapseGenerator : MonoBehaviour
                 go.transform.localScale = new Vector3(ROOM_SIZE , FLOOR_THICKNESS, ROOM_SIZE * depthRatio);
                 go.transform.position = new Vector3(ROOM_SIZE * (j-1), 0, ROOM_SIZE * depthRatio * (i-1));
                 go.GetComponent<Renderer>().material = floorMats[rooms[i,j]];
+                Destroy(go.GetComponent<BoxCollider>());
             }
             mat += '\n';
         }
@@ -73,9 +74,7 @@ public class WaveCollapseGenerator : MonoBehaviour
             print(string.Format("{0} | {2} looking at {1} | {3}", _coordinate, coord, _roomMap[_coordinate.y, _coordinate.x], _roomMap[coord.y, coord.x]));
             
             if(_roomMap[_coordinate.y, _coordinate.x] != _roomMap[coord.y, coord.x]){
-                GenerateWall(_coordinate, coord - _coordinate);
-                
-                
+                GenerateWall(_coordinate, coord - _coordinate, _roomMap[coord.y,coord.x] != -1 && _roomMap[_coordinate.y,_coordinate.x] != -1);
             }
         }
 
@@ -83,30 +82,67 @@ public class WaveCollapseGenerator : MonoBehaviour
             switch (_coordinate.x)
             {
                 case 0:
-                    GenerateWall(_coordinate, Vector2Int.left);
+                    GenerateWall(_coordinate, Vector2Int.left, false);
                     break;
                 case ROWS - 1:
-                    GenerateWall(_coordinate, Vector2Int.right);
+                    GenerateWall(_coordinate, Vector2Int.right, false);
                     break;
             }
             
             switch (_coordinate.y)
             {
                 case 0:
-                    GenerateWall(_coordinate, Vector2Int.down);
+                    GenerateWall(_coordinate, Vector2Int.down, false);
                     break;
                 case COLS - 1:
-                    GenerateWall(_coordinate, Vector2Int.up);
+                    GenerateWall(_coordinate, Vector2Int.up, false);
                     break;
             }
     }
 
-    void GenerateWall(Vector2Int _coordinate, Vector2Int _dir){
-        GameObject wall = GameObject.CreatePrimitive(PrimitiveType.Cube);
-        wall.transform.localScale = new Vector3(_dir.x == 0?ROOM_SIZE:WALL_THICKNESS, 3, _dir.y ==0?ROOM_SIZE*depthRatio:WALL_THICKNESS*depthRatio);
-        wall.transform.position = new Vector3(ROOM_SIZE * (_coordinate.x-1) + (_dir.x * ROOM_SIZE/2), 1.5f, ROOM_SIZE * depthRatio * (_coordinate.y-1) + (_dir.y * ROOM_SIZE/2 * depthRatio));
-        wall.transform.parent = transform;
-        wall.GetComponent<Renderer>().material = wallmat;
+    void GenerateWall(Vector2Int _coordinate, Vector2Int _dir, bool _doored = true){
+        List<GameObject> wallParts = new List<GameObject>();
+        switch (_doored){
+            case true:
+                float doorLoc = UnityEngine.Random.Range(0.25f,0.75f) * ROOM_SIZE;
+                GameObject wallPartL = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                wallPartL.transform.localScale = new Vector3(
+                    _dir.x == 0?(doorLoc - DOOR_WIDTH/2) + WALL_THICKNESS:WALL_THICKNESS,
+                    3,
+                    _dir.y ==0?(doorLoc - DOOR_WIDTH/2 + WALL_THICKNESS)*depthRatio:WALL_THICKNESS*depthRatio);
+
+
+                wallPartL.transform.position = new Vector3(
+                    ROOM_SIZE * (_coordinate.x-1) + (_dir.x * ROOM_SIZE/2) - (_dir.y * ROOM_SIZE/2) + (_dir.y * wallPartL.transform.localScale.x/2) - (_dir.y * WALL_THICKNESS/2),
+                    1.5f,
+                    ROOM_SIZE*depthRatio * (_coordinate.y-1) + (_dir.y * ROOM_SIZE/2)*depthRatio - (_dir.x * ROOM_SIZE/2)*depthRatio + (_dir.x * wallPartL.transform.localScale.z/2) - (_dir.x * WALL_THICKNESS/2)*depthRatio);
+                    //(_dir.x * ROOM_SIZE/2) - (_dir.x * wallPartL.transform.localScale.z/2) + (_dir.x * WALL_THICKNESS/2)
+                wallParts.Add(wallPartL);
+                GameObject wallPartR = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                wallPartR.transform.localScale = new Vector3(
+                _dir.x == 0?ROOM_SIZE-doorLoc-DOOR_WIDTH/2:WALL_THICKNESS,
+                3,
+                _dir.y ==0?(ROOM_SIZE-doorLoc-DOOR_WIDTH/2)*depthRatio:WALL_THICKNESS*depthRatio);
+                
+                wallPartR.transform.position = new Vector3(
+                ROOM_SIZE * (_coordinate.x-1) + (_dir.x * ROOM_SIZE/2) - (_dir.y * ROOM_SIZE/2) + (_dir.y * doorLoc) + (_dir.y * DOOR_WIDTH/2) + (_dir.y * wallPartR.transform.localScale.x/2),
+                1.5f,
+                ROOM_SIZE * (_coordinate.y-1) *depthRatio + (_dir.y * ROOM_SIZE/2) *depthRatio - (_dir.x * ROOM_SIZE/2)*depthRatio + (_dir.x * doorLoc)*depthRatio + (_dir.x * DOOR_WIDTH/2)*depthRatio + (_dir.x * wallPartR.transform.localScale.z/2) );
+                wallParts.Add(wallPartR);
+
+                break;
+            case false:
+                GameObject wall = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                wall.transform.localScale = new Vector3(_dir.x == 0?ROOM_SIZE:WALL_THICKNESS, 3, _dir.y ==0?ROOM_SIZE*depthRatio:WALL_THICKNESS*depthRatio);
+                wall.transform.position = new Vector3(ROOM_SIZE * (_coordinate.x-1) + (_dir.x * ROOM_SIZE/2), 1.5f, ROOM_SIZE * depthRatio * (_coordinate.y-1) + (_dir.y * ROOM_SIZE/2 * depthRatio));
+                wallParts.Add(wall);
+                break;
+        }
+        foreach (GameObject wall in wallParts)
+        {
+            wall.transform.parent = transform;
+            wall.GetComponent<Renderer>().material = wallmat;
+        }
     }
     int GetHighestNeighbor(ref bool[,] _explorationMap, ref int[,] roomMap, ref Stack<Vector2Int> _stack, Vector2Int _coordinate){
         Vector2Int[] potential = new Vector2Int[]{
@@ -123,8 +159,4 @@ public class WaveCollapseGenerator : MonoBehaviour
         }
         return (validNeighborStates.Count > 0)? validNeighborStates.Max():0;
     }
-    
-
-
-
 }
