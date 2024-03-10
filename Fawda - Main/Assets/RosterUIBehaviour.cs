@@ -21,12 +21,12 @@ public class RosterUIBehaviour
     }
 
 
-    
+
     private PlayerLobbyRosterSlot[] rosterPlayers;
     private short occupationCount = 0;
     private Image rosterRoulleteTicker;
     public RosterUIBehaviour(Transform _rosterParent){
-        
+
         rosterPlayers = new PlayerLobbyRosterSlot[_rosterParent.childCount];
         for(int i = 0; i <rosterPlayers.Length; i++){
             rosterPlayers[i] = new PlayerLobbyRosterSlot(_rosterParent.GetChild(i));
@@ -75,7 +75,7 @@ public class RosterUIBehaviour
                 currIdx += 1;
             }
         }
-        
+
         for(short i = 0; i < occupationCount; i++){
             rosterPlayers[i].occupied = true;
             rosterPlayers[i].playerColorImage.color = rosterPlayers[newIdxs[i]].playerColorImage.color;
@@ -90,7 +90,7 @@ public class RosterUIBehaviour
             SetRosterSlotVisibility(i,i == occupationCount);
         }
         DebugLogger.singleton.Log(string.Format("Tidied roster, occCount is {0}", occupationCount));
-        
+
     }
 
     private void SetRosterSlotVisibility(int _idx, bool _visibility){
@@ -115,13 +115,13 @@ public class RosterUIBehaviour
             DebugLogger.singleton.Log("Ummm...");
             for(int i = 0; i < _participants.Length; i++){
                 optedRosterSlots.Add((GetRosterTransform(i),i));
-            }   
+            }
         }
         UIManager.singleton.StartCoroutine(SlotRoulette(optedRosterSlots));
     }
 
     IEnumerator SlotRoulette(List<(Transform, int)> rosterTransforms){
-        
+
         rosterRoulleteTicker.color = Color.red;
         if (rosterTransforms.Count == 1){
             SetTickerPosition(rosterTransforms[0].Item1);

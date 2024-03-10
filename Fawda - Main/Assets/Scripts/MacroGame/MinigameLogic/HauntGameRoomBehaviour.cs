@@ -6,13 +6,13 @@ using UnityEngine;
 
 
 public class HauntGameRoomBehaviour : MonoBehaviour
-{   
+{
     static int num = 0;
     static bool extentReached;
     static float width_used = 0, height_used = 0, view_angle_factor = 1;
     const float FLOOR_THICKNESS = 0.2f, MAX_MAP_HEIGHT = 600, MAX_MAP_WIDTH = 400, OFFSET = FLOOR_THICKNESS + 5.0f/2;
     float targetOpacity = 1;
-    readonly Renderer[] bottomWallMats = null; //WHO THE FUCK?????????
+    List<Renderer> bottomWallMats = new List<Renderer>();
     short occupancy = 0;
     // Start is called before the first frame update
 
@@ -28,6 +28,13 @@ public class HauntGameRoomBehaviour : MonoBehaviour
         targetOpacity = occupancy == 0? 1 : 0.2f;
         foreach(Renderer mat in bottomWallMats){
             mat.material.color = new Color(mat.material.color.r, mat.material.color.g, mat.material.color.b, Mathf.Lerp(mat.material.color.a, targetOpacity, Time.deltaTime / 2));
+        }
+    }
+
+    public void FeedWalls(List<GameObject> _walls){
+        foreach(GameObject wallPart in _walls){
+            print(wallPart.name);
+            bottomWallMats.Add(wallPart.GetComponent<MeshRenderer>());
         }
     }
 

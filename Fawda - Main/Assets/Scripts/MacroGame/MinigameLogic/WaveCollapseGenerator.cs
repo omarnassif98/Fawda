@@ -10,14 +10,9 @@ public class WaveCollapseGenerator : MonoBehaviour
 {
     const int ROWS = 3, COLS = 3;
     const float FLOOR_THICKNESS = 0.4f, ROOM_SIZE = 12f, WALL_THICKNESS = 0.45f, DOOR_WIDTH = 3.0f;
-    float depthRatio = 0;
     [SerializeField] Material wallmat;
     [SerializeField] Material[] floorMats;
     [SerializeField] GameObject playerPrefab;
-
-    void Awake(){
-        depthRatio = 1/Mathf.Sin((Camera.main.transform.eulerAngles.x + 25) * Mathf.Deg2Rad);
-    }
 
 
     void Start(){
@@ -25,6 +20,8 @@ public class WaveCollapseGenerator : MonoBehaviour
     }
 
     public void GenerateFloormap(){
+        transform.eulerAngles = Vector3.zero;
+
         foreach(Transform t in transform){
             Destroy(t.gameObject);
         }
@@ -42,107 +39,127 @@ public class WaveCollapseGenerator : MonoBehaviour
             roomNum = (roomNum + 1)%floorMats.Length;
         }
 
-        rooms[UnityEngine.Random.Range(0,ROWS), UnityEngine.Random.Range(0,COLS)] = -1;
+
+        //Delete 1 room ON THE PERIFERY
+        if (UnityEngine.Random.Range(0.0f, 1.0f) < 0.5f) rooms[UnityEngine.Random.Range(0,ROWS), new int[2]{0,COLS-1}[UnityEngine.Random.Range(0,2)]] = -1; //Either on the horizontals
+        else rooms[new int[2]{0,ROWS-1}[UnityEngine.Random.Range(0,2)],UnityEngine.Random.Range(0,COLS)] = -1; //Or verticals
+
         string mat = "";
-        for(int i = 0; i < rooms.GetLength(0); i++){
-            for(int j = 0; j < rooms.GetLength(1); j++){
+        for(int i = 0; i < rooms.GetLength(0); i++){ //Down to Up
+            for(int j = 0; j < rooms.GetLength(1); j++){//Left to Right
                 mat += rooms[i,j].ToString() + ' ';
-                SetupRoomWalls(rooms, new Vector2Int(j,i));
-                if(rooms[i,j] == -1) continue;
+                List<GameObject> walls = SetupRoomWalls(rooms, new Vector2Int(j,i)); //Set up walls, each room handles their lower and right walls
+                if(rooms[i,j] == -1) continue; //Empty rooms technically have walls, but no floor, so skip
                 GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
                 go.transform.parent = transform;
-                go.transform.localScale = new Vector3(ROOM_SIZE , FLOOR_THICKNESS, ROOM_SIZE * depthRatio);
-                go.transform.position = new Vector3(ROOM_SIZE * (j-1), 0, ROOM_SIZE * depthRatio * (i-1));
+                go.transform.localScale = new Vector3(ROOM_SIZE , FLOOR_THICKNESS, ROOM_SIZE);
+                go.transform.position = new Vector3(ROOM_SIZE * (j-1), 0, ROOM_SIZE * (i-1));
                 go.GetComponent<Renderer>().material = floorMats[rooms[i,j]];
-                Destroy(go.GetComponent<BoxCollider>());
+                go.name = "Room " + (i*3 + j).ToString();
+                BoxCollider roomCollider = go.GetComponent<BoxCollider>();
+                roomCollider.isTrigger = true;
+                roomCollider.center = Vector3.up * FLOOR_THICKNESS * 1.5f;
+                HauntGameRoomBehaviour roomLogic = go.AddComponent<HauntGameRoomBehaviour>();
+                roomLogic.FeedWalls(walls);
             }
             mat += '\n';
         }
         print(mat);
-
         GameObject pl = GameObject.Instantiate(playerPrefab, new Vector3(0, .5f, 0), Quaternion.identity, transform);
-        
+        transform.eulerAngles = new Vector3(0,45,0);
     }
 
-    void SetupRoomWalls(int [,] _roomMap, Vector2Int _coordinate){
+    List<GameObject> SetupRoomWalls(int [,] _roomMap, Vector2Int _coordinate){
+        List<GameObject> roomWalls = new List<GameObject>(); // We need to return the walls to the RIGHT, and DOWN
+
+
         Vector2Int[] potential = new Vector2Int[]{
             _coordinate + Vector2Int.right,
-            _coordinate + Vector2Int.up
-        };
+            _coordinate + Vector2Int.down
+        }; // Potential, inter-room walls, we need their states
+
         foreach(Vector2Int coord in potential){
-            if(coord.x >= COLS || coord.y >= ROWS) continue;
-            print(string.Format("{0} | {2} looking at {1} | {3}", _coordinate, coord, _roomMap[_coordinate.y, _coordinate.x], _roomMap[coord.y, coord.x]));
-            
+            if(coord.x >= COLS || coord.y < 0) continue; //Ignore if it points out of the array
             if(_roomMap[_coordinate.y, _coordinate.x] != _roomMap[coord.y, coord.x]){
-                GenerateWall(_coordinate, coord - _coordinate, _roomMap[coord.y,coord.x] != -1 && _roomMap[_coordinate.y,_coordinate.x] != -1);
+                foreach(GameObject wall in GenerateWall(_coordinate, coord - _coordinate, _roomMap[coord.y,coord.x] != -1 && _roomMap[_coordinate.y,_coordinate.x] != -1)){
+                    roomWalls.Add(wall); //These ones are guaranteed to be relevant
+                }
             }
         }
 
-        if(_roomMap[_coordinate.y, _coordinate.x] == -1) return;
-            switch (_coordinate.x)
-            {
-                case 0:
-                    GenerateWall(_coordinate, Vector2Int.left, false);
-                    break;
-                case ROWS - 1:
-                    GenerateWall(_coordinate, Vector2Int.right, false);
-                    break;
-            }
-            
-            switch (_coordinate.y)
-            {
-                case 0:
-                    GenerateWall(_coordinate, Vector2Int.down, false);
-                    break;
-                case COLS - 1:
-                    GenerateWall(_coordinate, Vector2Int.up, false);
-                    break;
-            }
+        if(_roomMap[_coordinate.y, _coordinate.x] == -1) return roomWalls; //Empty rooms take up no space, they have no periphery
+
+        switch (_coordinate.x)
+        {
+            case 0:
+                GenerateWall(_coordinate, Vector2Int.left, false);
+                break;
+            case ROWS - 1: //Add right wall if it's periphery
+                foreach(GameObject wall in GenerateWall(_coordinate, Vector2Int.right, false)){
+                    roomWalls.Add(wall);
+                }
+                break;
+        }
+
+        switch (_coordinate.y)
+        {
+            case 0: //Add bottom wall if it's a periphery
+                foreach(GameObject wall in GenerateWall(_coordinate, Vector2Int.down, false)){
+                    roomWalls.Add(wall);
+                }
+                break;
+            case COLS - 1:
+                GenerateWall(_coordinate, Vector2Int.up, false);
+                break;
+        }
+        return roomWalls;
     }
 
-    void GenerateWall(Vector2Int _coordinate, Vector2Int _dir, bool _doored = true){
-        List<GameObject> wallParts = new List<GameObject>();
+    List<GameObject> GenerateWall(Vector2Int _coordinate, Vector2Int _dir, bool _doored = true){
+        List<GameObject> wallParts = new List<GameObject>();//if doors have walls, it's 2 game objects
+
         switch (_doored){
-            case true:
+            case true: //door exists, the rooms have different states
                 float doorLoc = UnityEngine.Random.Range(0.25f,0.75f) * ROOM_SIZE;
                 GameObject wallPartL = GameObject.CreatePrimitive(PrimitiveType.Cube);
                 wallPartL.transform.localScale = new Vector3(
                     _dir.x == 0?(doorLoc - DOOR_WIDTH/2) + WALL_THICKNESS:WALL_THICKNESS,
                     3,
-                    _dir.y ==0?(doorLoc - DOOR_WIDTH/2 + WALL_THICKNESS)*depthRatio:WALL_THICKNESS*depthRatio);
+                    _dir.y ==0?(doorLoc - DOOR_WIDTH/2 + WALL_THICKNESS):WALL_THICKNESS);
 
 
                 wallPartL.transform.position = new Vector3(
                     ROOM_SIZE * (_coordinate.x-1) + (_dir.x * ROOM_SIZE/2) - (_dir.y * ROOM_SIZE/2) + (_dir.y * wallPartL.transform.localScale.x/2) - (_dir.y * WALL_THICKNESS/2),
                     1.5f,
-                    ROOM_SIZE*depthRatio * (_coordinate.y-1) + (_dir.y * ROOM_SIZE/2)*depthRatio - (_dir.x * ROOM_SIZE/2)*depthRatio + (_dir.x * wallPartL.transform.localScale.z/2) - (_dir.x * WALL_THICKNESS/2)*depthRatio);
-                    //(_dir.x * ROOM_SIZE/2) - (_dir.x * wallPartL.transform.localScale.z/2) + (_dir.x * WALL_THICKNESS/2)
+                    ROOM_SIZE * (_coordinate.y-1) + (_dir.y * ROOM_SIZE/2) - (_dir.x * ROOM_SIZE/2) + (_dir.x * wallPartL.transform.localScale.z/2) - (_dir.x * WALL_THICKNESS/2));
                 wallParts.Add(wallPartL);
                 GameObject wallPartR = GameObject.CreatePrimitive(PrimitiveType.Cube);
                 wallPartR.transform.localScale = new Vector3(
                 _dir.x == 0?ROOM_SIZE-doorLoc-DOOR_WIDTH/2:WALL_THICKNESS,
                 3,
-                _dir.y ==0?(ROOM_SIZE-doorLoc-DOOR_WIDTH/2)*depthRatio:WALL_THICKNESS*depthRatio);
-                
+                _dir.y ==0?(ROOM_SIZE-doorLoc-DOOR_WIDTH/2):WALL_THICKNESS);
+
                 wallPartR.transform.position = new Vector3(
                 ROOM_SIZE * (_coordinate.x-1) + (_dir.x * ROOM_SIZE/2) - (_dir.y * ROOM_SIZE/2) + (_dir.y * doorLoc) + (_dir.y * DOOR_WIDTH/2) + (_dir.y * wallPartR.transform.localScale.x/2),
                 1.5f,
-                ROOM_SIZE * (_coordinate.y-1) *depthRatio + (_dir.y * ROOM_SIZE/2) *depthRatio - (_dir.x * ROOM_SIZE/2)*depthRatio + (_dir.x * doorLoc)*depthRatio + (_dir.x * DOOR_WIDTH/2)*depthRatio + (_dir.x * wallPartR.transform.localScale.z/2) );
+                ROOM_SIZE * (_coordinate.y-1)  + (_dir.y * ROOM_SIZE/2)  - (_dir.x * ROOM_SIZE/2) + (_dir.x * doorLoc) + (_dir.x * DOOR_WIDTH/2) + (_dir.x * wallPartR.transform.localScale.z/2) );
                 wallParts.Add(wallPartR);
 
                 break;
-            case false:
+            case false: //door does not exist, it is a periphery wall
                 GameObject wall = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                wall.transform.localScale = new Vector3(_dir.x == 0?ROOM_SIZE:WALL_THICKNESS, 3, _dir.y ==0?ROOM_SIZE*depthRatio:WALL_THICKNESS*depthRatio);
-                wall.transform.position = new Vector3(ROOM_SIZE * (_coordinate.x-1) + (_dir.x * ROOM_SIZE/2), 1.5f, ROOM_SIZE * depthRatio * (_coordinate.y-1) + (_dir.y * ROOM_SIZE/2 * depthRatio));
+                wall.transform.localScale = new Vector3(_dir.x == 0?ROOM_SIZE:WALL_THICKNESS, 3, _dir.y ==0?ROOM_SIZE:WALL_THICKNESS);
+                wall.transform.position = new Vector3(ROOM_SIZE * (_coordinate.x-1) + (_dir.x * ROOM_SIZE/2), 1.5f, ROOM_SIZE * (_coordinate.y-1) + (_dir.y * ROOM_SIZE/2));
                 wallParts.Add(wall);
                 break;
         }
         foreach (GameObject wall in wallParts)
         {
+            wall.name = "Wall";
             wall.transform.parent = transform;
             wall.GetComponent<Renderer>().material = wallmat;
         }
+        return wallParts;
     }
     int GetHighestNeighbor(ref bool[,] _explorationMap, ref int[,] roomMap, ref Stack<Vector2Int> _stack, Vector2Int _coordinate){
         Vector2Int[] potential = new Vector2Int[]{
