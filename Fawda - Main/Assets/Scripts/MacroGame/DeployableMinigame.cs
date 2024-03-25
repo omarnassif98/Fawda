@@ -7,13 +7,12 @@ using UnityEngine.Events;
 
 public abstract class DeployableMinigame
 {
-    
-    public abstract void SetupGame(int _specialityPlayer = -1);
+
+    public abstract void SetupGame(Transform _mapWrapper, int _specialityPlayer = -1);
 
     public virtual void EndGame(){
 
-
     }
 
-    
+
 }

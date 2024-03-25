@@ -10,14 +10,14 @@ public class HauntGameManager : DeployableMinigame
 
     }
 
-    public override void SetupGame(int _specialityPlayer = -1)
+    public override void SetupGame(Transform _mapWrapper, int _specialityPlayer = -1)
     {
         DebugLogger.singleton.Log("HAUNT GAME CONFIGURED OH YEEEEEEEEAAH");
         ghostIdx = _specialityPlayer;
         ProfileData[] playerProfiles = LobbyManager.singleton.GetPlayerProfiles();
+        HauntGameMapGenerator waveCollapse = new HauntGameMapGenerator(_mapWrapper);
+        waveCollapse.GenerateFloormap();
 
-        //MAP
-        
 
         for(int i = 0, p = 0; i < playerProfiles.Length && p < LobbyManager.singleton.GetLobbySize() - 1; i++){
             if(ghostIdx != i && playerProfiles[i] != null){

@@ -12,9 +12,7 @@ public abstract class GameSetupBehaviour : MonoBehaviour
 
     public abstract void ReadyUp();
 
-    protected virtual void DeployMinigame(){
-        
-    }
+    protected abstract void DeployMinigame();
 
     public virtual void OnEnable(){
         GameManager.singleton.LoadMinigame(gameCode);

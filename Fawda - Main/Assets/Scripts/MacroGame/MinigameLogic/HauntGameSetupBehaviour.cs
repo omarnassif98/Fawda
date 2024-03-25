@@ -39,7 +39,11 @@ public class HauntGameSetupBehaviour : GameSetupBehaviour
         for (int i = 0; i < LobbyManager.singleton.GetLobbySize(); i++){
             opt_ins[i] = false;
         }
-        
+
     }
 
+    protected override void DeployMinigame()
+    {
+        throw new NotImplementedException();
+    }
 }

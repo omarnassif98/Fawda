@@ -11,19 +11,24 @@ public class HauntNormalPlayerBehaviour : PlayerBehaviour
     const int FOV_RAYS = (int)(FOV_ANGLES * 2.5f);
     MeshFilter playerFOVMesh;
 
+    [SerializeField] Transform lookAtBall;
+
     void Awake(){
         playerFOVMesh = transform.Find("FOV").GetComponent<MeshFilter>();
         playerFOVMesh.name = "FOV Mesh";
         playerFOVMesh.mesh = new Mesh();
+        PlayerBehaviour.hotseat = this;
     }
 
     protected override void Tick()
     {
-
-    }
-
-    void LateUpdate(){
         DrawFOV();
+        if(PlayerBehaviour.hotseat != this) return;
+        Vector2 rotInput = new Vector2(Input.GetAxisRaw("Debug Horizontal"), Input.GetAxisRaw("Debug Vertical"));
+        if(rotInput == Vector2.zero) return;
+        lookAtBall.position = transform.position + new Vector3(rotInput.x, 0, rotInput.y);
+        transform.LookAt(lookAtBall);
+
     }
 
     void DrawFOV(){

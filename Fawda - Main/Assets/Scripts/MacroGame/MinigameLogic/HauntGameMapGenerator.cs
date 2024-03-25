@@ -1,30 +1,31 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-public class WaveCollapseGenerator : MonoBehaviour
+public class HauntGameMapGenerator
 {
     const int ROWS = 3, COLS = 3;
     const float FLOOR_THICKNESS = 0.4f, ROOM_SIZE = 12f, WALL_THICKNESS = 0.45f, DOOR_WIDTH = 3.0f;
-    [SerializeField] Material wallmat;
-    [SerializeField] Material[] floorMats;
-    [SerializeField] GameObject playerPrefab;
+    private Material wallmat;
+    private UnityEngine.Object[] floorMats;
+    private GameObject hunterPlayerPrefab, ghostPlayerPrefab;
+    private Transform mapTransform;
 
 
-    void Start(){
-        GenerateFloormap();
+
+    public HauntGameMapGenerator(Transform _mapTransform){
+        mapTransform = _mapTransform;
+        hunterPlayerPrefab = Resources.Load("MinigameAssets/Haunt/Prefabs/HunterPlayer") as GameObject;
+        ghostPlayerPrefab = Resources.Load("MinigameAssets/Haunt/Prefabs/HunterPlayer") as GameObject;
+        floorMats = Resources.LoadAll("MinigameAssets/Haunt/FloorMaterials", typeof(Material));
+        wallmat = Resources.Load("MinigameAssets/Haunt/WallMat") as Material;
     }
 
     public void GenerateFloormap(){
-        transform.eulerAngles = Vector3.zero;
-
-        foreach(Transform t in transform){
-            Destroy(t.gameObject);
-        }
+        mapTransform.eulerAngles = Vector3.zero;
         int[,] rooms = new int[ROWS,COLS];
         bool[,] explored = new bool[ROWS,COLS];
         int roomNum = 0;
@@ -32,7 +33,6 @@ public class WaveCollapseGenerator : MonoBehaviour
         ungenerated.Push(new Vector2Int(ROWS/2,COLS/2));
         while(ungenerated.Count > 0){
             Vector2Int coordToGenerate = ungenerated.Pop();
-            print("Popped " + roomNum);
             explored[coordToGenerate.y,coordToGenerate.x] = true;
             int highestNeighbor = GetHighestNeighbor(ref explored, ref rooms, ref ungenerated, coordToGenerate);
             rooms[coordToGenerate.y, coordToGenerate.x] = (UnityEngine.Random.Range(0.0f,1.0f) < 0.45f)? highestNeighbor:roomNum;
@@ -51,22 +51,38 @@ public class WaveCollapseGenerator : MonoBehaviour
                 List<GameObject> walls = SetupRoomWalls(rooms, new Vector2Int(j,i)); //Set up walls, each room handles their lower and right walls
                 if(rooms[i,j] == -1) continue; //Empty rooms technically have walls, but no floor, so skip
                 GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                go.transform.parent = transform;
+                go.transform.parent = mapTransform;
                 go.transform.localScale = new Vector3(ROOM_SIZE , FLOOR_THICKNESS, ROOM_SIZE);
                 go.transform.position = new Vector3(ROOM_SIZE * (j-1), 0, ROOM_SIZE * (i-1));
-                go.GetComponent<Renderer>().material = floorMats[rooms[i,j]];
+                go.GetComponent<Renderer>().material = (Material)floorMats[rooms[i,j]];
                 go.name = "Room " + (i*3 + j).ToString();
                 BoxCollider roomCollider = go.GetComponent<BoxCollider>();
                 roomCollider.isTrigger = true;
                 roomCollider.center = Vector3.up * FLOOR_THICKNESS * 1.5f;
                 HauntGameRoomBehaviour roomLogic = go.AddComponent<HauntGameRoomBehaviour>();
                 roomLogic.FeedWalls(walls);
+                if(i != 1 || j != 1) continue;
+                SetupSpawnPoints(go.transform);
             }
             mat += '\n';
         }
-        print(mat);
-        GameObject pl = GameObject.Instantiate(playerPrefab, new Vector3(0, .5f, 0), Quaternion.identity, transform);
-        transform.eulerAngles = new Vector3(0,45,0);
+
+        mapTransform.eulerAngles = new Vector3(0,45,0);
+    }
+
+    void SetupSpawnPoints(Transform _centerRoom){
+        Transform ghostSpawnPoint = new GameObject().transform;
+        ghostSpawnPoint.parent = _centerRoom;
+        ghostSpawnPoint.localPosition = new Vector3(0,FLOOR_THICKNESS/2, 0);
+        Transform[] playerSpawnPoints = new Transform[4];
+        Vector3[] cardinalDirs = new Vector3[4]{Vector3.forward, Vector3.back, Vector3.left, Vector3.right};
+        for(int i = 0; i < 4; i++){
+            playerSpawnPoints[i] = new GameObject().transform;
+            playerSpawnPoints[i].position = ghostSpawnPoint.position + cardinalDirs[i] * ROOM_SIZE/3;
+            playerSpawnPoints[i].parent = _centerRoom;
+            playerSpawnPoints[i].forward = -cardinalDirs[i];
+            GameObject hunterPlayer = GameObject.Instantiate(hunterPlayerPrefab, playerSpawnPoints[i].position + Vector3.up * hunterPlayerPrefab.transform.lossyScale.y/2, playerSpawnPoints[i].rotation, mapTransform);
+        }
     }
 
     List<GameObject> SetupRoomWalls(int [,] _roomMap, Vector2Int _coordinate){
@@ -156,7 +172,7 @@ public class WaveCollapseGenerator : MonoBehaviour
         foreach (GameObject wall in wallParts)
         {
             wall.name = "Wall";
-            wall.transform.parent = transform;
+            wall.transform.parent = mapTransform;
             wall.GetComponent<Renderer>().material = wallmat;
         }
         return wallParts;

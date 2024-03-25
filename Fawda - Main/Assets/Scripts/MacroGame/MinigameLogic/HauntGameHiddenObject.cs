@@ -2,23 +2,24 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class HauntGameHiddenObject : MonoBehaviour
+public class HauntGameHiddenPlayer : PlayerBehaviour
 {
     [SerializeField] Transform player;
-    MeshRenderer mr;
-    // Start is called before the first frame update
-    void Start()
-    {
-        mr = GetComponent<MeshRenderer>();
-    }
+    MeshRenderer meshRenderer;
 
-    // Update is called once per frame
-    void Update()
+    protected override void Tick()
     {
         Ray ray = new Ray(transform.position, player.position - transform.position);
         RaycastHit hit;
         if(Physics.Raycast(ray, out hit)){
-            mr.enabled = hit.collider.transform == player && Vector3.Angle(player.forward, transform.position - player.position) < 20;
+            meshRenderer.enabled = hit.collider.transform == player && Vector3.Angle(player.forward, transform.position - player.position) < 20;
         }
     }
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        meshRenderer = GetComponent<MeshRenderer>();
+    }
+
 }

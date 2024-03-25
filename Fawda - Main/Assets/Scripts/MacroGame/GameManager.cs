@@ -21,6 +21,7 @@ public class GameManager : MonoBehaviour
 
 
     void Awake(){
+        Application.targetFrameRate = 30;
         if(singleton != null) Destroy(this);
         singleton = this;
     }
@@ -30,7 +31,7 @@ public class GameManager : MonoBehaviour
             DebugLogger.singleton.Log(string.Format("Game Manager Lookup Entry {0}: {1}", entry.Key, entry.Value));
         }
     }
-    
+
     public void LoadMinigame(GameCodes _gamecode){
         activeMinigame = (DeployableMinigame)Activator.CreateInstance(minigameLookup[_gamecode]);
     }
@@ -39,5 +40,11 @@ public class GameManager : MonoBehaviour
         activeMinigame = null;
     }
 
-    public void ConfigureGame(int _specialIdx) => activeMinigame.SetupGame(_specialIdx);
+    public void ConfigureGame(int _specialIdx = -1){
+        Transform mapWrapper = transform.Find("MapWrapper");
+        foreach(Transform go in mapWrapper) Destroy(go.gameObject);
+        activeMinigame.SetupGame(mapWrapper, _specialIdx);
+        UIManager.singleton.backgroundBehaviour.JoltBackground();
+        UIManager.singleton.backgroundBehaviour.idealCheckerboardOpacity = 0;
     }
+}
