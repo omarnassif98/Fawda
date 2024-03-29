@@ -13,8 +13,8 @@ public class HauntGameMapGenerator
     private UnityEngine.Object[] floorMats;
     private GameObject hunterPlayerPrefab, ghostPlayerPrefab;
     private Transform mapTransform;
-
-
+    private Transform[] hunterSpawnPoints = new Transform[4];
+    private Transform ghostSpawnPoint;
 
     public HauntGameMapGenerator(Transform _mapTransform){
         mapTransform = _mapTransform;
@@ -71,23 +71,20 @@ public class HauntGameMapGenerator
     }
 
     void SetupSpawnPoints(Transform _centerRoom){
-        Transform ghostSpawnPoint = new GameObject().transform;
+        ghostSpawnPoint = new GameObject().transform;
         ghostSpawnPoint.parent = _centerRoom;
         ghostSpawnPoint.localPosition = new Vector3(0,FLOOR_THICKNESS/2, 0);
-        Transform[] playerSpawnPoints = new Transform[4];
         Vector3[] cardinalDirs = new Vector3[4]{Vector3.forward, Vector3.back, Vector3.left, Vector3.right};
         for(int i = 0; i < 4; i++){
-            playerSpawnPoints[i] = new GameObject().transform;
-            playerSpawnPoints[i].position = ghostSpawnPoint.position + cardinalDirs[i] * ROOM_SIZE/3;
-            playerSpawnPoints[i].parent = _centerRoom;
-            playerSpawnPoints[i].forward = -cardinalDirs[i];
-            GameObject hunterPlayer = GameObject.Instantiate(hunterPlayerPrefab, playerSpawnPoints[i].position + Vector3.up * hunterPlayerPrefab.transform.lossyScale.y/2, playerSpawnPoints[i].rotation, mapTransform);
+            hunterSpawnPoints[i] = new GameObject().transform;
+            hunterSpawnPoints[i].position = ghostSpawnPoint.position + cardinalDirs[i] * ROOM_SIZE/3;
+            hunterSpawnPoints[i].parent = _centerRoom;
+            hunterSpawnPoints[i].forward = -cardinalDirs[i];
         }
     }
 
     List<GameObject> SetupRoomWalls(int [,] _roomMap, Vector2Int _coordinate){
         List<GameObject> roomWalls = new List<GameObject>(); // We need to return the walls to the RIGHT, and DOWN
-
 
         Vector2Int[] potential = new Vector2Int[]{
             _coordinate + Vector2Int.right,

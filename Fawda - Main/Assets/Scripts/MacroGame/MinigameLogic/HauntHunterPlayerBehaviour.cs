@@ -5,14 +5,13 @@ using UnityEngine;
 
 
 
-public class HauntNormalPlayerBehaviour : PlayerBehaviour
+public class HauntHunterPlayerBehaviour : PlayerBehaviour
 {
-    const float FOV_ANGLES = 30, FOV_MAX = 15;
-    const int FOV_RAYS = (int)(FOV_ANGLES * 2.5f);
+    const float FOV_ANGLES = 40, FOV_MAX = 200;
+    const int FOV_RAYS = (int)(FOV_ANGLES * 1.5f);
     MeshFilter playerFOVMesh;
-
     [SerializeField] Transform lookAtBall;
-
+    [SerializeField] float flashDuration;
     void Awake(){
         playerFOVMesh = transform.Find("FOV").GetComponent<MeshFilter>();
         playerFOVMesh.name = "FOV Mesh";
@@ -22,12 +21,27 @@ public class HauntNormalPlayerBehaviour : PlayerBehaviour
 
     protected override void Tick()
     {
-        DrawFOV();
-        if(PlayerBehaviour.hotseat != this) return;
+        if(PlayerBehaviour.hotseat != this || !base.isMobile) return;
         Vector2 rotInput = new Vector2(Input.GetAxisRaw("Debug Horizontal"), Input.GetAxisRaw("Debug Vertical"));
+        if(Input.GetButtonDown("Action")) StartCoroutine(FlashCamera());
         if(rotInput == Vector2.zero) return;
         lookAtBall.position = transform.position + new Vector3(rotInput.x, 0, rotInput.y);
         transform.LookAt(lookAtBall);
+
+    }
+
+    IEnumerator FlashCamera(){
+        base.isMobile = false;
+        playerFOVMesh.gameObject.SetActive(true);
+        DrawFOV();
+        HauntGameHiddenPlayer[] hauntGameHiddenPlayers = GameObject.FindObjectsOfType<HauntGameHiddenPlayer>();
+        foreach(HauntGameHiddenPlayer hiddenPlayer in hauntGameHiddenPlayers){
+            if(Vector3.Angle(transform.forward, hiddenPlayer.transform.position - transform.position) < FOV_ANGLES) hiddenPlayer.Stun();
+
+        }
+        yield return new WaitForSeconds(flashDuration);
+        base.isMobile = true;
+        playerFOVMesh.gameObject.SetActive(false);
 
     }
 

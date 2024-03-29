@@ -6,20 +6,36 @@ public class HauntGameHiddenPlayer : PlayerBehaviour
 {
     [SerializeField] Transform player;
     MeshRenderer meshRenderer;
+    [SerializeField] float stunDuration, visibilityDuration;
+    bool canKill = true;
+    private Coroutine stunCycle;
 
     protected override void Tick()
     {
-        Ray ray = new Ray(transform.position, player.position - transform.position);
-        RaycastHit hit;
-        if(Physics.Raycast(ray, out hit)){
-            meshRenderer.enabled = hit.collider.transform == player && Vector3.Angle(player.forward, transform.position - player.position) < 20;
-        }
     }
 
+
+    public void Stun(){
+        if(stunCycle != null)StopCoroutine(stunCycle);
+        stunCycle = null;
+        canKill = false;
+        isMobile = false;
+        meshRenderer.enabled = true;
+        stunCycle = StartCoroutine(StunRecovery());
+    }
+
+    IEnumerator StunRecovery(){
+        yield return new WaitForSeconds(stunDuration);
+        isMobile = true;
+        yield return new WaitForSeconds(visibilityDuration);
+        meshRenderer.enabled = false;
+        canKill = true;
+    }
     // Start is called before the first frame update
     void Start()
     {
         meshRenderer = GetComponent<MeshRenderer>();
+        meshRenderer.enabled = false;
     }
 
 }

@@ -30,6 +30,8 @@ public class GameManager : MonoBehaviour
         foreach (KeyValuePair<GameCodes, Type> entry in minigameLookup){
             DebugLogger.singleton.Log(string.Format("Game Manager Lookup Entry {0}: {1}", entry.Key, entry.Value));
         }
+
+        UIManager.singleton.backgroundBehaviour.idealCheckerboardOpacity = 0;
     }
 
     public void LoadMinigame(GameCodes _gamecode){
