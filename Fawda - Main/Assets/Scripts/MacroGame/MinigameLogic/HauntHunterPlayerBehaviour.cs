@@ -9,14 +9,21 @@ public class HauntHunterPlayerBehaviour : PlayerBehaviour
 {
     const float FOV_ANGLES = 40, FOV_MAX = 200;
     const int FOV_RAYS = (int)(FOV_ANGLES * 1.5f);
+    public bool isPetrified{ get; private set;}
+    public bool isInvincible{ get; private set;}
     MeshFilter playerFOVMesh;
     [SerializeField] Transform lookAtBall;
     [SerializeField] float flashDuration;
+
+    Material playerPetrifiedMaterial;
     void Awake(){
         playerFOVMesh = transform.Find("FOV").GetComponent<MeshFilter>();
         playerFOVMesh.name = "FOV Mesh";
         playerFOVMesh.mesh = new Mesh();
         PlayerBehaviour.hotseat = this;
+        isPetrified = false;
+        playerDefaultMaterial = Resources.Load("Global/Materials/PlayerMat") as Material;
+        playerPetrifiedMaterial = Resources.Load("MinigameAssets/Haunt/Materials/PetifiedPlayerMat") as Material;
     }
 
     protected override void Tick()
@@ -38,6 +45,11 @@ public class HauntHunterPlayerBehaviour : PlayerBehaviour
         foreach(HauntGameHiddenPlayer hiddenPlayer in hauntGameHiddenPlayers){
             if(Vector3.Angle(transform.forward, hiddenPlayer.transform.position - transform.position) < FOV_ANGLES) hiddenPlayer.Stun();
 
+        }
+        HauntHunterPlayerBehaviour[] hunters = GameObject.FindObjectsOfType<HauntHunterPlayerBehaviour>();
+        foreach(HauntHunterPlayerBehaviour hauntHunter in hunters){
+            if(hauntHunter == this || !hauntHunter.isPetrified) continue;
+            if(Vector3.Angle(transform.forward, hauntHunter.transform.position - transform.position) < FOV_ANGLES) hauntHunter.StartCoroutine(hauntHunter.Revive());
         }
         yield return new WaitForSeconds(flashDuration);
         base.isMobile = true;
@@ -99,6 +111,34 @@ public class HauntHunterPlayerBehaviour : PlayerBehaviour
 
     Vector3 GetAngleDir(float _angle, float _dist = -1){
         return new Vector3(Mathf.Sin(_angle * Mathf.Deg2Rad),0,Mathf.Cos(_angle * Mathf.Deg2Rad)) * ((_dist == -1 || _dist > FOV_MAX)?FOV_MAX:_dist);
+    }
+
+    public void Petrify(){
+        print("Petrified");
+        isPetrified = true;
+        isMobile = false;
+        //Tell game manager to zoom in ig
+        GetComponent<Renderer>().material = playerPetrifiedMaterial;
+    }
+
+    public IEnumerator Revive(){
+        isPetrified = false;
+        isMobile = true;
+        isInvincible = true;
+        GetComponent<Renderer>().material = playerDefaultMaterial;
+        yield return new WaitForSeconds(0.05f);
+        GetComponent<Renderer>().enabled = false;
+        yield return new WaitForSeconds(0.05f);
+        GetComponent<Renderer>().enabled = true;
+        yield return new WaitForSeconds(0.13f);
+        GetComponent<Renderer>().enabled = false;
+        yield return new WaitForSeconds(0.05f);
+        GetComponent<Renderer>().enabled = true;
+        yield return new WaitForSeconds(0.13f);
+        GetComponent<Renderer>().enabled = false;
+        yield return new WaitForSeconds(0.05f);
+        GetComponent<Renderer>().enabled = true;
+        isInvincible = false;
     }
 }
 

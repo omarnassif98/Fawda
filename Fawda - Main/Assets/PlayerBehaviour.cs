@@ -9,6 +9,8 @@ public abstract class PlayerBehaviour : MonoBehaviour
     public static PlayerBehaviour hotseat; //Debug var
     protected bool isMobile = true;
     const float speed =  4.5f;
+    protected Material playerDefaultMaterial;
+
     void Update(){
         Move();
         Tick();
