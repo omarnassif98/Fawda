@@ -8,20 +8,29 @@ using UnityEngine.Events;
 public class LobbyManager : MonoBehaviour
 {
     public static LobbyManager singleton;
-    Transform gameSetupScreen;
-    
-    ProfileData[] players = new ProfileData[5];
 
-    public UnityEvent playerJoinEvent;
-    
-    void Start(){
+    //REWORK NEEDED
+    Transform gameSetupScreen;
+
+    public static ProfileData[] players {get;private set;}
+
+    public UnityEvent<string, Color> playerJoinEvent;
+    public UnityEvent<int> playerRemoveEvent;
+
+    void Awake(){
         if(singleton != null){
             Destroy(this);
         }else{
             singleton = this;
         }
-        ConnectionManager.singleton.RegisterRPC(OpCode.PROFILE_PAYLOAD, JoinPlayer);
+        players = new ProfileData[5];
         gameSetupScreen = GameObject.Find("Screens").transform.Find("Game Setup Screen");
+        playerJoinEvent = new UnityEvent<string, Color>();
+        playerRemoveEvent = new UnityEvent<int>();
+    }
+
+    void Start(){
+        ConnectionManager.singleton.RegisterRPC(OpCode.PROFILE_PAYLOAD, JoinPlayer);
     }
 
     public void TogglePlayerControls(bool _engage){
@@ -29,14 +38,25 @@ public class LobbyManager : MonoBehaviour
         ConnectionManager.singleton.SendMessageToClients(new NetMessage(OpCode.UDP_TOGGLE, BitConverter.GetBytes(_engage)));
     }
 
+    public void JoinTestPlayerAtFirstAvailable(){
+        for(int i = 0; i < players.Length; i++){
+            if(players[i] != null) continue;
+            JoinPlayer(new ProfileData("Test Player " + i.ToString(), i).Encode(),i);
+            return;
+        }
+    }
 
-    void JoinPlayer(byte[] _data, int idx){
-        print("Profile data " + _data.Length.ToString() +" bytes long - " + idx);
-        players[idx] = new ProfileData(_data);
-        print(players[idx].name);
-        UIManager.RosterManager.AddPlayerToRoster(players[idx].name, Color.cyan); //players[idx].colorSelection
-        MenuCursorManager.singleton.UpdateCursorPlayer(players[idx], idx);
-        playerJoinEvent.Invoke();
+    void JoinPlayer(byte[] _data, int _idx){
+        print("Profile data " + _data.Length.ToString() +" bytes long - " + _idx);
+        players[_idx] = new ProfileData(_data);
+        print(players[_idx].name + " - " + _idx.ToString());
+        MenuCursorManager.singleton.UpdateCursorPlayer(players[_idx], _idx);
+        playerJoinEvent.Invoke(players[_idx].name, ResourceManager.namedColors[players[_idx].colorSelection].color);
+    }
+
+    void RemovePlayer(int _idx){
+        players[_idx] = null;
+        playerRemoveEvent.Invoke(_idx);
     }
 
     public void IntroduceMinigame(string _mode){
@@ -45,6 +65,7 @@ public class LobbyManager : MonoBehaviour
             DebugLogger.singleton.Log(string.Format("{0}GameManager is not a minigame, dipshit", _mode));
             return;
         }
+        //REWORK NEEDED
         gameSetupScreen.Find(_mode).gameObject.SetActive(true);
         ConnectionManager.singleton.SendMessageToClients(OpCode.GAMESETUP, (int)Enum.Parse(typeof(GameCodes), _mode.ToUpper()));
         UIManager.singleton.SetRoomCodeVisibility(false);
@@ -57,7 +78,5 @@ public class LobbyManager : MonoBehaviour
         }
         return size;
     }
-
-    public ProfileData[] GetPlayerProfiles() => players;
 
 }

@@ -41,13 +41,9 @@ public class HauntHunterPlayerBehaviour : PlayerBehaviour
         base.isMobile = false;
         playerFOVMesh.gameObject.SetActive(true);
         DrawFOV();
-        HauntGameHiddenPlayer[] hauntGameHiddenPlayers = GameObject.FindObjectsOfType<HauntGameHiddenPlayer>();
-        foreach(HauntGameHiddenPlayer hiddenPlayer in hauntGameHiddenPlayers){
-            if(Vector3.Angle(transform.forward, hiddenPlayer.transform.position - transform.position) < FOV_ANGLES) hiddenPlayer.Stun();
+        if(Vector3.Angle(transform.forward, ((HauntGameDeployable)(GameManager.activeMinigame)).hauntHiddenPlayerInstance.transform.position - transform.position) < FOV_ANGLES) ((HauntGameDeployable)(GameManager.activeMinigame)).hauntHiddenPlayerInstance.Stun();
 
-        }
-        HauntHunterPlayerBehaviour[] hunters = GameObject.FindObjectsOfType<HauntHunterPlayerBehaviour>();
-        foreach(HauntHunterPlayerBehaviour hauntHunter in hunters){
+        foreach(HauntHunterPlayerBehaviour hauntHunter in ((HauntGameDeployable)(GameManager.activeMinigame)).hauntHunterPlayerInstances){
             if(hauntHunter == this || !hauntHunter.isPetrified) continue;
             if(Vector3.Angle(transform.forward, hauntHunter.transform.position - transform.position) < FOV_ANGLES) hauntHunter.StartCoroutine(hauntHunter.Revive());
         }

@@ -10,11 +10,10 @@ public class GameManager : MonoBehaviour
     public static GameManager singleton;
     private readonly Dictionary<GameCodes, Type> minigameLookup = new Dictionary<GameCodes,Type>()
     {
-        {GameCodes.HAUNT, typeof(HauntGameManager)}
+        {GameCodes.HAUNT, typeof(HauntGameDeployable)}
     };
 
-    [SerializeField]
-    private DeployableMinigame activeMinigame;
+    public static DeployableMinigame activeMinigame {get; private set;}
 
     [HideInInspector]
     public UnityEvent GameStartEvent = new UnityEvent(), GameEndEvent = new UnityEvent(), GamePauseEvent = new UnityEvent();
@@ -35,6 +34,7 @@ public class GameManager : MonoBehaviour
     }
 
     public void LoadMinigame(GameCodes _gamecode){
+        if(activeMinigame != null) return;
         activeMinigame = (DeployableMinigame)Activator.CreateInstance(minigameLookup[_gamecode]);
     }
 

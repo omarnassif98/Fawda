@@ -14,6 +14,11 @@ public class HauntGameSetupBehaviour : GameSetupBehaviour
         ConnectionManager.singleton.RegisterRPC("READYUP", IngestConfig);
     }
 
+    public void TestingReadyup(){
+        for(int i = 0; i < LobbyManager.players.Length; i++) if(LobbyManager.players[i] != null) IngestConfig(BitConverter.GetBytes(true), i);
+        ReadyUp();
+    }
+
     private void IngestConfig(byte[] _data, int _idx){
         opt_ins[_idx] = BitConverter.ToBoolean(_data,1);
         base.ChangeReadyStatus(_idx, BitConverter.ToBoolean(_data,0));

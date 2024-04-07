@@ -4,24 +4,24 @@ using UnityEngine;
 
 public struct NamedColor{
     int idx;
-    string name;
-    string hexCode;
+    public string name;
+    public Color color;
     public NamedColor(string _csvRow){
         string[] vals = _csvRow.Split(',');
         idx = int.Parse(vals[0]);
         name = vals[1];
-        hexCode = vals[2];
+        ColorUtility.TryParseHtmlString(vals[2],out color);
     }
 }
-public abstract class ResourceManager
+public class ResourceManager : MonoBehaviour
 {
-    public static NamedColor[] GetColors(){
-        TextAsset tex = Resources.Load<TextAsset>("player_colors");
+    public static NamedColor[] namedColors {get; private set;}
+    void Start(){
+        TextAsset tex = Resources.Load("player_colors") as TextAsset;
         string[] rows = tex.text.Split('\n');
-        NamedColor[] res = new NamedColor[rows.Length];
+        namedColors = new NamedColor[rows.Length];
         for(int i = 0; i < rows.Length; i++){
-            res[i] = new NamedColor(rows[i]);         
+            namedColors[i] = new NamedColor(rows[i]);
         }
-        return res;
     }
 }

@@ -2,13 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class HauntGameHiddenPlayer : PlayerBehaviour
+public class HauntHiddenPlayerBehaviour : PlayerBehaviour
 {
     MeshRenderer meshRenderer;
     [SerializeField] float stunDuration, visibilityDuration, killDuration, killRadius;
     bool canKill = true;
     private Coroutine stunCycle;
-    private HauntHunterPlayerBehaviour[] hauntHunterPlayers;
 
     protected override void Tick()
     {
@@ -18,7 +17,7 @@ public class HauntGameHiddenPlayer : PlayerBehaviour
     private Vector2 PullCoord(Vector3 _vec3) => new Vector2(_vec3.x,_vec3.z);
     void CheckForKill(){
         if(!canKill || !isMobile) return;
-        foreach(HauntHunterPlayerBehaviour player in hauntHunterPlayers){
+        foreach(HauntHunterPlayerBehaviour player in ((HauntGameDeployable)(GameManager.activeMinigame)).hauntHunterPlayerInstances){
             if(player.isPetrified || Vector2.Distance(PullCoord(player.transform.position), PullCoord(transform.position)) > killRadius) continue;
                 print("KILL");
                 StartCoroutine(PetrifyHunter(player));
@@ -57,7 +56,6 @@ public class HauntGameHiddenPlayer : PlayerBehaviour
     {
         meshRenderer = GetComponent<MeshRenderer>();
         meshRenderer.enabled = false;
-        hauntHunterPlayers = GameObject.FindObjectsOfType<HauntHunterPlayerBehaviour>();
         #if UNITY_EDITOR
             GameObject indicator = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             indicator.transform.parent = transform;

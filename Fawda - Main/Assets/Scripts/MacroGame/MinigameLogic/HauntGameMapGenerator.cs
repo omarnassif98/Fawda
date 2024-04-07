@@ -25,6 +25,7 @@ public class HauntGameMapGenerator
     }
 
     public void GenerateFloormap(){
+        //Wave-like collapse for generation
         mapTransform.eulerAngles = Vector3.zero;
         int[,] rooms = new int[ROWS,COLS];
         bool[,] explored = new bool[ROWS,COLS];
@@ -44,10 +45,10 @@ public class HauntGameMapGenerator
         if (UnityEngine.Random.Range(0.0f, 1.0f) < 0.5f) rooms[UnityEngine.Random.Range(0,ROWS), new int[2]{0,COLS-1}[UnityEngine.Random.Range(0,2)]] = -1; //Either on the horizontals
         else rooms[new int[2]{0,ROWS-1}[UnityEngine.Random.Range(0,2)],UnityEngine.Random.Range(0,COLS)] = -1; //Or verticals
 
-        string mat = "";
+        //Setup of the floorplan and walls according to the rng
+        //Also sets up the spawn points
         for(int i = 0; i < rooms.GetLength(0); i++){ //Down to Up
             for(int j = 0; j < rooms.GetLength(1); j++){//Left to Right
-                mat += rooms[i,j].ToString() + ' ';
                 List<GameObject> walls = SetupRoomWalls(rooms, new Vector2Int(j,i)); //Set up walls, each room handles their lower and right walls
                 if(rooms[i,j] == -1) continue; //Empty rooms technically have walls, but no floor, so skip
                 GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
@@ -64,9 +65,7 @@ public class HauntGameMapGenerator
                 if(i != 1 || j != 1) continue;
                 SetupSpawnPoints(go.transform);
             }
-            mat += '\n';
         }
-
         mapTransform.eulerAngles = new Vector3(0,45,0);
     }
 
@@ -89,7 +88,7 @@ public class HauntGameMapGenerator
         Vector2Int[] potential = new Vector2Int[]{
             _coordinate + Vector2Int.right,
             _coordinate + Vector2Int.down
-        }; // Potential, inter-room walls, we need their states
+        }; // Potential inter-room walls, we need their states
 
         foreach(Vector2Int coord in potential){
             if(coord.x >= COLS || coord.y < 0) continue; //Ignore if it points out of the array
