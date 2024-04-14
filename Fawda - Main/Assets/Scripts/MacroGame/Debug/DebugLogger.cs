@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -12,7 +13,13 @@ public class DebugLogger : MonoBehaviour
         if (singleton != null) return;
         singleton = this;
     }
-    // Start is called before the first frame update
+
+    [HideInCallstack]
+    public static void SourcedPrint(string _src, string _msg, string _color = "FFFFFF"){
+        string log = String.Format("<b><color=#{2}>{0}: </color></b>{1}", _src, _msg, _color);
+        print(log);
+        if(singleton!=null) singleton.Log(log);
+    }
     public void Log(string newLine){
         logs.Enqueue(string.Format("\n{0}",newLine));
     }

@@ -12,6 +12,7 @@ public class UIManager : MonoBehaviour
     public static UIManager singleton;
     public static DebugSystemsManager debugSystems;
     public static RosterUIBehaviour RosterManager;
+    public static BlackoutBehaviour blackoutBehaviour;
     public UnityEvent screenTransitionEvent = new UnityEvent();
     private Animator roomCodeAnimator;
     private TMP_Text roomCodeText;
@@ -23,11 +24,12 @@ public class UIManager : MonoBehaviour
             Destroy(this);
         }
         singleton= this;
+        debugSystems = gameObject.GetComponent<DebugSystemsManager>();
         RosterManager = new RosterUIBehaviour(transform.Find("Lobby Roster"));
         roomCodeAnimator = transform.Find("Room Code").GetComponent<Animator>();
-        debugSystems = gameObject.GetComponent<DebugSystemsManager>();
         startScreen = transform.Find("Screens").Find("Main Menu Screen").gameObject;
         roomCodeText = roomCodeAnimator.transform.Find("Room Code Text").GetComponent<TMP_Text>();
+        blackoutBehaviour = GameObject.FindObjectOfType<BlackoutBehaviour>();
 
     }
     // Start is called before the first frame update
@@ -62,7 +64,6 @@ public class UIManager : MonoBehaviour
         currentScreen = newScreen;
         MenuCursorManager.singleton.SetCursorInteractivities(true);
     }
-
 
     // Update is called once per frame
 

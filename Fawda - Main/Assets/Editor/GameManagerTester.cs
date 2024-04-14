@@ -17,7 +17,7 @@ public class GameManagerTester : Editor
         GUILayout.Space(5);
         if(GUILayout.Button("Load")){
             singleton.LoadMinigame(GameCodes.HAUNT);
-            singleton.ConfigureGame();
+            //singleton.ConfigureGame();
         }
         GUILayout.Space(5);
         EditorGUILayout.EndVertical();

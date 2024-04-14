@@ -6,7 +6,6 @@ using TMPro;
 using UnityEngine.UI;
 public class RosterUIBehaviour
 {
-    public UnityEvent<int> rouletteDecisionEvent = new UnityEvent<int>();
     struct PlayerLobbyRosterSlot{
         public TMP_Text playerNameText;
         public Image playerColorImage;
@@ -20,22 +19,24 @@ public class RosterUIBehaviour
         }
     }
 
-
+    IEnumerator roulettePlaying;
 
     private PlayerLobbyRosterSlot[] rosterPlayers;
     private short occupationCount = 0;
-    private Image rosterRoulleteTicker;
+    private TMP_Text rosterRoulleteTicker;
     public RosterUIBehaviour(Transform _rosterParent){
-
         rosterPlayers = new PlayerLobbyRosterSlot[_rosterParent.childCount];
         for(int i = 0; i <rosterPlayers.Length; i++){
             rosterPlayers[i] = new PlayerLobbyRosterSlot(_rosterParent.GetChild(i));
         }
         GameObject roulette = new GameObject();
         roulette.transform.parent = _rosterParent;
-        rosterRoulleteTicker = roulette.AddComponent<Image>();
-        rosterRoulleteTicker.rectTransform.sizeDelta = new Vector2(30,30);
+        rosterRoulleteTicker = roulette.AddComponent<TextMeshProUGUI>();
+        rosterRoulleteTicker.text = "▼";
+        rosterRoulleteTicker.rectTransform.sizeDelta = new Vector2(15,15);
         rosterRoulleteTicker.color = Color.red;
+        roulette.name = "Ticker";
+        rosterRoulleteTicker.enabled = false;
         TidyRoster();
     }
 
@@ -103,6 +104,7 @@ public class RosterUIBehaviour
     }
 
     public void StartReadyupProcess(bool[] _participants){
+        DebugLogger.SourcedPrint("Roster Roulette", "Preprocessing");
         List<(Transform,int)> optedRosterSlots = new List<(Transform,int)>();
         for (int i = 0; i<_participants.Length; i++){
             if(_participants[i]){
@@ -112,22 +114,30 @@ public class RosterUIBehaviour
         }
         if (optedRosterSlots.Count == 0)
         {
-            DebugLogger.singleton.Log("Ummm...");
             for(int i = 0; i < _participants.Length; i++){
                 optedRosterSlots.Add((GetRosterTransform(i),i));
             }
         }
-        UIManager.singleton.StartCoroutine(SlotRoulette(optedRosterSlots));
+        if(roulettePlaying != null){
+            DebugLogger.SourcedPrint("Roster Roulette", "Clearing junk");
+            UIManager.singleton.StopCoroutine(roulettePlaying);
+            roulettePlaying = null;
+        }
+        roulettePlaying = SlotRoulette(optedRosterSlots);
+        UIManager.singleton.StartCoroutine(roulettePlaying);
     }
 
     IEnumerator SlotRoulette(List<(Transform, int)> rosterTransforms){
-
+        DebugLogger.SourcedPrint("Roster Roulette", "Start");
+        rosterRoulleteTicker.enabled = true;
         rosterRoulleteTicker.color = Color.red;
         if (rosterTransforms.Count == 1){
             SetTickerPosition(rosterTransforms[0].Item1);
-            rouletteDecisionEvent.Invoke(rosterTransforms[0].Item2);
+            GameManager.singleton.IntroduceGame(rosterTransforms[0].Item2);
+            DebugLogger.SourcedPrint("Roster Roulette", "Just 1?");
             yield break;
         }
+
         int cap = rosterTransforms.Count;
         int idx = Random.Range(0,cap);
         int dials = Random.Range(13,18);
@@ -140,12 +150,17 @@ public class RosterUIBehaviour
             idx = (idx + 1) % cap;
             turn += 1;
         }
+        DebugLogger.SourcedPrint("Roster Roulette", "Stopped");
         yield return new WaitForSeconds(0.4f);
+        DebugLogger.SourcedPrint("Roster Roulette", "Chosen");
         rosterRoulleteTicker.color = Color.yellow;
-        rouletteDecisionEvent.Invoke(rosterTransforms[idx].Item2);
+        yield return new WaitForSeconds(0.2f);
+        GameManager.singleton.IntroduceGame(rosterTransforms[idx].Item2);
+        roulettePlaying = null;
     }
 
     private void SetTickerPosition(Transform slotTransform){
         rosterRoulleteTicker.rectTransform.position = slotTransform.position + (Vector3.up * 45);
     }
+
 }

@@ -52,7 +52,7 @@ public class DebugSystemsManager : MonoBehaviour
     void Update()
     {
         RefreshDebugInfo();
-        if(Input.GetKeyDown(KeyCode.Tilde)){
+        if(Input.GetKeyDown(KeyCode.Space)){
             debug_bar.SetActive(!debug_bar.activeInHierarchy);
             logger.SetActive(!logger.activeInHierarchy);
         }

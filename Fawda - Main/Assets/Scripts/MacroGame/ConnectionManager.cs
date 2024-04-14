@@ -57,7 +57,7 @@ public class ConnectionManager : MonoBehaviour
         if(!serverEvents.ContainsKey(_eventName)){
             serverEvents[_eventName] = new UnityEvent();
             DebugLogger.singleton.Log(string.Format("Registering Server Event: {0}", _eventName));
-        } 
+        }
         serverEvents[_eventName].AddListener(_func);
     }
 
@@ -76,6 +76,7 @@ public class ConnectionManager : MonoBehaviour
 
     public void VacateRPC(string _key){
         remoteProcCalls.Remove(_key);
+        DebugLogger.singleton.Log("REMOVING RPC - " + _key);
     }
 
     // Again called by the server - both TCP and UDP
@@ -93,6 +94,7 @@ public class ConnectionManager : MonoBehaviour
     // ACTUAL EXECUTION
     /////
 
+
     public void TriggerServerEvent(string _event){
         print(_event);
         if(serverEvents.ContainsKey(_event)){
@@ -100,7 +102,7 @@ public class ConnectionManager : MonoBehaviour
         }
     }
 
-    private void FlushRPCQueue(){
+    public void FlushRPCQueue(){
         while(rpcQueue.Count > 0){
             DirectedNetMessage msg = rpcQueue.Dequeue();
             string code = Enum.GetName(typeof(OpCode), msg.msg.opCode);

@@ -38,13 +38,6 @@ public class LobbyManager : MonoBehaviour
         ConnectionManager.singleton.SendMessageToClients(new NetMessage(OpCode.UDP_TOGGLE, BitConverter.GetBytes(_engage)));
     }
 
-    public void JoinTestPlayerAtFirstAvailable(){
-        for(int i = 0; i < players.Length; i++){
-            if(players[i] != null) continue;
-            JoinPlayer(new ProfileData("Test Player " + i.ToString(), i).Encode(),i);
-            return;
-        }
-    }
 
     void JoinPlayer(byte[] _data, int _idx){
         print("Profile data " + _data.Length.ToString() +" bytes long - " + _idx);
@@ -76,6 +69,7 @@ public class LobbyManager : MonoBehaviour
         for(int i = 0; i < players.Length; i++){
             if(players[i] != null) size += 1;
         }
+        print("LOBBY SIZE: " + size.ToString());
         return size;
     }
 

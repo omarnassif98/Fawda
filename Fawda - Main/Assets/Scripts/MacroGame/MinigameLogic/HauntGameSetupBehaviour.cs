@@ -5,19 +5,18 @@ using UnityEngine;
 
 public class HauntGameSetupBehaviour : GameSetupBehaviour
 {
-    private bool[] opt_ins;
+    [SerializeField] private bool[] opt_ins;
 
 
 
     void Start(){
+        print("W EIS???");
         InitializeLobbyConfigs();
-        ConnectionManager.singleton.RegisterRPC("READYUP", IngestConfig);
+        ConnectionManager.singleton.RegisterRPC(OpCode.READYUP, IngestConfig);
+        LobbyManager.singleton.playerJoinEvent.AddListener((string _a, Color _b) => InitializeLobbyConfigs());
+        LobbyManager.singleton.playerRemoveEvent.AddListener((int _a) => InitializeLobbyConfigs());
     }
 
-    public void TestingReadyup(){
-        for(int i = 0; i < LobbyManager.players.Length; i++) if(LobbyManager.players[i] != null) IngestConfig(BitConverter.GetBytes(true), i);
-        ReadyUp();
-    }
 
     private void IngestConfig(byte[] _data, int _idx){
         opt_ins[_idx] = BitConverter.ToBoolean(_data,1);
@@ -27,21 +26,14 @@ public class HauntGameSetupBehaviour : GameSetupBehaviour
     public override void ReadyUp()
     {
         ConnectionManager.singleton.VacateRPC("READYUP");
-        UIManager.RosterManager.rouletteDecisionEvent.AddListener(FinalizeSetup);
         UIManager.RosterManager.StartReadyupProcess(opt_ins);
     }
 
-    private void FinalizeSetup(int _ghostIdx){
-        UIManager.RosterManager.rouletteDecisionEvent.RemoveAllListeners();
-        GameManager.singleton.ConfigureGame(_ghostIdx);
-    }
-
-
-
     protected void InitializeLobbyConfigs(){
         base.ResetReadies();
-        opt_ins = new bool[LobbyManager.singleton.GetLobbySize()];
-        for (int i = 0; i < LobbyManager.singleton.GetLobbySize(); i++){
+        int size = LobbyManager.singleton.GetLobbySize();
+        opt_ins = new bool[size];
+        for (int i = 0; i < size; i++){
             opt_ins[i] = false;
         }
 

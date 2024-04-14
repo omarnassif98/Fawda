@@ -7,22 +7,11 @@ using UnityEngine;
 
 public class HauntGameRoomBehaviour : MonoBehaviour
 {
-    static int num = 0;
-    static bool extentReached;
-    static float width_used = 0, height_used = 0, view_angle_factor = 1;
-    const float FLOOR_THICKNESS = 0.2f, MAX_MAP_HEIGHT = 600, MAX_MAP_WIDTH = 400, OFFSET = FLOOR_THICKNESS + 5.0f/2;
+    const float FLOOR_THICKNESS = 0.2f;
     float targetOpacity = 1;
     List<Renderer> bottomWallMats = new List<Renderer>();
     short occupancy = 0;
-    // Start is called before the first frame update
 
-
-    void Awake(){
-
-        float viewAngle = Camera.main.transform.eulerAngles.x;
-        view_angle_factor = 1/Mathf.Sin(Mathf.Deg2Rad * viewAngle);
-        print("VIEW ANGLE FACTOR = " + view_angle_factor + " - from: " + viewAngle);
-    }
     void FixedUpdate(){
         if(bottomWallMats == null) return;
         targetOpacity = occupancy == 0? 1 : 0.2f;
@@ -33,7 +22,6 @@ public class HauntGameRoomBehaviour : MonoBehaviour
 
     public void FeedWalls(List<GameObject> _walls){
         foreach(GameObject wallPart in _walls){
-            print(wallPart.name);
             bottomWallMats.Add(wallPart.GetComponent<MeshRenderer>());
         }
     }

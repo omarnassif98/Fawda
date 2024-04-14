@@ -14,13 +14,13 @@ public class HauntGameDeployable : DeployableMinigame
 
     public override void SetupGame(Transform _mapWrapper, int _specialityPlayer = -1)
     {
-        DebugLogger.singleton.Log("HAUNT GAME CONFIGURED OH YEEEEEEEEAAH");
+        DebugLogger.SourcedPrint("Haunt Game Deployable","Deploying", ColorUtility.ToHtmlStringRGB(Color.cyan));
         ghostIdx = _specialityPlayer;
         ProfileData[] playerProfiles = LobbyManager.players;
         HauntGameMapGenerator waveCollapse = new HauntGameMapGenerator(_mapWrapper);
+        DebugLogger.SourcedPrint("Haunt Game Deployable","Map Generating", ColorUtility.ToHtmlStringRGB(Color.cyan));
         waveCollapse.GenerateFloormap();
-
-
+        DebugLogger.SourcedPrint("Haunt Game Deployable","Map Generated", ColorUtility.ToHtmlStringRGB(Color.cyan));
     }
 
     void PopulateInstances(){
