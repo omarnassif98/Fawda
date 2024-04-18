@@ -18,10 +18,6 @@ public abstract class GameSetupBehaviour : MonoBehaviour
         GameManager.singleton.LoadMinigame(gameCode);
     }
 
-    public virtual void OnDisable(){
-        GameManager.singleton.KillMinigame();
-    }
-
     protected void ChangeReadyStatus(int _idx, bool _flag){
         readies[_idx] = _flag;
         int cumCount = 0;

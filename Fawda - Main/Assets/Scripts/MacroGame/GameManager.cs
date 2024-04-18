@@ -52,7 +52,8 @@ public class GameManager : MonoBehaviour
     }
 
     public void ConfigureGame(int _specialIdx = -1){
-        DebugLogger.SourcedPrint(gameObject.name, "Config game called", ColorUtility.ToHtmlStringRGB(Color.red));
+        DebugLogger.SourcedPrint(gameObject.name, "Config game called");
+        UIManager.RosterManager.DismissRoulette();
         Transform mapWrapper = transform.Find("MapWrapper");
         foreach(Transform go in mapWrapper) Destroy(go.gameObject);
         DebugLogger.SourcedPrint(gameObject.name, "Reset map");

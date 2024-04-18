@@ -118,11 +118,7 @@ public class RosterUIBehaviour
                 optedRosterSlots.Add((GetRosterTransform(i),i));
             }
         }
-        if(roulettePlaying != null){
-            DebugLogger.SourcedPrint("Roster Roulette", "Clearing junk");
-            UIManager.singleton.StopCoroutine(roulettePlaying);
-            roulettePlaying = null;
-        }
+        FlushRoulette();
         roulettePlaying = SlotRoulette(optedRosterSlots);
         UIManager.singleton.StartCoroutine(roulettePlaying);
     }
@@ -152,11 +148,25 @@ public class RosterUIBehaviour
         }
         DebugLogger.SourcedPrint("Roster Roulette", "Stopped");
         yield return new WaitForSeconds(0.4f);
-        DebugLogger.SourcedPrint("Roster Roulette", "Chosen");
+        DebugLogger.SourcedPrint("Roster Roulette", "Chosen", ColorUtility.ToHtmlStringRGB(rosterPlayers[rosterTransforms[idx].Item2].playerColorImage.color));
         rosterRoulleteTicker.color = Color.yellow;
         yield return new WaitForSeconds(0.2f);
         GameManager.singleton.IntroduceGame(rosterTransforms[idx].Item2);
+
         roulettePlaying = null;
+    }
+
+    public void DismissRoulette(){
+        FlushRoulette();
+        rosterRoulleteTicker.enabled = false;
+    }
+
+    private void FlushRoulette(){
+        if(roulettePlaying == null) return;
+        DebugLogger.SourcedPrint("Roster Roulette", "Clearing junk");
+        UIManager.singleton.StopCoroutine(roulettePlaying);
+        roulettePlaying = null;
+
     }
 
     private void SetTickerPosition(Transform slotTransform){

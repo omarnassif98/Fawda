@@ -7,7 +7,7 @@ using UnityEngine.Events;
 
 public abstract class DeployableMinigame
 {
-
+    public bool gameInPlay = false;
     public abstract void SetupGame(Transform _mapWrapper, int _specialityPlayer = -1);
 
     public virtual void EndGame(){

@@ -11,15 +11,12 @@ public class HauntGameMapGenerator
     const float FLOOR_THICKNESS = 0.4f, ROOM_SIZE = 12f, WALL_THICKNESS = 0.45f, DOOR_WIDTH = 3.0f;
     private Material wallmat;
     private UnityEngine.Object[] floorMats;
-    private GameObject hunterPlayerPrefab, ghostPlayerPrefab;
     private Transform mapTransform;
-    private Transform[] hunterSpawnPoints = new Transform[4];
-    private Transform ghostSpawnPoint;
+    public Transform[] hunterSpawnPoints = new Transform[4];
+    public Transform ghostSpawnPoint;
 
     public HauntGameMapGenerator(Transform _mapTransform){
         mapTransform = _mapTransform;
-        hunterPlayerPrefab = Resources.Load("MinigameAssets/Haunt/Prefabs/HunterPlayer") as GameObject;
-        ghostPlayerPrefab = Resources.Load("MinigameAssets/Haunt/Prefabs/HunterPlayer") as GameObject;
         floorMats = Resources.LoadAll("MinigameAssets/Haunt/FloorMaterials", typeof(Material));
         wallmat = Resources.Load("MinigameAssets/Haunt/WallMat") as Material;
     }

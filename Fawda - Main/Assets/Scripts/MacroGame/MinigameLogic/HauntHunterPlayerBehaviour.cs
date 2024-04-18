@@ -28,7 +28,7 @@ public class HauntHunterPlayerBehaviour : PlayerBehaviour
 
     protected override void Tick()
     {
-        if(PlayerBehaviour.hotseat != this || !base.isMobile) return;
+        if(PlayerBehaviour.hotseat != this || !base.isMobile || !GameManager.activeMinigame.gameInPlay) return;
         Vector2 rotInput = new Vector2(Input.GetAxisRaw("Debug Horizontal"), Input.GetAxisRaw("Debug Vertical"));
         if(Input.GetButtonDown("Action")) StartCoroutine(FlashCamera());
         if(rotInput == Vector2.zero) return;
@@ -41,9 +41,9 @@ public class HauntHunterPlayerBehaviour : PlayerBehaviour
         base.isMobile = false;
         playerFOVMesh.gameObject.SetActive(true);
         DrawFOV();
-        if(Vector3.Angle(transform.forward, ((HauntGameDeployable)(GameManager.activeMinigame)).hauntHiddenPlayerInstance.transform.position - transform.position) < FOV_ANGLES) ((HauntGameDeployable)(GameManager.activeMinigame)).hauntHiddenPlayerInstance.Stun();
+        if(Vector3.Angle(transform.forward, ((HauntGameDeployable)(GameManager.activeMinigame)).ghostPlayerInstance.transform.position - transform.position) < FOV_ANGLES) ((HauntGameDeployable)(GameManager.activeMinigame)).ghostPlayerInstance.Stun();
 
-        foreach(HauntHunterPlayerBehaviour hauntHunter in ((HauntGameDeployable)(GameManager.activeMinigame)).hauntHunterPlayerInstances){
+        foreach(HauntHunterPlayerBehaviour hauntHunter in ((HauntGameDeployable)(GameManager.activeMinigame)).hunterPlayerInstances){
             if(hauntHunter == this || !hauntHunter.isPetrified) continue;
             if(Vector3.Angle(transform.forward, hauntHunter.transform.position - transform.position) < FOV_ANGLES) hauntHunter.StartCoroutine(hauntHunter.Revive());
         }
