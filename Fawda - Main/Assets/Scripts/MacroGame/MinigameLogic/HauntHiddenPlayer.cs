@@ -6,8 +6,9 @@ public class HauntHiddenPlayerBehaviour : PlayerBehaviour
 {
     MeshRenderer meshRenderer;
     [SerializeField] float stunDuration, visibilityDuration, killDuration, killRadius;
-    bool canKill = true;
+    public bool isStunned {get; private set;}
     private Coroutine stunCycle;
+    short health = 7;
 
     protected override void Tick()
     {
@@ -17,7 +18,7 @@ public class HauntHiddenPlayerBehaviour : PlayerBehaviour
 
     private Vector2 PullCoord(Vector3 _vec3) => new Vector2(_vec3.x,_vec3.z);
     void CheckForKill(){
-        if(!canKill || !isMobile) return;
+        if(isStunned || !isMobile) return;
         foreach(HauntHunterPlayerBehaviour player in ((HauntGameDeployable)GameManager.activeMinigame).hunterPlayerInstances){
             if(player.isPetrified || Vector2.Distance(PullCoord(player.transform.position), PullCoord(transform.position)) > killRadius) continue;
                 print("KILL");
@@ -39,7 +40,7 @@ public class HauntHiddenPlayerBehaviour : PlayerBehaviour
     public void Stun(){
         if(stunCycle != null) StopCoroutine(stunCycle);
         stunCycle = null;
-        canKill = false;
+        isStunned = true;
         isMobile = false;
         meshRenderer.enabled = true;
         stunCycle = StartCoroutine(StunRecovery());
@@ -50,12 +51,13 @@ public class HauntHiddenPlayerBehaviour : PlayerBehaviour
         isMobile = true;
         yield return new WaitForSeconds(visibilityDuration);
         meshRenderer.enabled = false;
-        canKill = true;
+        isStunned = false;
     }
     // Start is called before the first frame update
     void Start()
     {
-        meshRenderer = GetComponent<MeshRenderer>();
+        isStunned = false;
+        meshRenderer = transform.Find("PlayerRenderer").GetComponent<MeshRenderer>();
         meshRenderer.enabled = false;
         #if UNITY_EDITOR
             GameObject indicator = GameObject.CreatePrimitive(PrimitiveType.Sphere);

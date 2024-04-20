@@ -8,7 +8,7 @@ using UnityEngine.Rendering;
 public class HauntGameMapGenerator
 {
     const int ROWS = 3, COLS = 3;
-    const float FLOOR_THICKNESS = 0.4f, ROOM_SIZE = 12f, WALL_THICKNESS = 0.45f, DOOR_WIDTH = 3.0f;
+    public const float FLOOR_THICKNESS = 0.4f, ROOM_SIZE = 12f, WALL_THICKNESS = 0.45f, DOOR_WIDTH = 3.0f;
     private Material wallmat;
     private UnityEngine.Object[] floorMats;
     private Transform mapTransform;

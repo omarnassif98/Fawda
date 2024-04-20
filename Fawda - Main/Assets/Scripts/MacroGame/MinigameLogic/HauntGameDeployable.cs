@@ -9,6 +9,7 @@ public class HauntGameDeployable : DeployableMinigame
     private GameObject hunterPlayerPrefab, ghostPlayerPrefab;
     int ghostIdx = -1;
 
+
     public HauntGameDeployable(){
         DebugLogger.singleton.Log("Booyah");
         hunterPlayerPrefab = Resources.Load("MinigameAssets/Haunt/Prefabs/HunterPlayer") as GameObject;
@@ -31,9 +32,9 @@ public class HauntGameDeployable : DeployableMinigame
             if(playerProfiles[i] == null) continue;
             DebugLogger.SourcedPrint("Haunt Game Deployable","Spawning player " + i.ToString(), ColorUtility.ToHtmlStringRGB(Color.cyan));
             if(i == _specialityPlayer){
-                ghostPlayerInstance = GameObject.Instantiate(ghostPlayerPrefab, waveCollapse.ghostSpawnPoint.position, waveCollapse.ghostSpawnPoint.rotation, _mapWrapper).GetComponent<HauntHiddenPlayerBehaviour>();
+                ghostPlayerInstance = GameObject.Instantiate(ghostPlayerPrefab, waveCollapse.ghostSpawnPoint.position + Vector3.up * (HauntGameMapGenerator.FLOOR_THICKNESS + 0.1f), waveCollapse.ghostSpawnPoint.rotation, _mapWrapper).GetComponent<HauntHiddenPlayerBehaviour>();
             } else{
-                hunterPlayerInstances[currentHunterSpawnPointIdx] = GameObject.Instantiate(hunterPlayerPrefab, waveCollapse.hunterSpawnPoints[currentHunterSpawnPointIdx].position, waveCollapse.hunterSpawnPoints[currentHunterSpawnPointIdx].rotation, _mapWrapper).GetComponent<HauntHunterPlayerBehaviour>();
+                hunterPlayerInstances[currentHunterSpawnPointIdx] = GameObject.Instantiate(hunterPlayerPrefab, waveCollapse.hunterSpawnPoints[currentHunterSpawnPointIdx].position + Vector3.up * (HauntGameMapGenerator.FLOOR_THICKNESS + 0.1f), waveCollapse.hunterSpawnPoints[currentHunterSpawnPointIdx].rotation, _mapWrapper).GetComponent<HauntHunterPlayerBehaviour>();
                 currentHunterSpawnPointIdx += 1;
             }
             gameInPlay = true;

@@ -10,14 +10,18 @@ public class HauntHunterPlayerBehaviour : PlayerBehaviour
 
     public bool isPetrified{ get; private set;}
     public bool isInvincible{ get; private set;}
-    private short sanity = 100;
+    private bool wasNearGhostLastFrame = false;
+    const float RELOAD_TIME = 1.25f;
+    float reloadProgress = 0;
     [SerializeField] Transform lookAtBall;
-    IEnumerable currentlyRunningSanityLoop;
+    IEnumerable currentReloadLoop;
     HauntHunterFOVHelper fovHelper;
+    Renderer playerRenderer;
+    const short MAX_AMMO = 2;
+    private short currentAmmo = MAX_AMMO;
 
 
-
-    Material playerPetrifiedMaterial, playerStressedMaterial;
+    Material playerPetrifiedMaterial, playerStressedMaterial, playerReloadingMaterial;
     void Awake(){
         fovHelper = new HauntHunterFOVHelper(transform.Find("FOV").GetComponent<MeshFilter>(), this);
         PlayerBehaviour.hotseat = this;
@@ -25,24 +29,61 @@ public class HauntHunterPlayerBehaviour : PlayerBehaviour
         playerDefaultMaterial = Resources.Load("Global/Materials/PlayerMat") as Material;
         playerPetrifiedMaterial = Resources.Load("MinigameAssets/Haunt/Materials/PetifiedPlayerMat") as Material;
         playerStressedMaterial = Resources.Load("MinigameAssets/Haunt/Materials/StressedPlayerMat") as Material;
-        isMobile = true;
+        playerReloadingMaterial = Resources.Load("MinigameAssets/Haunt/Materials/ReloadPlayerMat") as Material;
+        playerRenderer = transform.Find("PlayerRenderer").GetComponent<Renderer>();
     }
 
     protected override void Tick()
     {
-        if(PlayerBehaviour.hotseat != this || !base.isMobile || !GameManager.activeMinigame.gameInPlay) return;
+        if(PlayerBehaviour.hotseat != this || !GameManager.activeMinigame.gameInPlay || isPetrified) return;
         Vector2 rotInput = new Vector2(Input.GetAxisRaw("Debug Horizontal"), Input.GetAxisRaw("Debug Vertical"));
-        if(Input.GetButtonDown("Action")){
+        if(Input.GetButton("Alt Action") && currentAmmo < MAX_AMMO){
             isMobile = false;
-            StartCoroutine(fovHelper.FlashCamera(() => {isMobile = true;}));
+            playerRenderer.material = playerReloadingMaterial;
+            reloadProgress += Time.deltaTime;
+            if(reloadProgress < RELOAD_TIME) return;
+            reloadProgress = 0;
+            currentAmmo += 1;
+            FlushStressMaterial();
+            isMobile = true;
         }
+
+        if(Input.GetButtonUp("Alt Action")){
+            FlushStressMaterial();
+            isMobile = true;
+        }
+
+        if(!isMobile) return;
+        if(Input.GetButtonDown("Action") && currentAmmo > 0){
+            currentAmmo -= 1;
+            isMobile = false;
+            StartCoroutine(fovHelper.FlashFOV(() => {isMobile = true;}));
+        }
+        UpdateStressCondition();
         if(rotInput == Vector2.zero) return;
         lookAtBall.position = transform.position + new Vector3(rotInput.x, 0, rotInput.y);
         transform.LookAt(lookAtBall);
     }
 
-    IEnumerator SanityLoop(){
-        yield return new WaitForSeconds(0);
+    void UpdateStressCondition(){
+        bool isNearGhost = Vector3.Distance(transform.position, ((HauntGameDeployable)GameManager.activeMinigame).ghostPlayerInstance.transform.position) < 5;
+        if(isNearGhost != wasNearGhostLastFrame) HandleStressShift(isNearGhost);
+        wasNearGhostLastFrame = isNearGhost;
+        if(!isNearGhost) return;
+        //Heartbeat effect goes here
+    }
+
+
+    void HandleStressShift(bool _isNearGhost){
+        DebugLogger.SourcedPrint(gameObject.name, "Stressed " + _isNearGhost.ToString());
+        Material newPlayerMaterial = _isNearGhost?playerStressedMaterial:playerDefaultMaterial;
+        playerRenderer.material = newPlayerMaterial;
+    }
+
+    void FlushStressMaterial(){
+        DebugLogger.SourcedPrint(gameObject.name, "Flushing stress");
+        Material newPlayerMaterial = Vector3.Distance(transform.position, ((HauntGameDeployable)GameManager.activeMinigame).ghostPlayerInstance.transform.position) < 5?playerStressedMaterial:playerDefaultMaterial;
+        playerRenderer.material = newPlayerMaterial;
     }
 
 
@@ -52,27 +93,26 @@ public class HauntHunterPlayerBehaviour : PlayerBehaviour
         isPetrified = true;
         isMobile = false;
         //Tell game manager to zoom in ig
-        GetComponent<Renderer>().material = playerPetrifiedMaterial;
+        playerRenderer.material = playerPetrifiedMaterial;
     }
 
     public IEnumerator Revive(){
         isPetrified = false;
         isMobile = true;
-        sanity = 50;
         isInvincible = true;
-        GetComponent<Renderer>().material = playerDefaultMaterial;
+        playerRenderer.material = playerDefaultMaterial;
         yield return new WaitForSeconds(0.05f);
-        GetComponent<Renderer>().enabled = false;
+        playerRenderer.enabled = false;
         yield return new WaitForSeconds(0.05f);
-        GetComponent<Renderer>().enabled = true;
+        playerRenderer.enabled = true;
         yield return new WaitForSeconds(0.13f);
-        GetComponent<Renderer>().enabled = false;
+        playerRenderer.enabled = false;
         yield return new WaitForSeconds(0.05f);
-        GetComponent<Renderer>().enabled = true;
+        playerRenderer.enabled = true;
         yield return new WaitForSeconds(0.13f);
-        GetComponent<Renderer>().enabled = false;
+        playerRenderer.enabled = false;
         yield return new WaitForSeconds(0.05f);
-        GetComponent<Renderer>().enabled = true;
+        playerRenderer.enabled = true;
         isInvincible = false;
 
     }
