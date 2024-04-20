@@ -39,6 +39,7 @@ public class GameManager : MonoBehaviour
 
     public void KillMinigame(){
         activeMinigame = null;
+        DebugLogger.SourcedPrint(gameObject.name, "Minigame Killed");
     }
 
     public void IntroduceGame(int _specialIdx = -1){

@@ -20,7 +20,7 @@ public class HauntGameDeployable : DeployableMinigame
         DebugLogger.SourcedPrint("Haunt Game Deployable","Deploying", ColorUtility.ToHtmlStringRGB(Color.cyan));
         ghostIdx = _specialityPlayer;
         ProfileData[] playerProfiles = LobbyManager.players;
-        hunterPlayerInstances = new HauntHunterPlayerBehaviour[playerProfiles.Length - 1];
+        hunterPlayerInstances = new HauntHunterPlayerBehaviour[LobbyManager.singleton.GetLobbySize() - 1];
         HauntGameMapGenerator waveCollapse = new HauntGameMapGenerator(_mapWrapper);
         DebugLogger.SourcedPrint("Haunt Game Deployable","Map Generating", ColorUtility.ToHtmlStringRGB(Color.cyan));
         waveCollapse.GenerateFloormap();

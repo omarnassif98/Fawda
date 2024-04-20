@@ -23,4 +23,5 @@ public abstract class PlayerBehaviour : MonoBehaviour
     }
 
     protected abstract void Tick();
+
 }
