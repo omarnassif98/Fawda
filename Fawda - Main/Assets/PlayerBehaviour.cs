@@ -10,6 +10,12 @@ public abstract class PlayerBehaviour : MonoBehaviour
     protected bool isMobile = true;
     const float speed =  4.5f;
     protected Material playerDefaultMaterial;
+    protected Renderer playerRenderer;
+
+    protected virtual void Awake(){
+        playerDefaultMaterial = Resources.Load("Global/Materials/PlayerMat") as Material;
+        playerRenderer = transform.Find("PlayerRenderer").GetComponent<Renderer>();
+    }
 
     void Update(){
         Move();

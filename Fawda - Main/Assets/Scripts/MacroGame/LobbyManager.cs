@@ -14,7 +14,7 @@ public class LobbyManager : MonoBehaviour
 
     public static ProfileData[] players {get;private set;}
 
-    public UnityEvent<string, Color> playerJoinEvent;
+    public UnityEvent<int> playerJoinEvent;
     public UnityEvent<int> playerRemoveEvent;
 
     void Awake(){
@@ -24,8 +24,8 @@ public class LobbyManager : MonoBehaviour
             singleton = this;
         }
         players = new ProfileData[5];
-        gameSetupScreen = GameObject.Find("Screens").transform.Find("Game Setup Screen");
-        playerJoinEvent = new UnityEvent<string, Color>();
+        //gameSetupScreen = GameObject.Find("Screens").transform.Find("Game Setup Screen");
+        playerJoinEvent = new UnityEvent<int>();
         playerRemoveEvent = new UnityEvent<int>();
     }
 
@@ -44,7 +44,7 @@ public class LobbyManager : MonoBehaviour
         players[_idx] = new ProfileData(_data);
         print(players[_idx].name + " - " + _idx.ToString());
         MenuCursorManager.singleton.UpdateCursorPlayer(players[_idx], _idx);
-        playerJoinEvent.Invoke(players[_idx].name, ResourceManager.namedColors[players[_idx].colorSelection].color);
+        playerJoinEvent.Invoke(_idx);
     }
 
     void RemovePlayer(int _idx){

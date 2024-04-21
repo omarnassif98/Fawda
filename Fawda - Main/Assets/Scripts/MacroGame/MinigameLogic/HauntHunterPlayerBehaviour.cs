@@ -14,23 +14,21 @@ public class HauntHunterPlayerBehaviour : PlayerBehaviour
     const float RELOAD_TIME = 1.25f;
     float reloadProgress = 0;
     [SerializeField] Transform lookAtBall;
-    IEnumerable currentReloadLoop;
     HauntHunterFOVHelper fovHelper;
-    Renderer playerRenderer;
     const short MAX_AMMO = 2;
     private short currentAmmo = MAX_AMMO;
 
 
     Material playerPetrifiedMaterial, playerStressedMaterial, playerReloadingMaterial;
-    void Awake(){
+    protected override void Awake(){
         fovHelper = new HauntHunterFOVHelper(transform.Find("FOV").GetComponent<MeshFilter>(), this);
         PlayerBehaviour.hotseat = this;
         isPetrified = false;
-        playerDefaultMaterial = Resources.Load("Global/Materials/PlayerMat") as Material;
         playerPetrifiedMaterial = Resources.Load("MinigameAssets/Haunt/Materials/PetifiedPlayerMat") as Material;
         playerStressedMaterial = Resources.Load("MinigameAssets/Haunt/Materials/StressedPlayerMat") as Material;
         playerReloadingMaterial = Resources.Load("MinigameAssets/Haunt/Materials/ReloadPlayerMat") as Material;
-        playerRenderer = transform.Find("PlayerRenderer").GetComponent<Renderer>();
+
+        base.Awake();
     }
 
     protected override void Tick()

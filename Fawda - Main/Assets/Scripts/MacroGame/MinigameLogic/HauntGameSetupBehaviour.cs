@@ -13,8 +13,8 @@ public class HauntGameSetupBehaviour : GameSetupBehaviour
         print("W EIS???");
         InitializeLobbyConfigs();
         ConnectionManager.singleton.RegisterRPC(OpCode.READYUP, IngestConfig);
-        LobbyManager.singleton.playerJoinEvent.AddListener((string _a, Color _b) => InitializeLobbyConfigs());
-        LobbyManager.singleton.playerRemoveEvent.AddListener((int _a) => InitializeLobbyConfigs());
+        LobbyManager.singleton.playerJoinEvent.AddListener((idx) => InitializeLobbyConfigs());
+        LobbyManager.singleton.playerRemoveEvent.AddListener((idx) => InitializeLobbyConfigs());
     }
 
 

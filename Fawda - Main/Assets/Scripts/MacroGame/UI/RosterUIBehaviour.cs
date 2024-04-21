@@ -40,14 +40,14 @@ public class RosterUIBehaviour
         TidyRoster();
     }
 
-    public void AddPlayerToRoster(string _name, Color _color){
+    public void AddPlayerToRoster(int _idx){
         if(occupationCount == rosterPlayers.Length){
             DebugLogger.singleton.Log("EYYO Trying to add player when roster is full");
             return;
         }
         rosterPlayers[occupationCount].occupied = true;
-        rosterPlayers[occupationCount].playerColorImage.color = _color;
-        rosterPlayers[occupationCount].playerNameText.text = _name;
+        rosterPlayers[occupationCount].playerColorImage.color = ResourceManager.namedColors[LobbyManager.players[_idx].colorSelection].color;
+        rosterPlayers[occupationCount].playerNameText.text = LobbyManager.players[_idx].name;
         occupationCount += 1;
         TidyRoster();
     }
