@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,6 +7,9 @@ public class LobbyMenuManager : MonoBehaviour
 {
     GameObject lobbyMenuPlayerPrefab;
     LobbyMenuPlayerBehaviour[] lobbyMenuPlayerInstances;
+
+
+    private Transform buttonParent;
 
     // Start is called before the first frame update
 
@@ -18,13 +22,18 @@ public class LobbyMenuManager : MonoBehaviour
     }
 
     void Awake(){
+
         lobbyMenuPlayerPrefab = Resources.Load("Global/Prefabs/LobbyMenuPlayer") as GameObject;
+        buttonParent = transform.Find("LobbyUIManager");
+        DebugLogger.SourcedPrint("LobbyMenuManager","Awake");
     }
 
     void Start(){
         lobbyMenuPlayerInstances = new LobbyMenuPlayerBehaviour[LobbyManager.players.Length];
         InferLobbySetup();
         LobbyManager.singleton.playerJoinEvent.AddListener((idx) => SpawnPlayer(idx, LobbyManager.players[idx]));
+        ConnectionManager.singleton.RegisterServerEventListener("wakeup", () => LoadScreen("MainScreen"));
+
     }
 
 
@@ -35,4 +44,17 @@ public class LobbyMenuManager : MonoBehaviour
         lobbyMenuPlayerInstances[_idx] = newPlayer;
     }
 
+    public void LoadScreen(string _screenName){
+        for(int i = 0; i < buttonParent.childCount; i++) Destroy(buttonParent.GetChild(i));
+        try
+        {
+            GameObject floorPlan = Resources.Load("LobbyMenuScreens/" + _screenName) as GameObject;
+            Transform floor = GameObject.Instantiate(floorPlan,buttonParent).transform;
+            transform.localPosition = Vector3.zero;
+        }
+        catch (System.Exception)
+        {
+            DebugLogger.SourcedPrint("LobbyMenuManager","Could not load screen " + _screenName, "FF0000");
+        }
+    }
 }

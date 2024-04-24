@@ -16,6 +16,7 @@ public class ConnectionManagerTester : Editor
         if(GUILayout.Button("Add New User")){
             for(int i = 0; i < LobbyManager.players.Length; i++){
                 if(LobbyManager.players[i] != null) continue;
+                ConnectionManager.singleton.HandlePlayerConnect(i);
                 NetMessage msg = new NetMessage(OpCode.PROFILE_PAYLOAD, new ProfileData("Omar", i).Encode());
                 singleton.QueueRPC(new DirectedNetMessage(msg,i));
                 return;

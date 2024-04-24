@@ -38,7 +38,6 @@ public class UIManager : MonoBehaviour
         print("Hello?");
         ConnectionManager.singleton.RegisterServerEventListener("listen", UpdateRoomCode);
         ConnectionManager.singleton.RegisterServerEventListener("listen", () => SetRoomCodeVisibility(true));
-        ConnectionManager.singleton.RegisterServerEventListener("wakeup", () => ChangeScreen("Main Menu Screen"));
         LobbyManager.singleton.playerJoinEvent.AddListener(RosterManager.AddPlayerToRoster);
 
     }
