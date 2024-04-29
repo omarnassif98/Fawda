@@ -69,7 +69,6 @@ public class LobbyManager : MonoBehaviour
         for(int i = 0; i < players.Length; i++){
             if(players[i] != null) size += 1;
         }
-        print("LOBBY SIZE: " + size.ToString());
         return size;
     }
 

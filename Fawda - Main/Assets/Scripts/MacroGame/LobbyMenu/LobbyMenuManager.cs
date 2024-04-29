@@ -7,6 +7,7 @@ public class LobbyMenuManager : MonoBehaviour
 {
     GameObject lobbyMenuPlayerPrefab;
     LobbyMenuPlayerBehaviour[] lobbyMenuPlayerInstances;
+    Animator icebergAnimator;
 
 
     private Transform buttonParent;
@@ -22,7 +23,7 @@ public class LobbyMenuManager : MonoBehaviour
     }
 
     void Awake(){
-
+        icebergAnimator = transform.Find("Floor").GetComponent<Animator>();
         lobbyMenuPlayerPrefab = Resources.Load("Global/Prefabs/LobbyMenuPlayer") as GameObject;
         buttonParent = transform.Find("LobbyUIManager");
         DebugLogger.SourcedPrint("LobbyMenuManager","Awake");
@@ -56,5 +57,14 @@ public class LobbyMenuManager : MonoBehaviour
         {
             DebugLogger.SourcedPrint("LobbyMenuManager","Could not load screen " + _screenName, "FF0000");
         }
+    }
+
+    public void TriggerFlip(){
+        //icebergAnimator.SetTrigger("flip");
+        foreach(LobbyMenuPlayerBehaviour lobbyMenuPlayer in lobbyMenuPlayerInstances) if(lobbyMenuPlayer != null) lobbyMenuPlayer.EmitSmoke();
+    }
+
+    public void ClearScreen(){
+        for(int i = 0; i < buttonParent.childCount; i++) Destroy(buttonParent.GetChild(i));
     }
 }

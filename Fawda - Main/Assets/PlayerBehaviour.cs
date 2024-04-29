@@ -11,10 +11,19 @@ public abstract class PlayerBehaviour : MonoBehaviour
     const float speed =  4.5f;
     protected Material playerDefaultMaterial;
     protected Renderer playerRenderer;
+    private ParticleSystem smokeEmitter;
 
     protected virtual void Awake(){
         playerDefaultMaterial = Resources.Load("Global/Materials/PlayerMat") as Material;
         playerRenderer = transform.Find("PlayerRenderer").GetComponent<Renderer>();
+        smokeEmitter = transform.Find("Smoke Particles").GetComponent<ParticleSystem>();
+    }
+
+    public void EmitSmoke(){
+        playerRenderer.enabled = false;
+        smokeEmitter.Clear();
+        smokeEmitter.Play();
+        isMobile = false;
     }
 
     void Update(){

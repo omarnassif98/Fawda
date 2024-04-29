@@ -6,29 +6,59 @@ using UnityEngine.Events;
 public class FloorButtonBehaviour : MonoBehaviour
 {
     private LobbyMenuScreenBehaviour screen;
-    [SerializeField] UnityEvent triggerEvent;
     private int buttonIdx;
+    [SerializeField] private int playersNeeded;
     short activations = 0;
+    const float BASE_TIME = 5;
+    public static float maxTime;
+    float timeLeft;
+
     public void Start(){
+        timeLeft = BASE_TIME;
         screen = transform.parent.GetComponent<LobbyMenuScreenBehaviour>();
         buttonIdx = screen.FeedButton(this);
-        DebugLogger.SourcedPrint("LobbyMenuFloorButton","Awake");
     }
 
     void OnTriggerEnter(Collider _obj){
         if(_obj.tag != "playerCollider") return;
         activations ++;
-        screen.ResetButton(buttonIdx);
+        OnOccupancy();
+        ResetTime();
     }
 
     void OnTriggerExit(Collider _obj){
         if(_obj.tag != "playerCollider") return;
         activations --;
-        screen.ResetButton(buttonIdx);
+        OnOccupancy();
+        ResetTime();
 
     }
 
+    public void OnOccupancy(){
+        GetComponent<SpriteRenderer>().color = (activations == 0)?Color.black:Color.white*0.15f;
+    }
+
+    public void Trigger(){
+       screen.TriggerScreenChange();
+    }
+
+
+
+    public void ResetTime(){
+        timeLeft = ((LobbyManager.singleton.GetLobbySize() + 1) * BASE_TIME) - (activations * BASE_TIME);
+    }
+
     void Update(){
-        screen.SetButtonActivations(buttonIdx,activations);
+        if(activations >= playersNeeded) timeLeft -= Time.deltaTime;
+        else ResetTime();
+
+        if(IsFinished()) return;
+    }
+
+    public bool IsFinished(){
+        if(timeLeft > 0 ) return false;
+        Trigger();
+        ResetTime();
+        return true;
     }
 }
