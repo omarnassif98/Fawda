@@ -39,7 +39,6 @@ public class BackgroundBehaviour : MonoBehaviour
         driftDir = new Vector2(Mathf.Cos(Mathf.Deg2Rad * realDriftAngle), Mathf.Sin(Mathf.Deg2Rad * realDriftAngle));
         center = images[4].GetComponent<RectTransform>();
         posOffset = transform.parent.GetComponent<CanvasScaler>().referenceResolution;
-        UIManager.singleton.screenTransitionEvent.AddListener(JoltBackground);
         for(int i = 0; i < images.Length; i++){
             images[i].sprite = backgroundImage;
             images[i].GetComponent<RectTransform>().sizeDelta = posOffset;

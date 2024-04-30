@@ -7,6 +7,7 @@ public class LobbyMenuScreenBehaviour : MonoBehaviour
     public bool isInteractable { get; private set; }
     LobbyMenuManager lobbyMenuManager;
     List<FloorButtonBehaviour> floorButtons;
+    float lowestTimeRemaining;
 
     void Awake()
     {
@@ -24,6 +25,11 @@ public class LobbyMenuScreenBehaviour : MonoBehaviour
 
     void Update(){
         if(!isInteractable) return;
+        foreach(FloorButtonBehaviour floorButton in floorButtons){
+            float timeLeft = floorButton.Tick();
+            if(timeLeft < FloorButtonBehaviour.maxTime) UIManager.singleton.SetCountdown(Mathf.CeilToInt(timeLeft));
+            if(floorButton.IsFinished()) isInteractable = false;
+        }
     }
 
     public void TriggerScreenChange(){

@@ -14,6 +14,7 @@ public class FloorButtonBehaviour : MonoBehaviour
     float timeLeft;
 
     public void Start(){
+        maxTime = ((LobbyManager.singleton.GetLobbySize()) * BASE_TIME) - (activations * BASE_TIME);
         timeLeft = BASE_TIME;
         screen = transform.parent.GetComponent<LobbyMenuScreenBehaviour>();
         buttonIdx = screen.FeedButton(this);
@@ -45,14 +46,14 @@ public class FloorButtonBehaviour : MonoBehaviour
 
 
     public void ResetTime(){
-        timeLeft = ((LobbyManager.singleton.GetLobbySize() + 1) * BASE_TIME) - (activations * BASE_TIME);
+        timeLeft = maxTime;
     }
 
-    void Update(){
+    public float Tick(){
         if(activations >= playersNeeded) timeLeft -= Time.deltaTime;
         else ResetTime();
 
-        if(IsFinished()) return;
+        return timeLeft;
     }
 
     public bool IsFinished(){

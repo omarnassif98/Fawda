@@ -43,7 +43,6 @@ public class LobbyManager : MonoBehaviour
         print("Profile data " + _data.Length.ToString() +" bytes long - " + _idx);
         players[_idx] = new ProfileData(_data);
         print(players[_idx].name + " - " + _idx.ToString());
-        MenuCursorManager.singleton.UpdateCursorPlayer(players[_idx], _idx);
         playerJoinEvent.Invoke(_idx);
     }
 

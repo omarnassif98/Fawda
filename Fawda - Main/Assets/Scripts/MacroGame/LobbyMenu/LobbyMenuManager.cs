@@ -60,11 +60,12 @@ public class LobbyMenuManager : MonoBehaviour
     }
 
     public void TriggerFlip(){
-        //icebergAnimator.SetTrigger("flip");
         foreach(LobbyMenuPlayerBehaviour lobbyMenuPlayer in lobbyMenuPlayerInstances) if(lobbyMenuPlayer != null) lobbyMenuPlayer.EmitSmoke();
+        icebergAnimator.SetTrigger("flip");
+        ClearScreen();
     }
 
     public void ClearScreen(){
-        for(int i = 0; i < buttonParent.childCount; i++) Destroy(buttonParent.GetChild(i));
+        for(int i = 0; i < buttonParent.childCount; i++) Destroy(buttonParent.GetChild(i).gameObject);
     }
 }

@@ -46,7 +46,7 @@ public class GameManager : MonoBehaviour
         DebugLogger.SourcedPrint(gameObject.name, "Introducing Event", ColorUtility.ToHtmlStringRGB(Color.red));
         UIManager.singleton.backgroundBehaviour.JoltBackground();
         UIManager.singleton.backgroundBehaviour.idealCheckerboardOpacity = 0;
-        UIManager.blackoutBehaviour.blackoutHiddenEvent.AddListener(() => {DebugLogger.SourcedPrint(gameObject.name, "This comes from the blackout HIDDEN event"); ConfigureGame(_specialIdx); UIManager.singleton.ChangeScreen("Game HUD Screen");});
+        UIManager.blackoutBehaviour.blackoutHiddenEvent.AddListener(() => {DebugLogger.SourcedPrint(gameObject.name, "This comes from the blackout HIDDEN event"); ConfigureGame(_specialIdx);});
         UIManager.blackoutBehaviour.blackoutFinishEvent.AddListener(() => {DebugLogger.SourcedPrint(gameObject.name, "This comes from the blackout FINISH event");});
         DebugLogger.SourcedPrint(gameObject.name, "Listening for blackout", ColorUtility.ToHtmlStringRGB(Color.red));
         UIManager.blackoutBehaviour.Pulse();

@@ -13,10 +13,8 @@ public class UIManager : MonoBehaviour
     public static DebugSystemsManager debugSystems;
     public static RosterUIBehaviour RosterManager;
     public static BlackoutBehaviour blackoutBehaviour;
-    public UnityEvent screenTransitionEvent = new UnityEvent();
     private Animator roomCodeAnimator;
-    private TMP_Text roomCodeText;
-    private GameObject startScreen;
+    private TMP_Text roomCodeText, countdownText;
 
 
     void Awake(){
@@ -27,7 +25,7 @@ public class UIManager : MonoBehaviour
         debugSystems = gameObject.GetComponent<DebugSystemsManager>();
         RosterManager = new RosterUIBehaviour(transform.Find("Lobby Roster"));
         roomCodeAnimator = transform.Find("Room Code").GetComponent<Animator>();
-        startScreen = transform.Find("Screens").Find("Main Menu Screen").gameObject;
+        countdownText = transform.Find("Countdown").GetComponent<TMP_Text>();
         roomCodeText = roomCodeAnimator.transform.Find("Room Code Text").GetComponent<TMP_Text>();
         blackoutBehaviour = GameObject.FindObjectOfType<BlackoutBehaviour>();
 
@@ -41,9 +39,6 @@ public class UIManager : MonoBehaviour
         LobbyManager.singleton.playerJoinEvent.AddListener(RosterManager.AddPlayerToRoster);
 
     }
-    public void SwitchScreen(){
-        screenTransitionEvent.Invoke();
-    }
 
 
     public void SetRoomCodeVisibility(bool _newStatus){
@@ -54,14 +49,9 @@ public class UIManager : MonoBehaviour
         roomCodeText.text = ConnectionManager.singleton.GetRoomCode();
     }
 
-    public void ChangeScreen(string _screenName){
-        if(currentScreen != null){
-            currentScreen.gameObject.SetActive(false);
-        }
-        ScreenManager newScreen = GameObject.Find("Screens").transform.Find(_screenName).GetComponent<ScreenManager>();
-        newScreen.gameObject.SetActive(true);
-        currentScreen = newScreen;
-        MenuCursorManager.singleton.SetCursorInteractivities(true);
+
+    public void SetCountdown(int _digits){
+        countdownText.text = _digits.ToString();
     }
 
     // Update is called once per frame
