@@ -1,7 +1,14 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+
+[Serializable]
+public enum ActionType{
+        SCREEN_LOAD = 0,
+        CUSTOM_ACTION = 1
+    }
 
 public class FloorButtonBehaviour : MonoBehaviour
 {
@@ -12,6 +19,20 @@ public class FloorButtonBehaviour : MonoBehaviour
     const float BASE_TIME = 5;
     public static float maxTime;
     float timeLeft;
+
+
+    [Serializable] struct FloorAction
+    {
+        public ActionType action;
+        public string value;
+        public FloorAction(ActionType _action, string _value){
+            action = _action;
+            value = _value;
+        }
+    }
+
+    [SerializeField] private FloorAction[] callback;
+
 
     public void Start(){
         maxTime = ((LobbyManager.singleton.GetLobbySize()) * BASE_TIME) - (activations * BASE_TIME);
@@ -40,7 +61,7 @@ public class FloorButtonBehaviour : MonoBehaviour
     }
 
     public void Trigger(){
-       screen.TriggerScreenChange();
+        foreach(FloorAction floorAction in callback) LobbyMenuManager.buttonActions[floorAction.action](floorAction.value);
     }
 
 
@@ -52,7 +73,6 @@ public class FloorButtonBehaviour : MonoBehaviour
     public float Tick(){
         if(activations >= playersNeeded) timeLeft -= Time.deltaTime;
         else ResetTime();
-
         return timeLeft;
     }
 

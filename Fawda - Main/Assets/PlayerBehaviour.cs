@@ -19,7 +19,7 @@ public abstract class PlayerBehaviour : MonoBehaviour
         smokeEmitter = transform.Find("Smoke Particles").GetComponent<ParticleSystem>();
     }
 
-    public void EmitSmoke(){
+    public void PoofPlayer(){
         playerRenderer.enabled = false;
         smokeEmitter.Clear();
         smokeEmitter.Play();

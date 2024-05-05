@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class LobbyMenuScreenBehaviour : MonoBehaviour
 {
@@ -8,7 +9,6 @@ public class LobbyMenuScreenBehaviour : MonoBehaviour
     LobbyMenuManager lobbyMenuManager;
     List<FloorButtonBehaviour> floorButtons;
     float lowestTimeRemaining;
-
     void Awake()
     {
         floorButtons = new List<FloorButtonBehaviour>();
@@ -33,7 +33,6 @@ public class LobbyMenuScreenBehaviour : MonoBehaviour
     }
 
     public void TriggerScreenChange(){
-        lobbyMenuManager.TriggerFlip();
         ResetAllButtons();
     }
 

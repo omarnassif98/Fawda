@@ -99,6 +99,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playersNeeded: 1
+  callback:
+  - action: 0
+    value: HAUNT_GAME
+  - action: 1
+    value: Shake
 --- !u!65 &7160469814559756033
 BoxCollider:
   m_ObjectHideFlags: 0
