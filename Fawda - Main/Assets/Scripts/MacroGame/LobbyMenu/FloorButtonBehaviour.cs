@@ -19,6 +19,8 @@ public class FloorButtonBehaviour : MonoBehaviour
     const float BASE_TIME = 5;
     public static float maxTime;
     float timeLeft;
+    SpriteRenderer foregroundSprite, graphicSprite;
+    ParticleSystem poofParticles;
 
 
     [Serializable] struct FloorAction
@@ -33,12 +35,25 @@ public class FloorButtonBehaviour : MonoBehaviour
 
     [SerializeField] private FloorAction[] callback;
 
+    void Awake(){
+        foregroundSprite = GetComponent<SpriteRenderer>();
+        graphicSprite = transform.Find("Graphic").GetComponent<SpriteRenderer>();
+        graphicSprite.enabled = false;
+        poofParticles = transform.Find("Smoke Particles").GetComponent<ParticleSystem>();
+    }
 
     public void Start(){
         maxTime = ((LobbyManager.singleton.GetLobbySize()) * BASE_TIME) - (activations * BASE_TIME);
         timeLeft = BASE_TIME;
-        screen = transform.parent.GetComponent<LobbyMenuScreenBehaviour>();
+        screen = transform.parent.parent.GetComponent<LobbyMenuScreenBehaviour>();
         buttonIdx = screen.FeedButton(this);
+    }
+
+    public void SetVisibility(bool _isVisible){
+        poofParticles.Clear();
+        poofParticles.Play();
+        foregroundSprite.enabled = _isVisible;
+        graphicSprite.enabled = _isVisible;
     }
 
     void OnTriggerEnter(Collider _obj){
@@ -57,11 +72,12 @@ public class FloorButtonBehaviour : MonoBehaviour
     }
 
     public void OnOccupancy(){
-        GetComponent<SpriteRenderer>().color = (activations == 0)?Color.black:Color.white*0.15f;
+        foregroundSprite.color = (activations == 0)?Color.black:Color.white*0.15f;
+        graphicSprite.color = (activations > 0)?Color.black:Color.white*0.15f;
     }
 
     public void Trigger(){
-        foreach(FloorAction floorAction in callback) LobbyMenuManager.buttonActions[floorAction.action](floorAction.value);
+        foreach(FloorAction floorAction in callback) screen.buttonActions[floorAction.action](floorAction.value);
     }
 
 

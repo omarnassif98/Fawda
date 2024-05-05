@@ -11,10 +11,6 @@ public class LobbyMenuManager : MonoBehaviour
     Animator snowglobeAnimator;
     public Transform buttonParent;
     public static LobbyMenuManager singleton;
-    public static Dictionary<ActionType, UnityAction<string>> buttonActions;
-    Dictionary<string, UnityAction> customButtonActions;
-
-
     ParticleSystem snowfallParticles, snowgustParticles;
 
     // Start is called before the first frame update
@@ -30,11 +26,6 @@ public class LobbyMenuManager : MonoBehaviour
     void Awake(){
         if (singleton != null) Destroy(gameObject);
         singleton = this;
-        buttonActions = new Dictionary<ActionType, UnityAction<string>>();
-        customButtonActions = new Dictionary<string, UnityAction>();
-        buttonActions[ActionType.SCREEN_LOAD] = LoadScreen;
-        customButtonActions["Shake"] = ShakeSnowGlobe;
-        buttonActions[ActionType.CUSTOM_ACTION] = (string _str) => customButtonActions[_str]();
         snowglobeAnimator = transform.GetComponent<Animator>();
         snowfallParticles = transform.Find("Snowfall").GetComponent<ParticleSystem>();
         snowgustParticles = transform.Find("Snowgust").GetComponent<ParticleSystem>();
@@ -48,12 +39,11 @@ public class LobbyMenuManager : MonoBehaviour
         lobbyMenuPlayerInstances = new LobbyMenuPlayerBehaviour[LobbyManager.players.Length];
         InferLobbySetup();
         LobbyManager.singleton.playerJoinEvent.AddListener((idx) => SpawnPlayer(idx, LobbyManager.players[idx]));
-        ConnectionManager.singleton.RegisterServerEventListener("wakeup", () => LoadScreen("MainScreen"));
         ConnectionManager.singleton.RegisterServerEventListener("wakeup", () => snowglobeAnimator.SetBool("capped",false));
         ConnectionManager.singleton.RegisterServerEventListener("wakeup", () => snowfallParticles.Stop());
     }
 
-    void ShakeSnowGlobe(){
+    public void ShakeSnowGlobe(){
         foreach(LobbyMenuPlayerBehaviour playerBehaviour in lobbyMenuPlayerInstances) if(playerBehaviour != null) playerBehaviour.PoofPlayer();
         snowglobeAnimator.SetTrigger("Shake");
     }
@@ -71,20 +61,5 @@ public class LobbyMenuManager : MonoBehaviour
         lobbyMenuPlayerInstances[_idx] = newPlayer;
     }
 
-    public static void LoadScreen(string _screenName){
-        for(int i = 0; i < singleton.buttonParent.childCount; i++) Destroy(singleton.buttonParent.GetChild(i).gameObject);
-        try
-        {
-            GameObject floorPlan = Resources.Load("LobbyMenuScreens/" + _screenName) as GameObject;
-            Transform floor = GameObject.Instantiate(floorPlan,singleton.buttonParent).transform;
-            singleton.transform.localPosition = Vector3.zero;
-        }
-        catch (System.Exception)
-        {
-            DebugLogger.SourcedPrint("LobbyMenuManager","Could not load screen " + _screenName, "FF0000");
-        }
-    }
-    public void ClearScreen(){
-        for(int i = 0; i < buttonParent.childCount; i++) Destroy(buttonParent.GetChild(i).gameObject);
-    }
+
 }
