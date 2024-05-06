@@ -86,7 +86,6 @@ public class SynapseServer
         {
             for (int i = 0; i < tcpClients.Length; i++)
             {
-                UIManager.debugSystems.SetDebug_Client_Status(i, tcpClients[i].Connected);
                 if (!tcpClients[i].Connected) continue;
                 try
                 {

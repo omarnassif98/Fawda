@@ -6,11 +6,9 @@ using System.Numerics;
 public abstract class SynapseDatastruct
 {
     public abstract ArrayList PackData();
-    
+
     public virtual byte[] Encode(){
-        DebugLogger.singleton.Log("Packing datatype");
         byte[] bytes = SynapseMessageFormatter.GetPackedDataBytes(PackData());
-        DebugLogger.singleton.Log(BitConverter.ToString(bytes));
         return bytes;
     }
 }
@@ -56,30 +54,45 @@ public class ProfileData : SynapseDatastruct{
 public enum InputType{
     Menu = OpCode.MENU_CONTROL,
     Joypad = OpCode.UDP_GAMEPAD_INPUT
-} 
+}
 
 [System.Serializable]
 public class GamepadData : SynapseDatastruct{
-    public float dir, dist;
+    public float xInput, yInput;
     public byte[] additionalInfo = new byte[0];
 
 
-    public GamepadData(float _dir, float _dist){
-        this.dir = _dir;
-        this.dist = _dist;
+    public GamepadData(float _xInput, float _yInput){
+        this.xInput = _xInput;
+        this.yInput = _yInput;
+    }
+
+    public GamepadData(float _xInput, float _yInput, bool _action){
+        this.xInput = _xInput;
+        this.yInput = _yInput;
+        this.additionalInfo = BitConverter.GetBytes(_action);
     }
 
     public GamepadData(byte[] _data){
-        this.dir = BitConverter.ToSingle(_data,0);
-        this.dist = BitConverter.ToSingle(_data,4);
+        this.additionalInfo = new byte[_data.Length - 8];
+        this.xInput = BitConverter.ToSingle(_data,0);
+        this.yInput = BitConverter.ToSingle(_data,4);
         if(_data.Length - 8 == 0) return;
         Buffer.BlockCopy(_data, 8, this.additionalInfo, 0, _data.Length - 8);
     }
 
     public override ArrayList PackData(){
         ArrayList data = new ArrayList();
-        data.Add(this.dir);
-        data.Add(this.dist);      
+        data.Add(this.xInput);
+        data.Add(this.yInput);
+        return data;
+    }
+    public override byte[] Encode(){
+        byte[] baseBytes = base.Encode();
+        byte[] data = new byte[baseBytes.Length + additionalInfo.Length];
+        Buffer.BlockCopy(baseBytes, 0, data, 0, baseBytes.Length);
+        if (additionalInfo.Length == 0) return data;
+        Buffer.BlockCopy(additionalInfo, 0, data, baseBytes.Length, additionalInfo.Length);
         return data;
     }
 }
@@ -102,4 +115,3 @@ public class GamepadData : SynapseDatastruct{
             return allData;
         }
     }
-    

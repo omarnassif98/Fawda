@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using System;
+using System.Security.Permissions;
 
 // FAWDA LAYER
 // Object is basically a bridge between the game and the actual Synapse network
@@ -69,13 +70,13 @@ public class ConnectionManager : MonoBehaviour
     }
     public void VacateServerEventListener(string _eventName, UnityAction _func){
         serverEvents[_eventName].RemoveListener(_func);
-        DebugLogger.SourcedPrint("Connection Manager", "Vacated single callback for " + _eventName);
+        DebugLogger.SourcedPrint("Connection Manager", "Vacated single callback for " + _eventName, "FFAA00");
     }
 
     // What makes RPCs special is that you can pass parameters along from the client
     // The _func is literally a void
     public void RegisterRPC(string _key, UnityAction<byte[], int> _func){
-        DebugLogger.singleton.Log("Registering RPC for " + _key);
+        DebugLogger.SourcedPrint("Connection Manager","Registering RPC for " + _key, "FFAA00");
         remoteProcCalls[_key] = _func;
     }
 
@@ -87,7 +88,7 @@ public class ConnectionManager : MonoBehaviour
 
     public void VacateRPC(string _key){
         remoteProcCalls.Remove(_key);
-        DebugLogger.singleton.Log("REMOVING RPC - " + _key);
+        DebugLogger.SourcedPrint("Connection Manager","REMOVING RPC - " + _key, "FFAA00");
     }
 
     // Again called by the server - both TCP and UDP
@@ -107,7 +108,6 @@ public class ConnectionManager : MonoBehaviour
 
 
     public void TriggerServerEvent(string _event){
-        print(_event);
         if(serverEvents.ContainsKey(_event)){
             serverEvents[_event].Invoke();
         }
@@ -117,7 +117,7 @@ public class ConnectionManager : MonoBehaviour
         while(rpcQueue.Count > 0){
             DirectedNetMessage msg = rpcQueue.Dequeue();
             string code = Enum.GetName(typeof(OpCode), msg.msg.opCode);
-            if (msg.msg.opCode != OpCode.MENU_CONTROL) DebugLogger.singleton.Log("Executing RPC: " + code);
+            if(!remoteProcCalls.ContainsKey(code)) continue;
             remoteProcCalls[code](msg.msg.val, msg.client);
         }
     }
