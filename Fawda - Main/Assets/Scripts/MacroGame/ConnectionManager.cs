@@ -56,9 +56,20 @@ public class ConnectionManager : MonoBehaviour
     public void RegisterServerEventListener(string _eventName, UnityAction _func){
         if(!serverEvents.ContainsKey(_eventName)){
             serverEvents[_eventName] = new UnityEvent();
-            DebugLogger.singleton.Log(string.Format("Registering Server Event: {0}", _eventName));
+            DebugLogger.SourcedPrint("Connection Manager", "New Event " + _eventName, "FFAA00");
         }
         serverEvents[_eventName].AddListener(_func);
+    }
+
+    public void RegisterEphemeralServerEvent(string _eventName, UnityAction _func){
+        UnityAction ephemeralAction = null;
+        ephemeralAction = () => {_func(); VacateServerEventListener(_eventName, ephemeralAction);};
+        RegisterServerEventListener(_eventName, ephemeralAction);
+        DebugLogger.SourcedPrint("Connection Manager", "Registered ephemiral for " + _eventName);
+    }
+    public void VacateServerEventListener(string _eventName, UnityAction _func){
+        serverEvents[_eventName].RemoveListener(_func);
+        DebugLogger.SourcedPrint("Connection Manager", "Vacated single callback for " + _eventName);
     }
 
     // What makes RPCs special is that you can pass parameters along from the client

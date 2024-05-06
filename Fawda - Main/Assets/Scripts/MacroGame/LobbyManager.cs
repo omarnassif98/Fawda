@@ -8,10 +8,7 @@ using UnityEngine.Events;
 public class LobbyManager : MonoBehaviour
 {
     public static LobbyManager singleton;
-
-    //REWORK NEEDED
-    Transform gameSetupScreen;
-
+    private InputManager inputManager;
     public static ProfileData[] players {get;private set;}
 
     public UnityEvent<int> playerJoinEvent;
@@ -19,17 +16,19 @@ public class LobbyManager : MonoBehaviour
 
     void Awake(){
         if(singleton != null){
+            DebugLogger.SourcedPrint("LobbyManager", "Singleton dispute, killing self", "FF0000");
             Destroy(this);
         }else{
             singleton = this;
         }
         players = new ProfileData[5];
-        //gameSetupScreen = GameObject.Find("Screens").transform.Find("Game Setup Screen");
         playerJoinEvent = new UnityEvent<int>();
         playerRemoveEvent = new UnityEvent<int>();
+        DebugLogger.SourcedPrint("LobbyManager", "Awake");
     }
 
     void Start(){
+        inputManager = new InputManager();
         ConnectionManager.singleton.RegisterRPC(OpCode.PROFILE_PAYLOAD, JoinPlayer);
     }
 
@@ -49,18 +48,6 @@ public class LobbyManager : MonoBehaviour
     void RemovePlayer(int _idx){
         players[_idx] = null;
         playerRemoveEvent.Invoke(_idx);
-    }
-
-    public void IntroduceMinigame(string _mode){
-        Type minigameLogic = Type.GetType(string.Format("{0}GameManager",_mode));
-        if(minigameLogic == null){
-            DebugLogger.singleton.Log(string.Format("{0}GameManager is not a minigame, dipshit", _mode));
-            return;
-        }
-        //REWORK NEEDED
-        gameSetupScreen.Find(_mode).gameObject.SetActive(true);
-        ConnectionManager.singleton.SendMessageToClients(OpCode.GAMESETUP, (int)Enum.Parse(typeof(GameCodes), _mode.ToUpper()));
-        UIManager.singleton.SetRoomCodeVisibility(false);
     }
 
     public int GetLobbySize(){

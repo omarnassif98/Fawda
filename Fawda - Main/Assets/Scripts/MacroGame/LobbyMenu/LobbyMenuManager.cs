@@ -39,8 +39,8 @@ public class LobbyMenuManager : MonoBehaviour
         lobbyMenuPlayerInstances = new LobbyMenuPlayerBehaviour[LobbyManager.players.Length];
         InferLobbySetup();
         LobbyManager.singleton.playerJoinEvent.AddListener((idx) => SpawnPlayer(idx, LobbyManager.players[idx]));
-        ConnectionManager.singleton.RegisterServerEventListener("wakeup", () => snowglobeAnimator.SetBool("capped",false));
-        ConnectionManager.singleton.RegisterServerEventListener("wakeup", () => snowfallParticles.Stop());
+        ConnectionManager.singleton.RegisterEphemeralServerEvent("wakeup", () => snowglobeAnimator.SetBool("capped",false));
+        ConnectionManager.singleton.RegisterEphemeralServerEvent("wakeup", () => snowfallParticles.Stop());
     }
 
     public void ShakeSnowGlobe(){
@@ -58,6 +58,7 @@ public class LobbyMenuManager : MonoBehaviour
         DebugLogger.SourcedPrint("LobbyMenu", "Adding player", ColorUtility.ToHtmlStringRGB(Color.cyan));
         Vector3 spawnPoint = new Vector3(0, 0, 0);
         LobbyMenuPlayerBehaviour newPlayer = GameObject.Instantiate(lobbyMenuPlayerPrefab, spawnPoint, Quaternion.identity, transform).GetComponent<LobbyMenuPlayerBehaviour>();
+        newPlayer.Initialize(_idx);
         lobbyMenuPlayerInstances[_idx] = newPlayer;
     }
 

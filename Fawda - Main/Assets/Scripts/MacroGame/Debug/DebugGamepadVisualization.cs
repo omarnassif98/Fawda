@@ -21,15 +21,11 @@ public class DebugGamepadVisualization : MonoBehaviour
     public void Initialize(short _idx){
         //Radius calculated with invisible object
         radius = Mathf.Abs(Vector2.Distance(transform.GetChild(1).position,  orientation.position));
-        playerIdx = _idx; 
+        playerIdx = _idx;
     }
 
 
 
-    void Update(){
-        UpdateVisualization(InputManager.singleton.PullJoypadState(playerIdx));
-        hertzDisplay.text = string.Format("{0} Hz", InputManager.singleton.GetIndexHertz(playerIdx).ToString("F2"));
-    }
 
     public void UpdateVisualization(JoypadState _controls){
         Vector2 _joystickInput = _controls.analog * radius;
