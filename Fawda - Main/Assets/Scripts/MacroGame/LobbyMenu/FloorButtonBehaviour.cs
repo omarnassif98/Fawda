@@ -7,7 +7,8 @@ using UnityEngine.Events;
 [Serializable]
 public enum ActionType{
         SCREEN_LOAD = 0,
-        CUSTOM_ACTION = 1
+        GAME_SETUP = 1,
+        CUSTOM_ACTION = 2
     }
 
 public class FloorButtonBehaviour : MonoBehaviour

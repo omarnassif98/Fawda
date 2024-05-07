@@ -8,7 +8,8 @@ using UnityEngine.Events;
 public abstract class DeployableMinigame
 {
     public bool gameInPlay = false;
-    public abstract void SetupGame(Transform _mapWrapper, int _specialityPlayer = -1);
+    public Dictionary<string, int> additionalConfig;
+    public abstract void SetupGame(Transform _mapWrapper, Dictionary<string, int> _additionalConfig = null);
 
     public virtual void EndGame(){
 

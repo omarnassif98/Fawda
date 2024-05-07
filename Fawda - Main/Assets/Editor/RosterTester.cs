@@ -1,23 +1,22 @@
 using UnityEditor;
 using UnityEngine;
 
-[CustomEditor(typeof(GameManager))]
-public class GameManagerTester : Editor
+[CustomEditor(typeof(UIManager))]
+public class UITester : Editor
 {
     // Start is called before the first frame update
     public override void OnInspectorGUI()
     {
         DrawDefaultInspector();
-        GameManager singleton = (GameManager)target;
+        UIManager singleton = (UIManager)target;
         GUILayout.Space(10);
 
         EditorGUILayout.BeginVertical("helpbox");
         GUILayout.Space(2);
-        GUILayout.Label("Load Haunt (Staging)");
+        GUILayout.Label("Roster Roulette testing");
         GUILayout.Space(5);
-        if(GUILayout.Button("Load")){
-            singleton.LoadMinigame(GameCodes.HAUNT);
-            singleton.ConfigureGame();
+        if(GUILayout.Button("Spin")){
+            UIManager.RosterManager.StartRoulette();
         }
         GUILayout.Space(5);
         EditorGUILayout.EndVertical();

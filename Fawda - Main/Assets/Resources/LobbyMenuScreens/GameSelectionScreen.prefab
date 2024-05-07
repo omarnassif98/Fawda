@@ -9,9 +9,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3248414232385944364}
-  - component: {fileID: 1922966859063172131}
   m_Layer: 0
-  m_Name: HauntScreen
+  m_Name: GameSelectionScreen
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -33,18 +32,6 @@ Transform:
   - {fileID: 4311729357776627994}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1922966859063172131
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7195097445751114400}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5f1b195a346f84d8cb7884c1cf20e95d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &1168860186662308836
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -103,7 +90,7 @@ PrefabInstance:
       objectReference: {fileID: 21300000, guid: bd2c46d5404907647ae046436fc484e6, type: 3}
     - target: {fileID: 6340964609196939570, guid: 25b4d684efcb1443b91d3c9b744d70db, type: 3}
       propertyPath: m_Name
-      value: LobbyMenuButton
+      value: HauntSelection
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

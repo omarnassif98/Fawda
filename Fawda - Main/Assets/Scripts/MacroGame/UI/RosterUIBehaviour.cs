@@ -103,55 +103,40 @@ public class RosterUIBehaviour
         rosterPlayers[_idx].occupied = _occupationStatus;
     }
 
-    public void StartReadyupProcess(bool[] _participants){
+    public void StartRoulette(){
         DebugLogger.SourcedPrint("Roster Roulette", "Preprocessing");
-        List<(Transform,int)> optedRosterSlots = new List<(Transform,int)>();
-        for (int i = 0; i<_participants.Length; i++){
-            if(_participants[i]){
-                 optedRosterSlots.Add((GetRosterTransform(i),i));
-                DebugLogger.singleton.Log(string.Format("Slot {0} opt in", i));
-            }
-        }
-        if (optedRosterSlots.Count == 0)
-        {
-            for(int i = 0; i < _participants.Length; i++){
-                optedRosterSlots.Add((GetRosterTransform(i),i));
-            }
-        }
         FlushRoulette();
-        roulettePlaying = SlotRoulette(optedRosterSlots);
+        roulettePlaying = SlotRoulette();
         UIManager.singleton.StartCoroutine(roulettePlaying);
     }
 
-    IEnumerator SlotRoulette(List<(Transform, int)> rosterTransforms){
+    IEnumerator SlotRoulette(){
         DebugLogger.SourcedPrint("Roster Roulette", "Start");
         rosterRoulleteTicker.enabled = true;
         rosterRoulleteTicker.color = Color.red;
-        if (rosterTransforms.Count == 1){
-            SetTickerPosition(rosterTransforms[0].Item1);
-            GameManager.singleton.IntroduceGame(rosterTransforms[0].Item2);
+        if (occupationCount == 1){
+            SetTickerPosition(rosterPlayers[0].rosterAnimator.transform);
             DebugLogger.SourcedPrint("Roster Roulette", "Just 1?");
+            rosterRoulleteTicker.color = Color.yellow;
             yield break;
         }
 
-        int cap = rosterTransforms.Count;
-        int idx = Random.Range(0,cap);
+        int idx = Random.Range(0,occupationCount);
         int dials = Random.Range(13,18);
         int turn = 0;
         float tickTime = 0.05f;
         while(turn <= dials){
-            SetTickerPosition(rosterTransforms[idx].Item1);
+            idx = (idx + 1) % occupationCount;
+            SetTickerPosition(rosterPlayers[idx].rosterAnimator.transform);
             yield return new WaitForSeconds(tickTime);
             tickTime *= 1.2f;
-            idx = (idx + 1) % cap;
             turn += 1;
         }
         DebugLogger.SourcedPrint("Roster Roulette", "Stopped");
         yield return new WaitForSeconds(0.4f);
-        DebugLogger.SourcedPrint("Roster Roulette", "Chosen", ColorUtility.ToHtmlStringRGB(rosterPlayers[rosterTransforms[idx].Item2].playerColorImage.color));
+        DebugLogger.SourcedPrint("Roster Roulette", "Chosen", ColorUtility.ToHtmlStringRGB(rosterPlayers[idx].playerColorImage.color));
         rosterRoulleteTicker.color = Color.yellow;
         yield return new WaitForSeconds(0.2f);
-        GameManager.singleton.IntroduceGame(rosterTransforms[idx].Item2);
 
         roulettePlaying = null;
     }
@@ -170,7 +155,7 @@ public class RosterUIBehaviour
     }
 
     private void SetTickerPosition(Transform slotTransform){
-        rosterRoulleteTicker.rectTransform.position = slotTransform.position + (Vector3.up * 45);
+        rosterRoulleteTicker.rectTransform.position = slotTransform.position + (Vector3.up * 90);
     }
 
 }

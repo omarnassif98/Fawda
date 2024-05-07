@@ -42,22 +42,10 @@ public class GameManager : MonoBehaviour
         DebugLogger.SourcedPrint(gameObject.name, "Minigame Killed");
     }
 
-    public void IntroduceGame(int _specialIdx = -1){
-        DebugLogger.SourcedPrint(gameObject.name, "Introducing Event", ColorUtility.ToHtmlStringRGB(Color.red));
-        UIManager.singleton.backgroundBehaviour.JoltBackground();
-        UIManager.singleton.backgroundBehaviour.idealCheckerboardOpacity = 0;
-        UIManager.blackoutBehaviour.blackoutHiddenEvent.AddListener(() => {DebugLogger.SourcedPrint(gameObject.name, "This comes from the blackout HIDDEN event"); ConfigureGame(_specialIdx);});
-        UIManager.blackoutBehaviour.blackoutFinishEvent.AddListener(() => {DebugLogger.SourcedPrint(gameObject.name, "This comes from the blackout FINISH event");});
-        DebugLogger.SourcedPrint(gameObject.name, "Listening for blackout", ColorUtility.ToHtmlStringRGB(Color.red));
-        UIManager.blackoutBehaviour.Pulse();
-    }
-
-    public void ConfigureGame(int _specialIdx = -1){
-        DebugLogger.SourcedPrint(gameObject.name, "Config game called");
-        UIManager.RosterManager.DismissRoulette();
+    public void ConfigureGame(Dictionary<string,int> _additionalConfig = null){
         Transform mapWrapper = transform.Find("MapWrapper");
         foreach(Transform go in mapWrapper) Destroy(go.gameObject);
         DebugLogger.SourcedPrint(gameObject.name, "Reset map");
-        activeMinigame.SetupGame(mapWrapper, _specialIdx);
+        activeMinigame.SetupGame(mapWrapper, _additionalConfig);
     }
 }
