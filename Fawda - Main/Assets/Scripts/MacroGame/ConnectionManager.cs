@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using System;
 using System.Security.Permissions;
+using System.Runtime.CompilerServices;
 
 // FAWDA LAYER
 // Object is basically a bridge between the game and the actual Synapse network
@@ -54,10 +55,12 @@ public class ConnectionManager : MonoBehaviour
     // Registers events that are meant to simultaneosly affect many liteners - basically a websocket Emit()
     // The _func is literally a void
     // Triggering an event trips ALL (one to many) functions (actions) listening for that event
-    public void RegisterServerEventListener(string _eventName, UnityAction _func){
+    public void RegisterServerEventListener(string _eventName, UnityAction _func, [CallerFilePath] string _caller = "", [CallerLineNumber] int _number = 0){
+        string[] tmp = _caller.Split("/");
+        string callerClass = tmp[tmp.Length-1].Split(".")[0];
         if(!serverEvents.ContainsKey(_eventName)){
             serverEvents[_eventName] = new UnityEvent();
-            DebugLogger.SourcedPrint("Connection Manager", "New Event " + _eventName, "FFAA00");
+            DebugLogger.SourcedPrint(string.Format("{0} via ConnectionManager",callerClass), "New Event " + _eventName, "FFAA00",_path:_caller, callingFileLineNumber:_number);
         }
         serverEvents[_eventName].AddListener(_func);
     }

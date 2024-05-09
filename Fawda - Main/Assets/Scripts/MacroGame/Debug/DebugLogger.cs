@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using TMPro;
 using UnityEngine;
 
@@ -14,10 +15,11 @@ public class DebugLogger : MonoBehaviour
         singleton = this;
     }
 
-    [HideInCallstack]
-    public static void SourcedPrint(string _src, string _msg, string _color = "FFFFFF"){
+    public static void SourcedPrint(string _src, string _msg, string _color = "FFFFFF", [CallerFilePath] string _path = "", [CallerMemberName] string callingMethod = "", [CallerLineNumber] int callingFileLineNumber = 0){
         string log = String.Format("<b><color=#{2}>{0}: </color></b>{1}", _src, _msg, _color);
-        print(log);
+        string pathFromProjectFolder = _path.Split("Fawda - Main/")[1];
+
+        Debug.Log(log + string.Format("\n<a href=\"{0}\" line=\"{1}\">Take me there</a>", _path, callingFileLineNumber));
         if(singleton!=null) singleton.Log(log);
     }
     public void Log(string newLine){
