@@ -27,5 +27,17 @@ public class ConnectionManagerTester : Editor
 
 
 
+        EditorGUILayout.BeginVertical("helpbox");
+
+        if(GUILayout.Button("Ready player 1")){
+            NetMessage netMessage = new NetMessage(OpCode.READYUP,new PlayerGameReadyUpData(true).Encode());
+            DirectedNetMessage directedNetMessage = new DirectedNetMessage(netMessage, 0);
+            ConnectionManager.singleton.QueueRPC(directedNetMessage);
+        }
+        GUILayout.Space(5);
+        EditorGUILayout.EndVertical();
+
+
+
     }
 }

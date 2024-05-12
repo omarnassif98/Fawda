@@ -20,7 +20,7 @@ public class InputManager
         for(int i = 0; i < 5; i++){
             heartbeatEvents[i] = new UnityEvent();
         }
-        ConnectionManager.singleton.RegisterRPC(Enum.GetName(typeof(OpCode), OpCode.UDP_GAMEPAD_INPUT), ReceivePoll);
+        ConnectionManager.singleton.RegisterRPC(OpCode.UDP_GAMEPAD_INPUT, ReceivePoll);
         DebugLogger.SourcedPrint("Input Manager", "Awake and ready");
     }
 

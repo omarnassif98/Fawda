@@ -97,21 +97,21 @@ public class GamepadData : SynapseDatastruct{
     }
 }
 
-    public class PlayerGameConfigData : SynapseDatastruct
+    public class PlayerGameReadyUpData : SynapseDatastruct
     {
-        bool ready;
-        ArrayList additionalData;
-        public PlayerGameConfigData(bool _ready, ArrayList _additionalData = null){
+        public bool ready;
+        public PlayerGameReadyUpData(bool _ready){
             ready = _ready;
-            additionalData = _additionalData;
         }
+
+        public PlayerGameReadyUpData(byte[] _data){
+            ready = BitConverter.ToBoolean(_data);
+        }
+
         public override ArrayList PackData()
         {
             ArrayList allData = new ArrayList();
             allData.Add(ready);
-            foreach(object o in allData){
-                allData.Add(o);
-            }
             return allData;
         }
     }

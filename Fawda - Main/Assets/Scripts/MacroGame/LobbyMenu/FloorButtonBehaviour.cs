@@ -22,6 +22,7 @@ public class FloorButtonBehaviour : MonoBehaviour
     float timeLeft;
     SpriteRenderer foregroundSprite, graphicSprite;
     ParticleSystem poofParticles;
+    [SerializeField] private float idealAlpha = 0, realAlpha = 0;
 
 
     [Serializable] struct FloorAction
@@ -39,7 +40,6 @@ public class FloorButtonBehaviour : MonoBehaviour
     void Awake(){
         foregroundSprite = GetComponent<SpriteRenderer>();
         graphicSprite = transform.Find("Graphic").GetComponent<SpriteRenderer>();
-        graphicSprite.enabled = false;
         poofParticles = transform.Find("Smoke Particles").GetComponent<ParticleSystem>();
     }
 
@@ -51,10 +51,7 @@ public class FloorButtonBehaviour : MonoBehaviour
     }
 
     public void SetVisibility(bool _isVisible){
-        poofParticles.Clear();
-        poofParticles.Play();
-        foregroundSprite.enabled = _isVisible;
-        graphicSprite.enabled = _isVisible;
+        idealAlpha = _isVisible? 1:0;
     }
 
     void OnTriggerEnter(Collider _obj){
@@ -73,8 +70,8 @@ public class FloorButtonBehaviour : MonoBehaviour
     }
 
     public void OnOccupancy(){
-        foregroundSprite.color = (activations == 0)?Color.black:Color.white*0.15f;
-        graphicSprite.color = (activations > 0)?Color.black:Color.white*0.15f;
+        foregroundSprite.color = (activations == 0)?new Color(0,0,0,realAlpha):new Color(0.75f,0.75f,0.75f,realAlpha);
+        graphicSprite.color = (activations > 0)?new Color(0,0,0,realAlpha):new Color(0.75f,0.75f,0.75f,realAlpha);
     }
 
     public void Trigger(){
@@ -92,11 +89,18 @@ public class FloorButtonBehaviour : MonoBehaviour
         else ResetTime();
         return timeLeft;
     }
-
+    public void StepAlpha(){
+        realAlpha = (Mathf.Abs(idealAlpha - realAlpha) < 0.005f)?idealAlpha:Mathf.Lerp(realAlpha,idealAlpha,0.2f);
+        foregroundSprite.color = new Color(foregroundSprite.color.r, foregroundSprite.color.g, foregroundSprite.color.b, realAlpha);
+        graphicSprite.color = new Color(graphicSprite.color.r, graphicSprite.color.g, graphicSprite.color.b, realAlpha);
+    }
     public bool IsFinished(){
         if(timeLeft > 0 ) return false;
         Trigger();
         ResetTime();
         return true;
+    }
+    void Update(){
+        StepAlpha();
     }
 }

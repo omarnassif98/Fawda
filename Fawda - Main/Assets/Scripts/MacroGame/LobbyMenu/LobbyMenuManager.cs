@@ -9,9 +9,10 @@ public class LobbyMenuManager : MonoBehaviour
     GameObject lobbyMenuPlayerPrefab;
     LobbyMenuPlayerBehaviour[] lobbyMenuPlayerInstances;
     Animator snowglobeAnimator;
-    public Transform buttonParent;
+    Transform buttonParent;
     public static LobbyMenuManager singleton;
     ParticleSystem snowfallParticles, snowgustParticles;
+    public static UnityEvent gustEvent;
 
     // Start is called before the first frame update
 
@@ -31,6 +32,7 @@ public class LobbyMenuManager : MonoBehaviour
         snowgustParticles = transform.Find("Snowgust").GetComponent<ParticleSystem>();
         lobbyMenuPlayerPrefab = Resources.Load("Global/Prefabs/LobbyMenuPlayer") as GameObject;
         buttonParent = transform.Find("LobbyUIManager");
+        gustEvent = new UnityEvent();
         DebugLogger.SourcedPrint("LobbyMenuManager","Awake");
 
     }
@@ -44,12 +46,13 @@ public class LobbyMenuManager : MonoBehaviour
     }
 
     public void ShakeSnowGlobe(){
-        foreach(LobbyMenuPlayerBehaviour playerBehaviour in lobbyMenuPlayerInstances) if(playerBehaviour != null) playerBehaviour.PoofPlayer();
+        foreach(LobbyMenuPlayerBehaviour playerBehaviour in lobbyMenuPlayerInstances) if(playerBehaviour != null) playerBehaviour.PoofPlayer(false);
         snowglobeAnimator.SetTrigger("Shake");
     }
 
     [ContextMenu("Gust")]
     public void TriggerSnowGust(){
+        gustEvent.Invoke();
         snowgustParticles.Clear();
         snowgustParticles.Play();
     }
@@ -62,5 +65,8 @@ public class LobbyMenuManager : MonoBehaviour
         lobbyMenuPlayerInstances[_idx] = newPlayer;
     }
 
+    public void ShakeEnd(){
+        foreach(LobbyMenuPlayerBehaviour lobbyMenuPlayerBehaviour in lobbyMenuPlayerInstances) if(lobbyMenuPlayerBehaviour != null) lobbyMenuPlayerBehaviour.PoofPlayer(true);
+    }
 
 }

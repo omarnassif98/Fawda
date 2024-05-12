@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,7 +8,7 @@ public class LobbyMenuScreenBehaviour : MonoBehaviour
 {
     public bool isInteractable { get; private set; }
     List<FloorButtonBehaviour> floorButtons;
-
+    UnityAction screenloadAction;
     Dictionary<string, UnityAction> customButtonActions;
     float lowestTimeRemaining;
     Transform currentFloorPlan;
@@ -20,17 +21,30 @@ public class LobbyMenuScreenBehaviour : MonoBehaviour
         DebugLogger.SourcedPrint("LobbyMenuScreen","Awake");
         buttonActions = new Dictionary<ActionType, UnityAction<string>>();
         customButtonActions = new Dictionary<string, UnityAction>();
-        buttonActions[ActionType.SCREEN_LOAD] = LoadScreen;
         customButtonActions["Shake"] = () => LobbyMenuManager.singleton.ShakeSnowGlobe();
+        buttonActions[ActionType.SCREEN_LOAD] = PrepareScreenLoadEphimeral;
+        buttonActions[ActionType.GAME_SETUP] = (string _code) => LobbyManager.gameManager.LoadMinigame((GameCodes)Enum.Parse(typeof(GameCodes), _code));
         buttonActions[ActionType.CUSTOM_ACTION] = (string _str) => customButtonActions[_str]();
     }
 
     void Start(){
         ConnectionManager.singleton.RegisterServerEventListener("wakeup", () => LoadScreen("MainScreen"));
-
+        LobbyMenuManager.gustEvent.AddListener(TripScreenTransitionAction);
     }
-    public void LoadScreen(string _screenName){
+
+    public void PrepareScreenLoadEphimeral(string _screenName){
         ClearScreen();
+        screenloadAction = () => LoadScreen(_screenName);
+    }
+
+    public void TripScreenTransitionAction(){
+        screenloadAction();
+        screenloadAction = null;
+    }
+
+    public void LoadScreen(string _screenName){
+        isInteractable = true;
+
         try
         {
             GameObject floorPlan = Resources.Load("LobbyMenuScreens/" + _screenName) as GameObject;

@@ -75,8 +75,7 @@ public class DebugSystemsManager : MonoBehaviour
     void CleanHeartbeats(){
         DateTime cutoff = DateTime.Now.AddSeconds(-1);
         for(int i = 0; i < heartBeats.Length; i++){
-            if(heartBeats[i].Count == 0) continue;
-            while(heartBeats[i].Peek() < cutoff) heartBeats[i].Dequeue();
+            while(heartBeats[i].Count > 0 && heartBeats[i].Peek() < cutoff) heartBeats[i].Dequeue();
         }
     }
     void Update()

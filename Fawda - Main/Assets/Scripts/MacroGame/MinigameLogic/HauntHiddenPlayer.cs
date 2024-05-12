@@ -12,14 +12,14 @@ public class HauntHiddenPlayerBehaviour : PlayerBehaviour
 
     protected override void Tick()
     {
-        if(!GameManager.activeMinigame.gameInPlay) return;
+        if(!LobbyManager.gameManager.activeMinigame.gameInPlay) return;
         CheckForKill();
     }
 
     private Vector2 PullCoord(Vector3 _vec3) => new Vector2(_vec3.x,_vec3.z);
     void CheckForKill(){
         if(isStunned || !isMobile) return;
-        foreach(HauntHunterPlayerBehaviour player in ((HauntGameDeployable)GameManager.activeMinigame).hunterPlayerInstances){
+        foreach(HauntHunterPlayerBehaviour player in ((HauntGameDeployable)LobbyManager.gameManager.activeMinigame).hunterPlayerInstances){
             if(player.isPetrified || Vector2.Distance(PullCoord(player.transform.position), PullCoord(transform.position)) > killRadius) continue;
                 print("KILL");
                 StartCoroutine(PetrifyHunter(player));

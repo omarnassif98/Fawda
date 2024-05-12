@@ -25,14 +25,15 @@ public abstract class PlayerBehaviour : MonoBehaviour
         isMobile = true;
     }
 
-    public void PoofPlayer(){
-        playerRenderer.enabled = false;
+    public void PoofPlayer(bool _activityStatus){
+        playerRenderer.enabled = _activityStatus;
         smokeEmitter.Clear();
         smokeEmitter.Play();
-        isMobile = false;
+        isMobile = _activityStatus;
     }
 
     void Update(){
+        if (isMobile)
         Move();
         Tick();
     }

@@ -4,48 +4,45 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-public class GameManager : MonoBehaviour
+public class GameManager
 {
 
-    public static GameManager singleton;
-    private readonly Dictionary<GameCodes, Type> minigameLookup = new Dictionary<GameCodes,Type>()
+    private readonly Dictionary<GameCodes, Tuple<Type,Type>> minigameLookup = new Dictionary<GameCodes,Tuple<Type,Type>>()
     {
-        {GameCodes.HAUNT, typeof(HauntGameDeployable)}
+        {GameCodes.HAUNT, new Tuple<Type, Type>(typeof(HauntGameDeployable),typeof(HauntGameSetupBehaviour))}
     };
 
-    public static DeployableMinigame activeMinigame {get; private set;}
+    public GameSetupBehaviour activeMinigameSetup {get; private set;}
+    public DeployableMinigame activeMinigame {get; private set;}
+    Transform mapWrapper;
 
     [HideInInspector]
     public UnityEvent GameStartEvent = new UnityEvent(), GameEndEvent = new UnityEvent(), GamePauseEvent = new UnityEvent();
 
 
-    void Awake(){
-        Application.targetFrameRate = 30;
-        if(singleton != null) Destroy(this);
-        singleton = this;
-    }
 
-    void Start(){
-        foreach (KeyValuePair<GameCodes, Type> entry in minigameLookup){
-            DebugLogger.singleton.Log(string.Format("Game Manager Lookup Entry {0}: {1}", entry.Key, entry.Value));
-        }
+
+    public GameManager(Transform _maptransform){
+        mapWrapper = _maptransform;
     }
 
     public void LoadMinigame(GameCodes _gamecode){
         if(activeMinigame != null) return;
-        DebugLogger.SourcedPrint(gameObject.name,"Minigame Loaded");
-        activeMinigame = (DeployableMinigame)Activator.CreateInstance(minigameLookup[_gamecode]);
+        Tuple<Type,Type> gameInfo = minigameLookup[_gamecode];
+        activeMinigame = (DeployableMinigame)Activator.CreateInstance(gameInfo.Item1);
+        activeMinigameSetup = (GameSetupBehaviour)Activator.CreateInstance(gameInfo.Item2);
+        DebugLogger.SourcedPrint("GameManager",string.Format("Minigame Loaded - {0}",Enum.GetName(typeof(GameCodes),_gamecode)));
     }
 
     public void KillMinigame(){
         activeMinigame = null;
-        DebugLogger.SourcedPrint(gameObject.name, "Minigame Killed");
+        DebugLogger.SourcedPrint("GameManager", "Minigame Killed");
     }
 
     public void ConfigureGame(Dictionary<string,int> _additionalConfig = null){
-        Transform mapWrapper = transform.Find("MapWrapper");
-        foreach(Transform go in mapWrapper) Destroy(go.gameObject);
-        DebugLogger.SourcedPrint(gameObject.name, "Reset map");
+        DebugLogger.SourcedPrint("GameManager", "Reset map");
         activeMinigame.SetupGame(mapWrapper, _additionalConfig);
     }
+
+
 }

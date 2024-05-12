@@ -33,7 +33,7 @@ public class HauntHunterPlayerBehaviour : PlayerBehaviour
 
     protected override void Tick()
     {
-        if(PlayerBehaviour.hotseat != this || !GameManager.activeMinigame.gameInPlay || isPetrified) return;
+        if(PlayerBehaviour.hotseat != this || !LobbyManager.gameManager.activeMinigame.gameInPlay || isPetrified) return;
         Vector2 rotInput = new Vector2(Input.GetAxisRaw("Debug Horizontal"), Input.GetAxisRaw("Debug Vertical"));
         if(Input.GetButton("Alt Action") && currentAmmo < MAX_AMMO){
             isMobile = false;
@@ -64,7 +64,7 @@ public class HauntHunterPlayerBehaviour : PlayerBehaviour
     }
 
     void UpdateStressCondition(){
-        bool isNearGhost = Vector3.Distance(transform.position, ((HauntGameDeployable)GameManager.activeMinigame).ghostPlayerInstance.transform.position) < 5;
+        bool isNearGhost = Vector3.Distance(transform.position, ((HauntGameDeployable)LobbyManager.gameManager.activeMinigame).ghostPlayerInstance.transform.position) < 5;
         if(isNearGhost != wasNearGhostLastFrame) HandleStressShift(isNearGhost);
         wasNearGhostLastFrame = isNearGhost;
         if(!isNearGhost) return;
@@ -80,7 +80,7 @@ public class HauntHunterPlayerBehaviour : PlayerBehaviour
 
     void FlushStressMaterial(){
         DebugLogger.SourcedPrint(gameObject.name, "Flushing stress");
-        Material newPlayerMaterial = Vector3.Distance(transform.position, ((HauntGameDeployable)GameManager.activeMinigame).ghostPlayerInstance.transform.position) < 5?playerStressedMaterial:playerDefaultMaterial;
+        Material newPlayerMaterial = Vector3.Distance(transform.position, ((HauntGameDeployable)LobbyManager.gameManager.activeMinigame).ghostPlayerInstance.transform.position) < 5?playerStressedMaterial:playerDefaultMaterial;
         playerRenderer.material = newPlayerMaterial;
     }
 

@@ -1,24 +1,28 @@
 using UnityEditor;
 using UnityEngine;
 
-[CustomEditor(typeof(UIManager))]
-public class UITester : Editor
+[CustomEditor(typeof(FloorButtonBehaviour), true)]
+public class FloorButtonTester : Editor
 {
+    bool vis = true;
     // Start is called before the first frame update
     public override void OnInspectorGUI()
     {
         DrawDefaultInspector();
-        UIManager singleton = (UIManager)target;
+        FloorButtonBehaviour singleton = (FloorButtonBehaviour)target;
         GUILayout.Space(10);
 
         EditorGUILayout.BeginVertical("helpbox");
-        GUILayout.Space(2);
-        GUILayout.Label("Roster Roulette testing");
-        GUILayout.Space(5);
-        if(GUILayout.Button("Spin")){
-            UIManager.RosterManager.StartRoulette();
+
+        if(GUILayout.Button("Toggle visibility")){
+            vis = !vis;
+            singleton.SetVisibility(vis);
+
         }
         GUILayout.Space(5);
         EditorGUILayout.EndVertical();
+
+
+
     }
 }

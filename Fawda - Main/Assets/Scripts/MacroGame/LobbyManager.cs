@@ -8,6 +8,7 @@ using UnityEngine.Events;
 public class LobbyManager : MonoBehaviour
 {
     public static LobbyManager singleton;
+    public static GameManager gameManager;
     private InputManager inputManager;
     public static ProfileData[] players {get;private set;}
 
@@ -21,6 +22,7 @@ public class LobbyManager : MonoBehaviour
         }else{
             singleton = this;
         }
+        gameManager = new GameManager(transform.Find("MapWrapper"));
         players = new ProfileData[5];
         playerJoinEvent = new UnityEvent<int>();
         playerRemoveEvent = new UnityEvent<int>();

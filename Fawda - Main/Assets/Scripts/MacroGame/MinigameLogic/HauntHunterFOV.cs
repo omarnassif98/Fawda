@@ -21,9 +21,9 @@ public class HauntHunterFOVHelper {
     public IEnumerator FlashFOV(UnityAction _callback){
         playerFOVMesh.gameObject.SetActive(true);
         DrawFOV();
-        if(Vector3.Angle(hauntHunterPlayerBehaviour.transform.forward, ((HauntGameDeployable)(GameManager.activeMinigame)).ghostPlayerInstance.transform.position - hauntHunterPlayerBehaviour.transform.position) < FOV_ANGLES/2) ((HauntGameDeployable)(GameManager.activeMinigame)).ghostPlayerInstance.Stun();
+        if(Vector3.Angle(hauntHunterPlayerBehaviour.transform.forward, ((HauntGameDeployable)(LobbyManager.gameManager.activeMinigame)).ghostPlayerInstance.transform.position - hauntHunterPlayerBehaviour.transform.position) < FOV_ANGLES/2) ((HauntGameDeployable)(LobbyManager.gameManager.activeMinigame)).ghostPlayerInstance.Stun();
 
-        foreach(HauntHunterPlayerBehaviour hauntHunter in ((HauntGameDeployable)(GameManager.activeMinigame)).hunterPlayerInstances){
+        foreach(HauntHunterPlayerBehaviour hauntHunter in ((HauntGameDeployable)(LobbyManager.gameManager.activeMinigame)).hunterPlayerInstances){
             if(hauntHunter == hauntHunterPlayerBehaviour || !hauntHunter.isPetrified) continue;
             //DRAW LINE
             if(Vector3.Angle(hauntHunterPlayerBehaviour.transform.forward, hauntHunter.transform.position - hauntHunterPlayerBehaviour.transform.position) < FOV_ANGLES) hauntHunter.StartCoroutine(hauntHunter.Revive());

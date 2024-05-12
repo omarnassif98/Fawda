@@ -41,8 +41,12 @@ PrefabInstance:
     m_TransformParent: {fileID: 3248414232385944364}
     m_Modifications:
     - target: {fileID: 1259311260129539697, guid: 25b4d684efcb1443b91d3c9b744d70db, type: 3}
-      propertyPath: m_Enabled
+      propertyPath: m_Color.a
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1259311260129539697, guid: 25b4d684efcb1443b91d3c9b744d70db, type: 3}
+      propertyPath: m_Enabled
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1661631105629861674, guid: 25b4d684efcb1443b91d3c9b744d70db, type: 3}
       propertyPath: callback.Array.size
@@ -50,7 +54,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1661631105629861674, guid: 25b4d684efcb1443b91d3c9b744d70db, type: 3}
       propertyPath: callback.Array.data[0].value
-      value: HauntScreen
+      value: GameSelectionScreen
       objectReference: {fileID: 0}
     - target: {fileID: 1661631105629861674, guid: 25b4d684efcb1443b91d3c9b744d70db, type: 3}
       propertyPath: callback.Array.data[1].value
@@ -58,7 +62,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1661631105629861674, guid: 25b4d684efcb1443b91d3c9b744d70db, type: 3}
       propertyPath: callback.Array.data[1].action
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 3165739323085333246, guid: 25b4d684efcb1443b91d3c9b744d70db, type: 3}
       propertyPath: m_LocalPosition.x
@@ -101,8 +105,12 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3960369159980593331, guid: 25b4d684efcb1443b91d3c9b744d70db, type: 3}
-      propertyPath: m_Enabled
+      propertyPath: m_Color.a
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3960369159980593331, guid: 25b4d684efcb1443b91d3c9b744d70db, type: 3}
+      propertyPath: m_Enabled
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4302388782101175357, guid: 25b4d684efcb1443b91d3c9b744d70db, type: 3}
       propertyPath: m_LocalPosition.y

@@ -78,14 +78,10 @@ public class ConnectionManager : MonoBehaviour
 
     // What makes RPCs special is that you can pass parameters along from the client
     // The _func is literally a void
-    public void RegisterRPC(string _key, UnityAction<byte[], int> _func){
-        DebugLogger.SourcedPrint("Connection Manager","Registering RPC for " + _key, "FFAA00");
-        remoteProcCalls[_key] = _func;
-    }
 
     public void RegisterRPC(OpCode _opCode, UnityAction<byte[], int> _func){
         string opCode = Enum.GetName(typeof(OpCode), _opCode);
-        PrintWrap("Registering " + opCode);
+        DebugLogger.SourcedPrint("Connection Manager","Registering RPC for " + Enum.GetName(typeof(OpCode),_opCode), "FFAA00");
         remoteProcCalls[opCode] = _func;
     }
 
@@ -120,7 +116,7 @@ public class ConnectionManager : MonoBehaviour
         while(rpcQueue.Count > 0){
             DirectedNetMessage msg = rpcQueue.Dequeue();
             string code = Enum.GetName(typeof(OpCode), msg.msg.opCode);
-            if(!remoteProcCalls.ContainsKey(code)) continue;
+            if(!remoteProcCalls.ContainsKey(code)) {DebugLogger.SourcedPrint("Synapse Client", "Got DOA RPC - " + code, "FFAA00"); continue;}
             remoteProcCalls[code](msg.msg.val, msg.client);
         }
     }

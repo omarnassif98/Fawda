@@ -40,6 +40,26 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 3248414232385944364}
     m_Modifications:
+    - target: {fileID: 1259311260129539697, guid: 25b4d684efcb1443b91d3c9b744d70db, type: 3}
+      propertyPath: m_Color.a
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1259311260129539697, guid: 25b4d684efcb1443b91d3c9b744d70db, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1661631105629861674, guid: 25b4d684efcb1443b91d3c9b744d70db, type: 3}
+      propertyPath: callback.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1661631105629861674, guid: 25b4d684efcb1443b91d3c9b744d70db, type: 3}
+      propertyPath: callback.Array.data[0].value
+      value: HAUNT
+      objectReference: {fileID: 0}
+    - target: {fileID: 1661631105629861674, guid: 25b4d684efcb1443b91d3c9b744d70db, type: 3}
+      propertyPath: callback.Array.data[0].action
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3165739323085333246, guid: 25b4d684efcb1443b91d3c9b744d70db, type: 3}
       propertyPath: m_LocalScale.y
       value: 3.0000002
@@ -50,7 +70,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3165739323085333246, guid: 25b4d684efcb1443b91d3c9b744d70db, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 9
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3165739323085333246, guid: 25b4d684efcb1443b91d3c9b744d70db, type: 3}
       propertyPath: m_LocalPosition.z
@@ -88,6 +108,14 @@ PrefabInstance:
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: 21300000, guid: bd2c46d5404907647ae046436fc484e6, type: 3}
+    - target: {fileID: 3960369159980593331, guid: 25b4d684efcb1443b91d3c9b744d70db, type: 3}
+      propertyPath: m_Color.a
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3960369159980593331, guid: 25b4d684efcb1443b91d3c9b744d70db, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6340964609196939570, guid: 25b4d684efcb1443b91d3c9b744d70db, type: 3}
       propertyPath: m_Name
       value: HauntSelection

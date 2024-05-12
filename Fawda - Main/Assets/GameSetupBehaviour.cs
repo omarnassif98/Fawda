@@ -3,29 +3,31 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class GameSetupBehaviour : MonoBehaviour
+public abstract class GameSetupBehaviour
 {
-    [SerializeField]
-    GameCodes gameCode;
-
     private bool[] readies;
+
+    public GameSetupBehaviour(){
+        readies = new bool[5];
+        DebugLogger.SourcedPrint("Game Setup (grandfather logic)", "Now accepting readies");
+        ConnectionManager.singleton.RegisterRPC(OpCode.READYUP, ChangeReadyStatus);
+    }
 
     public abstract void ReadyUp();
 
-    protected abstract void DeployMinigame();
+    protected abstract void OnReadyStatusChange(int _idx, bool _newVal);
 
-    public virtual void OnEnable(){
-        GameManager.singleton.LoadMinigame(gameCode);
-    }
-
-    protected void ChangeReadyStatus(int _idx, bool _flag){
-        readies[_idx] = _flag;
+    protected void ChangeReadyStatus(byte[] _data, int _idx){
+        DebugLogger.SourcedPrint("Game Setup (grandfather logic)", "logic tripped");
+        bool newVal = new PlayerGameReadyUpData(_data).ready;
+        readies[_idx] = newVal;
         int cumCount = 0;
         foreach(bool r in readies) if (r) cumCount += 1;
         if (cumCount == LobbyManager.singleton.GetLobbySize()) ReadyUp();
+        OnReadyStatusChange(_idx, newVal);
     }
 
-    protected void ResetReadies(){
+    protected virtual void ResetReadies(){
         readies = new bool[LobbyManager.singleton.GetLobbySize()];
         for (int i = 0; i < readies.Length; i++){
             readies[i] = false;
