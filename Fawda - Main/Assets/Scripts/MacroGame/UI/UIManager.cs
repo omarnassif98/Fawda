@@ -33,7 +33,6 @@ public class UIManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        print("Hello?");
         ConnectionManager.singleton.RegisterServerEventListener("listen", UpdateRoomCode);
         ConnectionManager.singleton.RegisterServerEventListener("listen", () => SetRoomCodeVisibility(true));
         LobbyManager.singleton.playerJoinEvent.AddListener(RosterManager.AddPlayerToRoster);

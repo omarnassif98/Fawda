@@ -52,7 +52,7 @@ public class ConnectionManager : MonoBehaviour
     // STAGING
     //////
 
-    // Registers events that are meant to simultaneosly affect many liteners - basically a websocket Emit()
+    // Registers events that are meant to simultaneosly affect many liteners - NOT BASED ON ANY OUTSIDE COMMUNICATION
     // The _func is literally a void
     // Triggering an event trips ALL (one to many) functions (actions) listening for that event
     public void RegisterServerEventListener(string _eventName, UnityAction _func, [CallerFilePath] string _caller = "", [CallerLineNumber] int _number = 0){
@@ -85,9 +85,9 @@ public class ConnectionManager : MonoBehaviour
         remoteProcCalls[opCode] = _func;
     }
 
-    public void VacateRPC(string _key){
-        remoteProcCalls.Remove(_key);
-        DebugLogger.SourcedPrint("Connection Manager","REMOVING RPC - " + _key, "FFAA00");
+    public void VacateRPC(OpCode _opCode){
+        remoteProcCalls.Remove(Enum.GetName(typeof(OpCode), _opCode));
+        DebugLogger.SourcedPrint("Connection Manager","REMOVING RPC - " + Enum.GetName(typeof(OpCode), _opCode), "FFAA00");
     }
 
     // Again called by the server - both TCP and UDP

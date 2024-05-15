@@ -4,12 +4,14 @@ public enum OpCode{
     PROFILE_PAYLOAD = 1,
     MENU_OCCUPY = 2,
     MENU_OCCUPATION_STATUS = 3,
-    MENU_CONTROL = 4,
-    UDP_TOGGLE = 5,
+    GAME_BEGIN = 4,
     UDP_GAMEPAD_INPUT = 6,
-    INPUT_SETUP = 7,
     GAMESETUP = 8,
-    READYUP = 9
+    READYUP = 9,
+    PROMPT_RESPONSE = 10,
+    CONTROL_SCHEME = 11,
+    UDP_SYNC = 12,
+    MAP_SETUP = 13
 }
 
 [System.Serializable]

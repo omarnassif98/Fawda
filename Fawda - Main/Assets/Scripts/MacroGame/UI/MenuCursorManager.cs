@@ -10,7 +10,7 @@ public class MenuCursorManager : MonoBehaviour
     void Awake(){
         if(singleton != null){
             Destroy(this);
-        } 
+        }
         singleton = this;
         cursors = new MenuCursorBehaviour[transform.childCount];
         for(short i = 0; i < cursors.Length; i++){
@@ -20,7 +20,6 @@ public class MenuCursorManager : MonoBehaviour
 
     void Start()
     {
-        ConnectionManager.singleton.RegisterRPC(OpCode.MENU_CONTROL, ControlCursor);
         ConnectionManager.singleton.RegisterRPC(OpCode.MENU_OCCUPY, HandleClientOccupation);
     }
 

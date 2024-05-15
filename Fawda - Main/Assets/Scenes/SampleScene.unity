@@ -945,60 +945,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f1b195a346f84d8cb7884c1cf20e95d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!1 &145577803
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 145577805}
-  - component: {fileID: 145577804}
-  m_Layer: 0
-  m_Name: GameManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &145577804
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 145577803}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 97a1a2ce5fcc2364c90370dda63d9280, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  GameStartEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  GameEndEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  GamePauseEvent:
-    m_PersistentCalls:
-      m_Calls: []
---- !u!4 &145577805
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 145577803}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 264921890}
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &167706149
 GameObject:
   m_ObjectHideFlags: 0
@@ -1657,7 +1603,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 145577805}
+  m_Father: {fileID: 1104618978}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &268721044 stripped
 Transform:
@@ -4885,7 +4831,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2c0e0ff017afa43a9bda7190de1484ba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buttonParent: {fileID: 0}
 --- !u!4 &1104618978
 Transform:
   m_ObjectHideFlags: 0
@@ -4905,6 +4850,7 @@ Transform:
   - {fileID: 1183230564}
   - {fileID: 1764637092}
   - {fileID: 1953826427}
+  - {fileID: 264921890}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!95 &1104618979
@@ -19062,7 +19008,6 @@ SceneRoots:
   - {fileID: 853881378}
   - {fileID: 96156693}
   - {fileID: 2068143656}
-  - {fileID: 145577805}
   - {fileID: 1793135447}
   - {fileID: 1577777695}
   - {fileID: 623345444}

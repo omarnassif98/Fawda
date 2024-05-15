@@ -34,10 +34,6 @@ public class LobbyManager : MonoBehaviour
         ConnectionManager.singleton.RegisterRPC(OpCode.PROFILE_PAYLOAD, JoinPlayer);
     }
 
-    public void TogglePlayerControls(bool _engage){
-        print("UDP FUCKING ENGAGE DAMNIT");
-        ConnectionManager.singleton.SendMessageToClients(new NetMessage(OpCode.UDP_TOGGLE, BitConverter.GetBytes(_engage)));
-    }
 
 
     void JoinPlayer(byte[] _data, int _idx){

@@ -51,11 +51,6 @@ public class ProfileData : SynapseDatastruct{
     }
 }
 
-public enum InputType{
-    Menu = OpCode.MENU_CONTROL,
-    Joypad = OpCode.UDP_GAMEPAD_INPUT
-}
-
 [System.Serializable]
 public class GamepadData : SynapseDatastruct{
     public float xInput, yInput;
@@ -97,14 +92,14 @@ public class GamepadData : SynapseDatastruct{
     }
 }
 
-    public class PlayerGameReadyUpData : SynapseDatastruct
+    public class SimpleBooleanMessage : SynapseDatastruct
     {
         public bool ready;
-        public PlayerGameReadyUpData(bool _ready){
+        public SimpleBooleanMessage(bool _ready){
             ready = _ready;
         }
 
-        public PlayerGameReadyUpData(byte[] _data){
+        public SimpleBooleanMessage(byte[] _data){
             ready = BitConverter.ToBoolean(_data);
         }
 
@@ -112,6 +107,35 @@ public class GamepadData : SynapseDatastruct{
         {
             ArrayList allData = new ArrayList();
             allData.Add(ready);
+            return allData;
+        }
+    }
+
+    public class TransformSynchronizationMessage : SynapseDatastruct{
+        public int entitySceneID;
+        public Vector3 position;
+        public float yRot;
+        public TransformSynchronizationMessage(int _entitySceneID, Vector3 _position, float _yRot){
+            entitySceneID = _entitySceneID;
+            position = _position;
+            yRot = _yRot;
+        }
+
+
+        public TransformSynchronizationMessage(byte[] _data){
+            entitySceneID = _data[0];
+            position = new Vector3(BitConverter.ToSingle(_data,1), BitConverter.ToSingle(_data,5), BitConverter.ToSingle(_data,9));
+            yRot = BitConverter.ToSingle(_data,13);
+        }
+
+        public override ArrayList PackData()
+        {
+            ArrayList allData = new ArrayList();
+            allData.Add(entitySceneID);
+            allData.Add(position.X);
+            allData.Add(position.Y);
+            allData.Add(position.Z);
+            allData.Add(yRot);
             return allData;
         }
     }

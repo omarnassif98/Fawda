@@ -50,10 +50,12 @@ public static class SynapseMessageFormatter
                 break;
                     //Strings are to be 9 letters or less
             case TypeCode.Int32:
+            case TypeCode.Int16:
                 byte val = (byte)Mathf.Clamp((int)_packedData[i],0,255);
                 resBytes[lastIdx] = val;
                 lastIdx += 1;
                 break;
+                //All ints are 1 byte long, sue me
             case TypeCode.Single:
                 byte[] singleBytes = BitConverter.GetBytes((float)_packedData[i]);
                 Buffer.BlockCopy(singleBytes,0,resBytes,lastIdx,singleBytes.Length);

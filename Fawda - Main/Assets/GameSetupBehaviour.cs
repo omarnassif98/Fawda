@@ -19,12 +19,12 @@ public abstract class GameSetupBehaviour
 
     protected void ChangeReadyStatus(byte[] _data, int _idx){
         DebugLogger.SourcedPrint("Game Setup (grandfather logic)", "logic tripped");
-        bool newVal = new PlayerGameReadyUpData(_data).ready;
+        bool newVal = new SimpleBooleanMessage(_data).ready;
         readies[_idx] = newVal;
         int cumCount = 0;
         foreach(bool r in readies) if (r) cumCount += 1;
-        if (cumCount == LobbyManager.singleton.GetLobbySize()) ReadyUp();
         OnReadyStatusChange(_idx, newVal);
+        if (cumCount == LobbyManager.singleton.GetLobbySize()) ReadyUp();
     }
 
     protected virtual void ResetReadies(){
