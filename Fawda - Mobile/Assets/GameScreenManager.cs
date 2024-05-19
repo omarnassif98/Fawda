@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 public class GameScreenManager : ScreenManager
 {
-    [SerializeField] SynapseInputManager menuStickManager;
     Dictionary<GameCodes,int> gameSetupScreens = new Dictionary<GameCodes, int>();
-    
+
     void Awake(){
         gameSetupScreens[GameCodes.HAUNT] = 2;
     }
@@ -18,12 +17,9 @@ public class GameScreenManager : ScreenManager
     }
 
 
-    public void SummonMenuControls(){
-        ModalManager.singleton.SummonModal(0);
-        ModalManager.singleton.AddDismissalListener(menuStickManager.EndPolling);
-        ModalManager.singleton.AddDismissalListener(() => ClientConnection.singleton.SendMessageToServer(OpCode.MENU_OCCUPY,false));
-        ClientConnection.singleton.SendMessageToServer(OpCode.MENU_OCCUPY,true);
-        menuStickManager.BeginPolling();
+    public void ToggleMenuControls(bool _newVal){
+        Orchestrator.singleton.inputHandler.SetPollActivity(_newVal);
+        transform.parent.parent.GetComponent<Animator>().SetBool("gamepad",_newVal);
     }
 
 }

@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using TMPro;
 
 public class TouchStickInput : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDragHandler{
     [SerializeField]
     private RectTransform cursorTransform, orientationTransform;
-    private Vector2 stickVal;
     private bool tracking = false;
     float radius = 40;
-    [SerializeField] private float[] stickData = new float[2];
     private Vector3 pointerLocation;
+    [SerializeField] TMP_Text debugVal;
     public void OnPointerDown(PointerEventData _eventData)
     {
         // Handle click event
@@ -22,8 +22,6 @@ public class TouchStickInput : MonoBehaviour, IPointerDownHandler, IPointerUpHan
     public void OnPointerUp(PointerEventData _eventData){
         tracking = false;
         cursorTransform.localPosition = Vector2.zero;
-        stickVal = Vector2.zero;
-        stickData[0] = stickData[1] = 0;
     }
 
     public void OnDrag(PointerEventData _eventData){
@@ -31,25 +29,26 @@ public class TouchStickInput : MonoBehaviour, IPointerDownHandler, IPointerUpHan
     }
 
     void Start(){
-        radius = Mathf.Abs(Vector2.Distance(transform.position, orientationTransform.position));      
+        radius = Mathf.Abs(Vector2.Distance(transform.position, orientationTransform.position));
         print(radius);
     }
-    void Update(){      
-        if(!tracking) return;
+    void Update(){
+        if(!tracking){
+            FinalizeOutput(Vector2.zero);
+            return;
+        }
         Vector3 offset = pointerLocation - transform.position;
         offset = Vector2.ClampMagnitude(offset,radius);
-        //print(offset);
-        float angle = Mathf.Deg2Rad * Vector2.SignedAngle(transform.right, offset);
-        stickData[0] = angle;
-        Quaternion rotation = Quaternion.Euler(0, 0, angle);
-        Vector2 rotatedVector = rotation * offset;
+        float angle = Mathf.Deg2Rad * Vector2.SignedAngle(orientationTransform.position - transform.position, offset);
         cursorTransform.position = transform.position + offset;
-        stickData[1] = Mathf.Abs(Vector2.Distance(cursorTransform.position,transform.position)/radius);
-        stickVal = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle));
-        //print(string.Format("Angle: {0}, val: {1}",angle, stickVal));
+        float power = Mathf.Clamp01(Mathf.Abs(Vector2.Distance(cursorTransform.position,transform.position)/radius));
+        Vector2 input = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * power;
+        FinalizeOutput(input);
     }
 
-    public float[] PollInput(){
-        return stickData;
+    void FinalizeOutput(Vector2 _newVal){
+        Orchestrator.singleton.inputHandler.stickVal = _newVal;
+        debugVal.text = string.Format("X: {0:0.00}\nY: {1:0.00} ", Orchestrator.singleton.inputHandler.stickVal.x, Orchestrator.singleton.inputHandler.stickVal.y);
     }
+
 }

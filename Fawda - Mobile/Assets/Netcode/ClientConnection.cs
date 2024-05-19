@@ -74,7 +74,7 @@ public class ClientConnection : MonoBehaviour
     }
 
     public void PrintWrap(string _message){
-        
+
         print(string.Format("<color=#FFBF00>Synapse Client: </color>{0}",_message));
     }
 
@@ -95,7 +95,7 @@ public class ClientConnection : MonoBehaviour
     public void SendMessageToServer(OpCode _opCode, int _val){
         SendMessageToServer(_opCode, new byte[]{(byte)_val});
     }
-    
+
     public void SendMessageToServer(OpCode _opCode){
         SendMessageToServer(_opCode, new byte[]{(byte)0});
     }
@@ -128,7 +128,7 @@ public class ClientConnection : MonoBehaviour
         remoteProcCalls[_key] = _func;
     }
 
-        public void RegisterRPC(OpCode _opCode, UnityAction<byte[]> _func){
+    public void RegisterRPC(OpCode _opCode, UnityAction<byte[]> _func){
         string opCode = Enum.GetName(typeof(OpCode), _opCode);
         PrintWrap("Registering " + opCode);
         remoteProcCalls[opCode] = _func;

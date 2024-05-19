@@ -5,14 +5,25 @@ using System;
 using UnityEngine.SceneManagement;
 public class Orchestrator : MonoBehaviour
 {
+    public static Orchestrator singleton;
+    public InputHandler inputHandler { get; private set;}
     public void Start (){
         PlayerProfileManager.singleton.LoadProfile();
         DebugLogger.singleton.Log(string.Format("FYI a bool is {0} bytes long", BitConverter.GetBytes(true).Length));
         print("ORCHESTRA");
     }
+    void Awake(){
+        if(singleton != null){ Destroy(this); return;}
+        singleton = this;
+        inputHandler = new InputHandler();
+    }
 
     public void ResetData(){
         PlayerProfileManager.singleton.DeleteProfile();
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name); 
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
+    void Update(){
+        inputHandler.PollInput();
     }
 }

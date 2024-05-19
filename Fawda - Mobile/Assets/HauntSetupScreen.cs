@@ -23,8 +23,6 @@ public class HauntSetupScreen : MonoBehaviour
         ArrayList config = new ArrayList();
         config.Add(playerOptOut);
         ready = !ready;
-        PlayerGameConfigData gameConfigData = new PlayerGameConfigData(ready, config);
-        ClientConnection.singleton.SendMessageToServer(OpCode.READYUP, gameConfigData.Encode());
     }
 
 }
