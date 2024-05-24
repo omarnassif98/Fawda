@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-public class ProfileColorSelectorButton : MonoBehaviour
+public class ProfileColorSelectorButton
 {
     [SerializeField]
     Sprite selectionImage;
@@ -12,7 +12,7 @@ public class ProfileColorSelectorButton : MonoBehaviour
     UnityAction<int> Callback;
 
     [SerializeField] Image innerSelect, outerSelect;
-    //When populating the page, run 
+    //When populating the page, run
     public void Setup(Color _color, short _colorIdx, bool _selected, UnityAction<int> _callback, UnityEvent<int> _event){
         innerSelect.color = _color;
         outerSelect.color = _color;

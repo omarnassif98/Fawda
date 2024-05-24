@@ -28,7 +28,7 @@ public class LobbyMenuScreenBehaviour : MonoBehaviour
     }
 
     void Start(){
-        ConnectionManager.singleton.RegisterServerEventListener("wakeup", () => LoadScreen("MainScreen"));
+        ConnectionManager.singleton.RegisterServerEventListener("wakeup", () => LoadScreen("GameSelectionScreen"));
         LobbyMenuManager.gustEvent.AddListener(TripScreenTransitionAction);
     }
 

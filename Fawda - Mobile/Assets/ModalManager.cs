@@ -1,31 +1,35 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
-public class ModalManager : MonoBehaviour
+
+public class ModalBehaviour
 {
     Animation backdropAnimator;
-    [SerializeField] GameObject[] modalSubscreens;
-    public static ModalManager singleton;
-    private int activeScreen;
     private UnityEvent dismissEvent = new UnityEvent();
-    
-    [SerializeField] Button modalBackgroundDismiss;
+    private Transform transform, modalWrapper;
+    Button modalBackgroundDismiss;
 
-    void Awake(){
-        backdropAnimator = GetComponent<Animation>();
-        if(singleton != null) Destroy(this);
-        singleton = this;
+    public ModalBehaviour(Transform _transform){
+        transform = _transform;
+        modalWrapper = transform.Find("Modal");
+        backdropAnimator = transform.GetComponent<Animation>();
+        modalBackgroundDismiss = transform.Find("Background").GetComponent<Button>();
+
     }
-    // Start is called before the first frame update
-    public void SummonModal(int _screenIdx, string _animation = "Modal_Intro"){
-        print("Bringing up modal with " + modalSubscreens[_screenIdx].name + " screen");
-        modalSubscreens[activeScreen].SetActive(false);
-        modalSubscreens[_screenIdx].SetActive(true);
-        PlayAnimation(_animation);
-        activeScreen = _screenIdx;
+
+    public void SummonModal(string _modalScreenName){
+        ClearModal();
+        DebugLogger.SourcedPrint("Modal", "Bringing up " + _modalScreenName + " screen");
+        GameObject skel = Resources.Load(String.Format("ModalScreens/{0}", _modalScreenName)) as GameObject;
+        GameObject.Instantiate(skel, modalWrapper);
         modalBackgroundDismiss.enabled = true;
+    }
+
+    void ClearModal(){
+        for(int i = 0; i < modalWrapper.childCount; i++) GameObject.Destroy(modalWrapper.GetChild(i));
     }
 
     public void AddDismissalListener(UnityAction _caller){
@@ -34,7 +38,6 @@ public class ModalManager : MonoBehaviour
 
     public void DismissModal(){
         modalBackgroundDismiss.enabled = false;
-        modalSubscreens[activeScreen].SetActive(false);
         backdropAnimator.Play("Modal_Outro");
         dismissEvent.Invoke();
         dismissEvent.RemoveAllListeners();

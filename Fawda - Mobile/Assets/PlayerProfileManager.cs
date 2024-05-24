@@ -6,7 +6,7 @@ using System;
 using System.Text;
 using UnityEngine.Events;
 
-public class PlayerProfileManager : MonoBehaviour
+public class PlayerProfileManager
 {
     [SerializeField]
     private ProfileData PlayerProfile;
@@ -43,7 +43,7 @@ public class PlayerProfileManager : MonoBehaviour
     public bool LoadProfile(){
         PlayerProfile = profileHandler.Load();
         bool existing = PlayerProfile != null;
-        if(existing) loadEvent.Invoke(); 
+        if(existing) loadEvent.Invoke();
         else createEvent.Invoke();
         DebugLogger.singleton.Log("Profile Loaded");
         return existing;

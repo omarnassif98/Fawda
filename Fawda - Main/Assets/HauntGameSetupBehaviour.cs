@@ -28,6 +28,7 @@ public class HauntGameSetupBehaviour : GameSetupBehaviour
 
     IEnumerator PromptPlayerForGhost(){
         DebugLogger.SourcedPrint("HauntGameSetup","Sending prompt to client " + readyOrder[readyOrderIdx]);
+        //BOOKMARK: PROMPT
         ConnectionManager.singleton.SendMessageToClients(OpCode.PROMPT_RESPONSE, new SimpleBooleanMessage(true).Encode(), readyOrder[readyOrderIdx]);
         yield return new WaitForSeconds(2.5f);
         pushPromptForward();
@@ -42,6 +43,7 @@ public class HauntGameSetupBehaviour : GameSetupBehaviour
             return;
         }
         DebugLogger.SourcedPrint("HauntGameSetup","Ghost is client #" + readyOrder[readyOrderIdx], "00FF00");
+        //BOOKMARK: INFORMING PLAYERS
         foreach(int i in readyOrder) ConnectionManager.singleton.SendMessageToClients(OpCode.CONTROL_SCHEME, new SimpleBooleanMessage(i == readyOrder[readyOrderIdx]).Encode(), i);
         ConnectionManager.singleton.VacateRPC(OpCode.PROMPT_RESPONSE);
     }
