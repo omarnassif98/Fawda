@@ -8,39 +8,34 @@ public class ProfileScreenManager : ScreenManager
 {
     [SerializeField] TMP_InputField nameDisplay;
     [SerializeField] Image nameBackground;
-    [SerializeField] PlayerColorPickerManager playerColorPickerManager;
+    [SerializeField] PlayerColorPickerManager playerColorPickerManager; // WHAT THE FUCK??
+    private PlayerProfileManager playerProfileManager;
 
-    public void Start(){
-        PlayerProfileManager.singleton.loadEvent.AddListener(fillName);
-        PlayerProfileManager.singleton.loadEvent.AddListener(FillCharacterColor);
-
-        fillName();
-        FillCharacterColor();
+    public void SetProfileManagerInstance(PlayerProfileManager _playerProfileManager){
+        playerProfileManager = _playerProfileManager;
     }
-
-    void fillName(){
-        print(PlayerProfileManager.singleton.GetProfileData().name);
-        nameDisplay.text = PlayerProfileManager.singleton.GetProfileData().name;
+    public void SetName(string _name){
+        nameDisplay.text = _name;
     }
 
     public void ChangeName(){
-        ProfileData prof = PlayerProfileManager.singleton.GetProfileData();
+        ProfileData prof = playerProfileManager.GetProfileData();
         if(nameDisplay.text == prof.name) return;
         prof.name = nameDisplay.text;
-        PlayerProfileManager.singleton.SetProfileData(prof);
+        playerProfileManager.SetProfileData(prof);
     }
 
     public void FillCharacterColor(){
-        int idx = PlayerProfileManager.singleton.GetProfileData().colorSelection;
-        Color newColor = PlayerProfileManager.singleton.GetColors()[idx];
-        nameBackground.color = newColor;
-        playerColorPickerManager.ChangeColorSelection(idx);
+        int idx = playerProfileManager.GetProfileData().colorSelection;
+        //Color newColor = playerProfileManager.GetColors()[idx];
+        //nameBackground.color = newColor;
+        //playerColorPickerManager.ChangeColorSelection(idx);
     }
 
     public void ChangeCharacterColor(int _colorSelectionIdx){
-        ProfileData prof = PlayerProfileManager.singleton.GetProfileData();
+        ProfileData prof = playerProfileManager.GetProfileData();
         if(_colorSelectionIdx == prof.colorSelection) return;
         prof.colorSelection = _colorSelectionIdx;
-        PlayerProfileManager.singleton.SetProfileData(prof);
+        playerProfileManager.SetProfileData(prof);
     }
 }

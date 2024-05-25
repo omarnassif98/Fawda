@@ -1,20 +1,20 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using TMPro;
+using UnityEngine;
+using UnityEngine.Events;
 public class PlayerProfileIntroBehaviour
 {
-    [SerializeField] TMP_Text nameInput;
+    TMP_Text nameInput;
+    public UnityEvent<string> createEvent {get; private set;}
+
     // Start is called before the first frame update
-    public PlayerProfileIntroBehaviour(TMP_Text _nameInput)
+    public PlayerProfileIntroBehaviour()
     {
-     nameInput = _nameInput;
+        createEvent = new UnityEvent<string>();
+        //Summon Screen + Bind Button
     }
 
     public void ProgressIntro(){
         if(nameInput.text.Trim().Length == 0) return;
-        PlayerProfileManager.singleton.StartNewProfile(new ProfileData(nameInput.text, 0));
-        PlayerProfileManager.singleton.SaveProfile();
-        PlayerProfileManager.singleton.LoadProfile();
+        createEvent.Invoke(nameInput.text);
         }
 }

@@ -8,87 +8,55 @@ using UnityEngine.Events;
 
 public class PlayerProfileManager
 {
-    [SerializeField]
-    private ProfileData PlayerProfile;
-    public static PlayerProfileManager singleton;
+    public enum PROFILE_MANAGER_ACTIONS{
+        LOAD_SUCCESS=1,
+        LOAD_FAILURE=2,
+        CREATED=3,
+        SAVED=4
+    }
+    public Dictionary<PROFILE_MANAGER_ACTIONS, UnityEvent> profileManagerEvents {get; private set;}
+
+    public ProfileData playerProfile {get; private set;}
     SaveFileHandler profileHandler;
 
-    public UnityEvent loadEvent = new UnityEvent(), saveEvent = new UnityEvent(), createEvent = new UnityEvent();
 
-    void Awake()
+    public PlayerProfileManager()
     {
-        if (singleton != null){
-             DebugLogger.singleton.Log("Two profile singletons?");
-             Destroy(this);
-        }
-        singleton = this;
+        profileManagerEvents = new Dictionary<PROFILE_MANAGER_ACTIONS, UnityEvent>();;
         profileHandler = new SaveFileHandler(Application.persistentDataPath, "prof.json");
+        foreach(PROFILE_MANAGER_ACTIONS profAction in Enum.GetValues(typeof(PROFILE_MANAGER_ACTIONS))) profileManagerEvents[profAction] = new UnityEvent();
     }
 
-    public void Start(){
-        DebugLogger.singleton.Log("Setting up Profile Payload Connection Callback");
-        ClientConnection.singleton.RegisterServerEventListener("connect",SendProfilePayload);
-    }
-
-    void SendProfilePayload(){
-        DebugLogger.singleton.Log("Profile - Connection Callback");
-        if (PlayerProfile == null) {
-            DebugLogger.singleton.Log("Connecting without profile, aborting");
-            return;
-        }
-        byte[] data = PlayerProfile.Encode();
-        ClientConnection.singleton.SendMessageToServer(OpCode.PROFILE_PAYLOAD,data);
-    }
-
-    public bool LoadProfile(){
-        PlayerProfile = profileHandler.Load();
-        bool existing = PlayerProfile != null;
-        if(existing) loadEvent.Invoke();
-        else createEvent.Invoke();
+    public void LoadProfile(){
+        playerProfile = profileHandler.Load();
+        if(playerProfile != null) profileManagerEvents[PROFILE_MANAGER_ACTIONS.LOAD_SUCCESS].Invoke();
+        else profileManagerEvents[PROFILE_MANAGER_ACTIONS.LOAD_FAILURE].Invoke();
         DebugLogger.singleton.Log("Profile Loaded");
-        return existing;
     }
 
     public void SaveProfile(){
-        profileHandler.Save(PlayerProfile);
-        saveEvent.Invoke();
-        loadEvent.Invoke();
-        DebugLogger.singleton.Log("Profile Saved");
+        profileHandler.Save(playerProfile);
+        profileManagerEvents[PROFILE_MANAGER_ACTIONS.SAVED].Invoke();
     }
 
     public void StartNewProfile(ProfileData _profile){
-        PlayerProfile = _profile;
+        playerProfile = _profile;
+        SaveProfile();
     }
 
     public void DeleteProfile(){
         profileHandler.Delete();
-        PlayerProfile = null;
+        playerProfile = null;
+
     }
 
     public ProfileData GetProfileData(){
-        return PlayerProfile;
+        return playerProfile;
     }
 
     public void SetProfileData(ProfileData _newProfile){
-        PlayerProfile = _newProfile;
+        playerProfile = _newProfile;
         SaveProfile();
     }
-    public Color[] GetColors(){
-        TextAsset colors = Resources.Load("sProfile/CharColors") as TextAsset;
-        List<Color> vals = new List<Color>();
-        string[] col = colors.text.Split('\n');
-        for(int i = 1; i < col.Length; i++){
-            try
-            {
-                string[] splitVals = col[i].Split(',');
-                Color parsed = new Color(int.Parse(splitVals[1])/255.0f, int.Parse(splitVals[2])/255.0f, int.Parse(splitVals[3])/255.0f);
-                vals.Add(parsed);
-            }
-            catch (System.Exception)
-            {
-                continue;
-            }
-        }
-        return vals.ToArray();
-    }
+
 }

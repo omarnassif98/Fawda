@@ -24,7 +24,7 @@ public class ProfileColorSelectorButton
     //Change sprite mask + singleton is now something else (another instance LockSelectioned)
 
     public void LockInSelection(int _idx){
-        outerSelect.color = (_idx == color)?Color.black:PlayerProfileManager.singleton.GetColors()[color];
+        //outerSelect.color = (_idx == color)?Color.black:PlayerProfileManager.singleton.GetColors()[color];
     }
 
 

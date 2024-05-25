@@ -12,12 +12,11 @@ public class ModalBehaviour
     private Transform transform, modalWrapper;
     Button modalBackgroundDismiss;
 
-    public ModalBehaviour(Transform _transform){
-        transform = _transform;
-        modalWrapper = transform.Find("Modal");
+    public ModalBehaviour(){
+        transform = GameObject.Find("Canvas").transform.Find("Foreground");
+        modalWrapper = transform.Find("Modal").Find("Safe Area");
         backdropAnimator = transform.GetComponent<Animation>();
-        modalBackgroundDismiss = transform.Find("Background").GetComponent<Button>();
-
+        modalBackgroundDismiss = transform.Find("Backdrop").GetComponent<Button>();
     }
 
     public void SummonModal(string _modalScreenName){
@@ -29,7 +28,7 @@ public class ModalBehaviour
     }
 
     void ClearModal(){
-        for(int i = 0; i < modalWrapper.childCount; i++) GameObject.Destroy(modalWrapper.GetChild(i));
+        for(int i = 0; i < modalWrapper.childCount; i++) GameObject.Destroy(modalWrapper.GetChild(i).gameObject);
     }
 
     public void AddDismissalListener(UnityAction _caller){
