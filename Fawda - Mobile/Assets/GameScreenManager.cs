@@ -18,7 +18,7 @@ public class GameScreenManager : ScreenManager
 
 
     public void ToggleMenuControls(bool _newVal){
-        Orchestrator.singleton.inputHandler.SetPollActivity(_newVal);
+        Orchestrator.inputHandler.SetPollActivity(_newVal);
         transform.parent.parent.GetComponent<Animator>().SetBool("gamepad",_newVal);
     }
 

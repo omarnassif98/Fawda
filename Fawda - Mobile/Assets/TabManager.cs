@@ -1,40 +1,56 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-[System.Serializable]
-public class TabScreenRelation{
-    public ScreenManager screenManager;
-    public Button tabButton;
-}
-public class TabManager : MonoBehaviour
+public class TabManager
 {
-    [SerializeField] TabScreenRelation[] tabScreenRelations;
-    int currentScreenIdx = 1;
-
-    void Awake(){
-        for(int i = 0; i < tabScreenRelations.Length; i++){
-            int j = i;
-            tabScreenRelations[j].tabButton.onClick.AddListener(() => SwitchScreens(j));
+    int currentScreenIdx = -1;
+    struct TabScreenRelation{
+        public Transform screen;
+        public Animation tabButton;
+        public TabScreenRelation(Transform _screen, Animation _tabButton) {
+            screen = _screen;
+            tabButton = _tabButton;
         }
-        ActivateTab(currentScreenIdx);
+    }
+    private TabScreenRelation[] tabScreenRelations;
+
+
+
+    public TabManager(){
+        Transform tabTransform, screenTransform;
+        tabTransform = GameObject.Find("Canvas").transform.Find("Tab Area/Tab Aligner");
+        screenTransform = GameObject.Find("Canvas").transform.Find("Safe Area/Screens");
+
+        if (tabTransform.childCount != screenTransform.childCount){
+            DebugLogger.SourcedPrint("TabManager", "Not all screens accounted for", "FF00000");
+            return;
+        }
+
+        tabScreenRelations = new TabScreenRelation[tabTransform.childCount];
+        for(int i = 0; i < tabScreenRelations.Length; i++){
+            int cpy = i;
+            tabScreenRelations[cpy] = new TabScreenRelation(screenTransform.GetChild(cpy), tabTransform.GetChild(cpy).GetComponent<Animation>());
+            DebugLogger.SourcedPrint("TabManager", "Relation " + cpy + "| Tab: " + tabScreenRelations[cpy].tabButton.name + "| Screen: " + tabScreenRelations[cpy].screen.name);
+            tabTransform.GetChild(cpy).GetComponent<Button>().onClick.AddListener(() => SwitchScreens(cpy));
+        }
     }
 
     public void SwitchScreens(int _newIdx){
+            DebugLogger.SourcedPrint("TabManager", "Switch " + _newIdx, "FF00000");
+
         if(currentScreenIdx == _newIdx) return;
-        DeactivateTab();
+        if(currentScreenIdx >= 0) DeactivateTab();
         ActivateTab(_newIdx);
         currentScreenIdx = _newIdx;
     }
 
     void ActivateTab(int _newIdx){
-        tabScreenRelations[_newIdx].screenManager.gameObject.SetActive(true);
+        tabScreenRelations[_newIdx].screen.gameObject.SetActive(true);
         tabScreenRelations[_newIdx].tabButton.GetComponent<Animation>().Play("Button_Puff");
     }
 
     void DeactivateTab(){
-        tabScreenRelations[currentScreenIdx].screenManager.gameObject.SetActive(false);
+        tabScreenRelations[currentScreenIdx].screen.gameObject.SetActive(false);
         tabScreenRelations[currentScreenIdx].tabButton.GetComponent<Animation>().Play("Button_Shrink");
     }
 }

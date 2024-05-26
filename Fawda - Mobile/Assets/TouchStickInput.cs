@@ -47,8 +47,8 @@ public class TouchStickInput : MonoBehaviour, IPointerDownHandler, IPointerUpHan
     }
 
     void FinalizeOutput(Vector2 _newVal){
-        Orchestrator.singleton.inputHandler.stickVal = _newVal;
-        debugVal.text = string.Format("X: {0:0.00}\nY: {1:0.00} ", Orchestrator.singleton.inputHandler.stickVal.x, Orchestrator.singleton.inputHandler.stickVal.y);
+        Orchestrator.inputHandler.stickVal = _newVal;
+        debugVal.text = string.Format("X: {0:0.00}\nY: {1:0.00} ", Orchestrator.inputHandler.stickVal.x, Orchestrator.inputHandler.stickVal.y);
     }
 
 }
