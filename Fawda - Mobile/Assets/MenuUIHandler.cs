@@ -5,17 +5,18 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-public class ModalBehaviour
+public class MenuUIHandler
 {
-    Animator backdropAnimator;
+    Animator animator;
     private UnityEvent dismissEvent = new UnityEvent();
-    private Transform transform, modalWrapper;
+    private Transform modalTransform, modalWrapper;
     Button modalBackgroundDismiss;
-    public ModalBehaviour(){
-        transform = GameObject.Find("Canvas").transform.Find("Foreground");
-        modalWrapper = transform.Find("Modal").Find("Safe Area");
-        backdropAnimator = transform.GetComponent<Animator>();
-        modalBackgroundDismiss = transform.Find("Backdrop").GetComponent<Button>();
+    public MenuUIHandler(){
+        animator = GameObject.Find("Canvas").GetComponent<Animator>();
+
+        modalTransform = GameObject.Find("Canvas").transform.Find("Foreground");
+        modalWrapper = modalTransform.Find("Modal").Find("Safe Area");
+        modalBackgroundDismiss = modalTransform.Find("Backdrop").GetComponent<Button>();
         modalBackgroundDismiss.onClick.AddListener(DismissModal);
         modalBackgroundDismiss.GetComponent<Image>().raycastTarget = true;
     }
@@ -25,8 +26,8 @@ public class ModalBehaviour
         DebugLogger.SourcedPrint("Modal", "Bringing up " + _modalScreenName + " screen");
         GameObject skel = Resources.Load(String.Format("ModalScreens/{0}", _modalScreenName)) as GameObject;
         GameObject.Instantiate(skel, modalWrapper).name = _modalScreenName;
-        modalBackgroundDismiss.gameObject.SetActive(true);
-        backdropAnimator.SetBool("summoned", true);
+        modalTransform.gameObject.SetActive(true);
+        animator.SetBool("Modal Summoned", true);
     }
 
     void ClearModal(){
@@ -39,9 +40,12 @@ public class ModalBehaviour
 
     public void DismissModal(){
         DebugLogger.SourcedPrint("Modal", "Dismissing");
-        modalBackgroundDismiss.gameObject.SetActive(true);
-        backdropAnimator.SetBool("summoned", false);
+        modalTransform.gameObject.SetActive(false);
+        animator.SetBool("Modal Summoned", false);
         dismissEvent.Invoke();
-        dismissEvent.RemoveAllListeners();
+    }
+
+    public void SetTabVisibility(bool _visible){
+        animator.SetBool("Tab Summoned", _visible);
     }
 }

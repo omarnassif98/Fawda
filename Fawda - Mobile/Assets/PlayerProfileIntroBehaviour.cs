@@ -4,17 +4,20 @@ using UnityEngine.Events;
 using UnityEngine.UI;
 public class PlayerProfileIntroBehaviour
 {
+    public Transform flow;
     TMP_Text nameInput;
     public UnityEvent<string> createEvent {get; private set;}
 
     // Start is called before the first frame update
     public PlayerProfileIntroBehaviour()
     {
+        GameObject profileSetupFlowPrefab = Resources.Load("DeployableScreens/Profile Creation") as GameObject;
         createEvent = new UnityEvent<string>();
-        nameInput = GameObject.Find("Canvas").transform.Find("Foreground/Modal/Safe Area/Profile Creation/InputField (TMP)/Text Area/Text").GetComponent<TMP_Text>();
-        GameObject.Find("Canvas").transform.Find("Foreground/Modal/Safe Area/Profile Creation/Button").GetComponent<Button>().onClick.AddListener(() => ProgressIntro());
+
+        flow = GameObject.Instantiate(profileSetupFlowPrefab,GameObject.Find("Canvas").transform.Find("Safe Area")).transform;
+        nameInput = flow.Find("InputField (TMP)/Text Area/Text").GetComponent<TMP_Text>();
+        flow.Find("Button").GetComponent<Button>().onClick.AddListener(() => ProgressIntro());
         DebugLogger.SourcedPrint("Profile Intro", "AWAKE");
-        ProgressIntro();
     }
 
     public void ProgressIntro(){

@@ -41,6 +41,7 @@ public class PlayerProfileManager
 
     public void StartNewProfile(ProfileData _profile){
         playerProfile = _profile;
+        profileManagerEvents[PROFILE_MANAGER_ACTIONS.CREATED].Invoke();
         SaveProfile();
     }
 

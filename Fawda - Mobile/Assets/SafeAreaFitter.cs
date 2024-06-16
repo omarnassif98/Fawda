@@ -1,26 +1,27 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class SafeAreaFitter : MonoBehaviour
+public class SafeAreaFitter
 {
-    RectTransform rectTransform;
-    [SerializeField] RectTransform tabRect;
-    
+    RectTransform safeAreaRect, tabRect;
+
     static float TAB_AREA_TOP = 0.075f;
 
+    public SafeAreaFitter(){
+        DebugLogger.SourcedPrint("SafeAreaFitter","Awake");
+        safeAreaRect = GameObject.Find("Canvas").transform.Find("Safe Area").GetComponent<RectTransform>();
+        tabRect = GameObject.Find("Canvas").transform.Find("Tab Area").GetComponent<RectTransform>();
+        CalibrateSafeArea();
+    }
 
-    // Start is called before the first frame update
-    void Awake(){
-        rectTransform = GetComponent<RectTransform>();
+    public void CalibrateSafeArea(){
         Vector2 pos = Screen.safeArea.position;
         Vector2 extent = pos + Screen.safeArea.size;
         pos.x /= Screen.width;
         pos.y /= Screen.height;
         extent.x /= Screen.width;
         extent.y /= Screen.height;
-        rectTransform.anchorMin = new Vector2(0,TAB_AREA_TOP);
-        rectTransform.anchorMax = extent;
+        safeAreaRect.anchorMin = new Vector2(0,TAB_AREA_TOP);
+        safeAreaRect.anchorMax = extent;
         if(tabRect == null){
             Debug.LogError("TabArea unset. Dipshit");
             return;

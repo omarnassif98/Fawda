@@ -14,13 +14,15 @@ public class TabManager
     }
     private TabScreenRelation[] tabScreenRelations;
 
-
+    private GameScreenManager gameScreenManager;
+    private ProfileScreenManager profileScreenManager;
 
     public TabManager(){
         Transform tabTransform, screenTransform;
         tabTransform = GameObject.Find("Canvas").transform.Find("Tab Area/Tab Aligner");
         screenTransform = GameObject.Find("Canvas").transform.Find("Safe Area/Screens");
-
+        gameScreenManager = new GameScreenManager(screenTransform.Find("Game Screen"));
+        profileScreenManager = new ProfileScreenManager(screenTransform.Find("Profile Screen"));
         if (tabTransform.childCount != screenTransform.childCount){
             DebugLogger.SourcedPrint("TabManager", "Not all screens accounted for", "FF00000");
             return;
@@ -33,11 +35,10 @@ public class TabManager
             DebugLogger.SourcedPrint("TabManager", "Relation " + cpy + "| Tab: " + tabScreenRelations[cpy].tabButton.name + "| Screen: " + tabScreenRelations[cpy].screen.name);
             tabTransform.GetChild(cpy).GetComponent<Button>().onClick.AddListener(() => SwitchScreens(cpy));
         }
+        DebugLogger.SourcedPrint("TabManager", "Awake", "00FF00");
     }
 
     public void SwitchScreens(int _newIdx){
-            DebugLogger.SourcedPrint("TabManager", "Switch " + _newIdx, "FF00000");
-
         if(currentScreenIdx == _newIdx) return;
         if(currentScreenIdx >= 0) DeactivateTab();
         ActivateTab(_newIdx);

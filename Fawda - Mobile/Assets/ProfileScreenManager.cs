@@ -6,10 +6,17 @@ using UnityEngine.UI;
 
 public class ProfileScreenManager : ScreenManager
 {
-    [SerializeField] TMP_InputField nameDisplay;
+    [SerializeField] TMP_Text nameDisplay;
     [SerializeField] Image nameBackground;
     [SerializeField] PlayerColorPickerManager playerColorPickerManager; // WHAT THE FUCK??
     private PlayerProfileManager playerProfileManager;
+
+    public ProfileScreenManager(Transform _transform) : base(_transform)
+    {
+        Transform wrapper = _transform.GetChild(0);
+        nameBackground = wrapper.Find("Nametag/Background").GetComponent<Image>();
+        nameDisplay = wrapper.Find("Nametag/Name").GetComponent<TMP_Text>();
+    }
 
     public void SetProfileManagerInstance(PlayerProfileManager _playerProfileManager){
         playerProfileManager = _playerProfileManager;
