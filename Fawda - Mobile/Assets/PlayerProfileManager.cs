@@ -1,9 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using System;
-using System.Text;
 using UnityEngine.Events;
 
 public class PlayerProfileManager
@@ -18,7 +16,6 @@ public class PlayerProfileManager
 
     public ProfileData playerProfile {get; private set;}
     SaveFileHandler profileHandler;
-
 
     public PlayerProfileManager()
     {

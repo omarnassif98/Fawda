@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -13,7 +14,6 @@ public class MenuUIHandler
     Button modalBackgroundDismiss;
     public MenuUIHandler(){
         animator = GameObject.Find("Canvas").GetComponent<Animator>();
-
         modalTransform = GameObject.Find("Canvas").transform.Find("Foreground");
         modalWrapper = modalTransform.Find("Modal").Find("Safe Area");
         modalBackgroundDismiss = modalTransform.Find("Backdrop").GetComponent<Button>();
@@ -47,5 +47,22 @@ public class MenuUIHandler
 
     public void SetTabVisibility(bool _visible){
         animator.SetBool("Tab Summoned", _visible);
+    }
+
+    public void FadeBackgroundColor(Color _newColor){
+        IEnumerator nextStep = StepBackgroundColor(_newColor);
+        Orchestrator.singleton.StartCoroutine(nextStep);
+    }
+
+    IEnumerator StepBackgroundColor(Color _colorToMatch){
+        Color stepColor = Color.Lerp(Camera.main.backgroundColor, _colorToMatch, 1/60f);
+        yield return new WaitForSeconds(1/60f);
+        if (MathF.Abs((stepColor.r + stepColor.g + stepColor.b)/3 - (_colorToMatch.r + _colorToMatch.g + _colorToMatch.b)/3) <= 0.015f){
+            Camera.main.backgroundColor = _colorToMatch;
+            yield break;
+        }
+        Camera.main.backgroundColor = stepColor;
+        IEnumerator nextStep = StepBackgroundColor(_colorToMatch);
+        Orchestrator.singleton.StartCoroutine(nextStep);
     }
 }

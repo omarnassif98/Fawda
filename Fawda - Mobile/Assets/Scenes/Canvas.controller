@@ -20,7 +20,7 @@ AnimatorStateTransition:
   m_TransitionDuration: 0
   m_TransitionOffset: 0
   m_ExitTime: 0.75
-  m_HasExitTime: 1
+  m_HasExitTime: 0
   m_HasFixedDuration: 1
   m_InterruptionSource: 0
   m_OrderedInterruption: 1
@@ -198,40 +198,34 @@ AnimatorController:
   m_Name: Canvas
   serializedVersion: 5
   m_AnimatorParameters:
-  - m_Name: transition
-    m_Type: 9
-    m_DefaultFloat: 0
-    m_DefaultInt: 0
-    m_DefaultBool: 0
-    m_Controller: {fileID: 9100000}
   - m_Name: Tab Summoned
     m_Type: 4
     m_DefaultFloat: 0
     m_DefaultInt: 0
     m_DefaultBool: 0
-    m_Controller: {fileID: 9100000}
+    m_Controller: {fileID: 0}
   - m_Name: Modal Summoned
     m_Type: 4
     m_DefaultFloat: 0
     m_DefaultInt: 0
     m_DefaultBool: 0
-    m_Controller: {fileID: 9100000}
+    m_Controller: {fileID: 0}
   m_AnimatorLayers:
   - serializedVersion: 5
-    m_Name: tab layer
-    m_StateMachine: {fileID: -6696069780332956698}
+    m_Name: Modal Layer
+    m_StateMachine: {fileID: -7037166712374728370}
     m_Mask: {fileID: 0}
     m_Motions: []
     m_Behaviours: []
-    m_BlendingMode: 1
+    m_BlendingMode: 0
     m_SyncedLayerIndex: -1
     m_DefaultWeight: 1
     m_IKPass: 0
     m_SyncedLayerAffectsTiming: 0
     m_Controller: {fileID: 9100000}
   - serializedVersion: 5
-    m_Name: Modal Layer
-    m_StateMachine: {fileID: -7037166712374728370}
+    m_Name: tab layer
+    m_StateMachine: {fileID: -6696069780332956698}
     m_Mask: {fileID: 0}
     m_Motions: []
     m_Behaviours: []

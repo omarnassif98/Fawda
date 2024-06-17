@@ -32,7 +32,7 @@ public class TabManager
         for(int i = 0; i < tabScreenRelations.Length; i++){
             int cpy = i;
             tabScreenRelations[cpy] = new TabScreenRelation(screenTransform.GetChild(cpy), tabTransform.GetChild(cpy).GetComponent<Animation>());
-            DebugLogger.SourcedPrint("TabManager", "Relation " + cpy + "| Tab: " + tabScreenRelations[cpy].tabButton.name + "| Screen: " + tabScreenRelations[cpy].screen.name);
+            DebugLogger.SourcedPrint("TabManager", "Relation " + cpy + " | Tab: " + tabScreenRelations[cpy].tabButton.name + " | Screen: " + tabScreenRelations[cpy].screen.name, "FFFF00");
             tabTransform.GetChild(cpy).GetComponent<Button>().onClick.AddListener(() => SwitchScreens(cpy));
         }
         DebugLogger.SourcedPrint("TabManager", "Awake", "00FF00");

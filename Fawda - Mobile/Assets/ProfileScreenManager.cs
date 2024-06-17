@@ -6,29 +6,37 @@ using UnityEngine.UI;
 
 public class ProfileScreenManager : ScreenManager
 {
-    [SerializeField] TMP_Text nameDisplay;
-    [SerializeField] Image nameBackground;
-    [SerializeField] PlayerColorPickerManager playerColorPickerManager; // WHAT THE FUCK??
+    TMP_InputField nameDisplay;
+    Image nameBackground;
     private PlayerProfileManager playerProfileManager;
 
     public ProfileScreenManager(Transform _transform) : base(_transform)
     {
+        DebugLogger.SourcedPrint("ProfileScreen","Awake");
         Transform wrapper = _transform.GetChild(0);
         nameBackground = wrapper.Find("Nametag/Background").GetComponent<Image>();
-        nameDisplay = wrapper.Find("Nametag/Name").GetComponent<TMP_Text>();
+        nameDisplay = wrapper.Find("Nametag").GetComponent<TMP_InputField>();
+        nameDisplay.onEndEdit.AddListener(ChangeName);
+        playerProfileManager = Orchestrator.singleton.playerProfileManager;
+        playerProfileManager.profileManagerEvents[PlayerProfileManager.PROFILE_MANAGER_ACTIONS.LOAD_SUCCESS].AddListener(FillProfileDetails);
     }
 
-    public void SetProfileManagerInstance(PlayerProfileManager _playerProfileManager){
-        playerProfileManager = _playerProfileManager;
+    public void FillProfileDetails(){
+        DebugLogger.SourcedPrint("ProfileScreen","Fill Event","00FFFF");
+        ProfileData profileData = playerProfileManager.GetProfileData();
+        SetName(profileData.name);
     }
+
     public void SetName(string _name){
+        DebugLogger.SourcedPrint("ProfileScreen","Loaded name is " + _name,"00FFFF");
         nameDisplay.text = _name;
     }
 
-    public void ChangeName(){
+    public void ChangeName(string _newName){
+        DebugLogger.SourcedPrint("ProfileScreen","New name is " + _newName,"00FFFF");
         ProfileData prof = playerProfileManager.GetProfileData();
-        if(nameDisplay.text == prof.name) return;
-        prof.name = nameDisplay.text;
+        if(_newName == prof.name) return;
+        prof.name = _newName;
         playerProfileManager.SetProfileData(prof);
     }
 
