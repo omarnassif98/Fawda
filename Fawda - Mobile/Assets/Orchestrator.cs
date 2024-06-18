@@ -12,6 +12,7 @@ public class Orchestrator : MonoBehaviour
     public PlayerProfileManager playerProfileManager {get; private set;}
     private MenuUIHandler menuUIHandler;
     private TabManager tabManager;
+    public Dictionary<string, UnityAction> actionMap { get; private set;} = new Dictionary<string,UnityAction>();
     void Awake(){
         DebugLogger.SourcedPrint("Orchestrator", "Waking up", "770077");
         if(singleton != null){ Destroy(this); return;}
@@ -21,7 +22,14 @@ public class Orchestrator : MonoBehaviour
         inputHandler = new InputHandler();
         menuUIHandler = new MenuUIHandler();
         SafeAreaFitter safeAreaFitter = new SafeAreaFitter();
+        InitializeProfile();
+    }
 
+    public void RegisterAction(string _key, UnityAction _action) => actionMap[_key] = _action;
+
+    public void ExecuteAction(string _key) => actionMap[_key].Invoke();
+
+    private void InitializeProfile() {
         UnityAction ephimeral = null;
         ephimeral = () => {
                 menuUIHandler.SetTabVisibility(true);
@@ -38,7 +46,6 @@ public class Orchestrator : MonoBehaviour
             playerProfileManager.profileManagerEvents[PlayerProfileManager.PROFILE_MANAGER_ACTIONS.LOAD_SUCCESS].AddListener(ephimeral);
         playerProfileManager.LoadProfile();
     }
-
     private void InitiateProfileSetupFlow(){
         menuUIHandler.FadeBackgroundColor(Color.black);
         DebugLogger.SourcedPrint("Orchestrator", "Blank profile", "FF00000");

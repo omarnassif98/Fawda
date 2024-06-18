@@ -5,7 +5,7 @@ using UnityEngine.Events;
 public class ScreenManager
 {
     private Transform[] subscreens;
-    protected int currentSubscreenIdx = 0;
+    private int currentSubscreenIdx = 0;
 
     public ScreenManager(Transform _transform){
         subscreens = new Transform[_transform.childCount];

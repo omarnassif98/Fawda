@@ -19,6 +19,8 @@ public class MenuUIHandler
         modalBackgroundDismiss = modalTransform.Find("Backdrop").GetComponent<Button>();
         modalBackgroundDismiss.onClick.AddListener(DismissModal);
         modalBackgroundDismiss.GetComponent<Image>().raycastTarget = true;
+        Orchestrator.singleton.RegisterAction("Summon Tab", () => SetTabVisibility(true));
+        Orchestrator.singleton.RegisterAction("Dismiss Tab", () => SetTabVisibility(false));
     }
 
     public void SummonModal(string _modalScreenName){
