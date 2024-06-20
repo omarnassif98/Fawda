@@ -50,21 +50,9 @@ public class MenuUIHandler
     public void SetTabVisibility(bool _visible){
         animator.SetBool("Tab Summoned", _visible);
     }
-
     public void FadeBackgroundColor(Color _newColor){
-        IEnumerator nextStep = StepBackgroundColor(_newColor);
-        Orchestrator.singleton.StartCoroutine(nextStep);
-    }
-
-    IEnumerator StepBackgroundColor(Color _colorToMatch){
-        Color stepColor = Color.Lerp(Camera.main.backgroundColor, _colorToMatch, 1/60f);
-        yield return new WaitForSeconds(1/60f);
-        if (MathF.Abs((stepColor.r + stepColor.g + stepColor.b)/3 - (_colorToMatch.r + _colorToMatch.g + _colorToMatch.b)/3) <= 0.015f){
-            Camera.main.backgroundColor = _colorToMatch;
-            yield break;
-        }
-        Camera.main.backgroundColor = stepColor;
-        IEnumerator nextStep = StepBackgroundColor(_colorToMatch);
-        Orchestrator.singleton.StartCoroutine(nextStep);
+    DebugLogger.SourcedPrint("MenuUI", "COLOR");
+    Color startColor = Camera.main.backgroundColor;
+    Orchestrator.singleton.StartCoroutine(Helper.LerpStep((_progress) => Camera.main.backgroundColor = Color.Lerp(startColor, _newColor, _progress),_time:0.5f));
     }
 }

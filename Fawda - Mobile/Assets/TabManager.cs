@@ -43,6 +43,7 @@ public class TabManager
         if(currentScreenIdx >= 0) DeactivateTab();
         ActivateTab(_newIdx);
         currentScreenIdx = _newIdx;
+
     }
 
     void ActivateTab(int _newIdx){
