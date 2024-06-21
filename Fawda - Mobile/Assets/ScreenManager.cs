@@ -38,9 +38,7 @@ public class ScreenManager
         currentSubscreenIdx = -1;
         subscreens = new Subscreen[_transform.childCount];
         for(int i = 0; i < subscreens.Length; i++) subscreens[i] = new Subscreen(_transform.GetChild(i));
-        UnityAction ephimeral = null;
-        ephimeral = () => SwitchSubscreens(0);
-        Orchestrator.singleton.playerProfileManager.profileManagerEvents[PlayerProfileManager.PROFILE_MANAGER_ACTIONS.LOAD_SUCCESS].AddListener(ephimeral);
+        PlayerProfileManager.RegisterEphimeral(() => SwitchSubscreens(0),PlayerProfileManager.PROFILE_MANAGER_ACTIONS.LOAD_SUCCESS);
     }
 
     public void SwitchSubscreens(int _newIdx){

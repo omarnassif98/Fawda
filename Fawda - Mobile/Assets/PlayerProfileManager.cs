@@ -24,6 +24,17 @@ public class PlayerProfileManager
         foreach(PROFILE_MANAGER_ACTIONS profAction in Enum.GetValues(typeof(PROFILE_MANAGER_ACTIONS))) profileManagerEvents[profAction] = new UnityEvent();
     }
 
+    public static UnityAction RegisterEphimeral(UnityAction _action, PROFILE_MANAGER_ACTIONS _wait){
+        UnityAction ephimeral = null;
+        ephimeral = () => {
+            DebugLogger.SourcedPrint("PlayerProfileManager","Ephimeral Spent");
+            _action();
+            Orchestrator.singleton.playerProfileManager.profileManagerEvents[_wait].RemoveListener(ephimeral);
+        };
+        Orchestrator.singleton.playerProfileManager.profileManagerEvents[_wait].AddListener(ephimeral);
+        return ephimeral;
+    }
+
     public void LoadProfile(){
         playerProfile = profileHandler.Load();
         if(playerProfile != null) profileManagerEvents[PROFILE_MANAGER_ACTIONS.LOAD_SUCCESS].Invoke();
@@ -39,6 +50,7 @@ public class PlayerProfileManager
     public void StartNewProfile(ProfileData _profile){
         playerProfile = _profile;
         profileManagerEvents[PROFILE_MANAGER_ACTIONS.CREATED].Invoke();
+        profileManagerEvents[PROFILE_MANAGER_ACTIONS.LOAD_SUCCESS].Invoke();
         SaveProfile();
     }
 

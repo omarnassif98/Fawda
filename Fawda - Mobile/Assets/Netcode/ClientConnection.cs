@@ -75,7 +75,7 @@ public class ClientConnection : MonoBehaviour
 
     public void PrintWrap(string _message){
 
-        print(string.Format("<color=#FFBF00>Synapse Client: </color>{0}",_message));
+        DebugLogger.SourcedPrint("Synapse Client",_message,"FFBF00");
     }
 
     void SetPlayerIdx(byte[] _data){
@@ -106,7 +106,7 @@ public class ClientConnection : MonoBehaviour
     }
 
     public void TriggerServerEvent(string _event){
-        print("FIRE EVENT: " + _event);
+        PrintWrap("trigger event - " + _event);
         if(serverEvents.ContainsKey(_event)){
             serverEvents[_event].Invoke();
         }
@@ -117,20 +117,15 @@ public class ClientConnection : MonoBehaviour
     }
 
     public void RegisterServerEventListener(string _eventName, UnityAction _function){
-        print("REGISTER EVENT: " + _eventName);
+        PrintWrap("Registering event - " + _eventName);
         if(!serverEvents.ContainsKey(_eventName)) serverEvents[_eventName] = new UnityEvent();
         serverEvents[_eventName].AddListener(_function);
     }
 
     //Registers Listeners to RPCs
-    public void RegisterRPC(string _key, UnityAction<byte[]> _func){
-        PrintWrap("Registering " + _key);
-        remoteProcCalls[_key] = _func;
-    }
-
     public void RegisterRPC(OpCode _opCode, UnityAction<byte[]> _func){
         string opCode = Enum.GetName(typeof(OpCode), _opCode);
-        PrintWrap("Registering " + opCode);
+        PrintWrap("Registering RPC - " + opCode);
         remoteProcCalls[opCode] = _func;
     }
 

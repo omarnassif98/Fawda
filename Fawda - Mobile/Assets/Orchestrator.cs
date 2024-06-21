@@ -30,20 +30,16 @@ public class Orchestrator : MonoBehaviour
     public void ExecuteAction(string _key) => actionMap[_key].Invoke();
 
     private void InitializeProfile() {
-        UnityAction ephimeral = null;
-        ephimeral = () => {
+        UnityAction ephimeral = PlayerProfileManager.RegisterEphimeral(() => {
                 menuUIHandler.SetTabVisibility(true);
                 tabManager.SwitchScreens(1);
-                playerProfileManager.profileManagerEvents[PlayerProfileManager.PROFILE_MANAGER_ACTIONS.LOAD_SUCCESS].RemoveListener(ephimeral);
-        };
+        }, PlayerProfileManager.PROFILE_MANAGER_ACTIONS.LOAD_SUCCESS);
 
 
         playerProfileManager.profileManagerEvents[PlayerProfileManager.PROFILE_MANAGER_ACTIONS.LOAD_FAILURE].AddListener(() => {
             playerProfileManager.profileManagerEvents[PlayerProfileManager.PROFILE_MANAGER_ACTIONS.LOAD_SUCCESS].RemoveListener(ephimeral);
             InitiateProfileSetupFlow();
         });
-
-            playerProfileManager.profileManagerEvents[PlayerProfileManager.PROFILE_MANAGER_ACTIONS.LOAD_SUCCESS].AddListener(ephimeral);
         playerProfileManager.LoadProfile();
     }
     private void InitiateProfileSetupFlow(){
