@@ -22,6 +22,7 @@ public class PlayerProfileManager
         profileManagerEvents = new Dictionary<PROFILE_MANAGER_ACTIONS, UnityEvent>();;
         profileHandler = new SaveFileHandler(Application.persistentDataPath, "prof.json");
         foreach(PROFILE_MANAGER_ACTIONS profAction in Enum.GetValues(typeof(PROFILE_MANAGER_ACTIONS))) profileManagerEvents[profAction] = new UnityEvent();
+        ClientConnection.singleton.RegisterServerEventListener("connect", () => ClientConnection.singleton.SendMessageToServer(OpCode.PROFILE_PAYLOAD, playerProfile.Encode()));
     }
 
     public static UnityAction RegisterEphimeral(UnityAction _action, PROFILE_MANAGER_ACTIONS _wait){

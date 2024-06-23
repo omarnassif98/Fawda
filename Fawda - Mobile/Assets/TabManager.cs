@@ -16,6 +16,7 @@ public class TabManager
 
     private GameScreenManager gameScreenManager;
     private ProfileScreenManager profileScreenManager;
+    private SettingsScreenManager settingsScreenManager;
 
     public TabManager(){
         Transform tabTransform, screenTransform;
@@ -23,6 +24,7 @@ public class TabManager
         screenTransform = GameObject.Find("Canvas").transform.Find("Safe Area/Screens");
         gameScreenManager = new GameScreenManager(screenTransform.Find("Game Screen"));
         profileScreenManager = new ProfileScreenManager(screenTransform.Find("Profile Screen"));
+        settingsScreenManager = new SettingsScreenManager(screenTransform.Find("Settings Screen"));
         if (tabTransform.childCount != screenTransform.childCount){
             DebugLogger.SourcedPrint("TabManager", "Not all screens accounted for", "FF00000");
             return;

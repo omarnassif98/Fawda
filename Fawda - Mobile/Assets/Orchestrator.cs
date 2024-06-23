@@ -10,7 +10,7 @@ public class Orchestrator : MonoBehaviour
     public static Orchestrator singleton {get; private set;}
     public static InputHandler inputHandler { get; private set;}
     public PlayerProfileManager playerProfileManager {get; private set;}
-    private MenuUIHandler menuUIHandler;
+    public MenuUIHandler menuUIHandler;
     private TabManager tabManager;
     public Dictionary<string, UnityAction> actionMap { get; private set;} = new Dictionary<string,UnityAction>();
     void Awake(){
@@ -23,6 +23,7 @@ public class Orchestrator : MonoBehaviour
         menuUIHandler = new MenuUIHandler();
         SafeAreaFitter safeAreaFitter = new SafeAreaFitter();
         InitializeProfile();
+        for (int i = 1; i<50;i++) DebugLogger.SourcedPrint("Orchestrator","DM: " + i.ToString(), "FFFF00");
     }
 
     public void RegisterAction(string _key, UnityAction _action) => actionMap[_key] = _action;

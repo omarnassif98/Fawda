@@ -12,13 +12,13 @@ public class ProfileScreenManager : ScreenManager
 
     public ProfileScreenManager(Transform _transform) : base(_transform)
     {
-        DebugLogger.SourcedPrint("ProfileScreen","Awake");
         Transform wrapper = _transform.GetChild(0);
         nameBackground = wrapper.Find("Nametag/Background").GetComponent<Image>();
         nameDisplay = wrapper.Find("Nametag").GetComponent<TMP_InputField>();
         nameDisplay.onEndEdit.AddListener(ChangeName);
         playerProfileManager = Orchestrator.singleton.playerProfileManager;
         playerProfileManager.profileManagerEvents[PlayerProfileManager.PROFILE_MANAGER_ACTIONS.LOAD_SUCCESS].AddListener(FillProfileDetails);
+        DebugLogger.SourcedPrint("ProfileScreen","Awake","FFFFFF");
     }
 
     public void FillProfileDetails(){

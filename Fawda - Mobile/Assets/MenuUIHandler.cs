@@ -15,7 +15,8 @@ public class MenuUIHandler
     public MenuUIHandler(){
         animator = GameObject.Find("Canvas").GetComponent<Animator>();
         modalTransform = GameObject.Find("Canvas").transform.Find("Foreground");
-        modalWrapper = modalTransform.Find("Modal").Find("Safe Area");
+        modalWrapper = modalTransform.Find("Modal/Safe Area");
+        modalTransform.Find("Modal/DismissButton").GetComponent<Button>().onClick.AddListener(DismissModal);
         modalBackgroundDismiss = modalTransform.Find("Backdrop").GetComponent<Button>();
         modalBackgroundDismiss.onClick.AddListener(DismissModal);
         modalBackgroundDismiss.GetComponent<Image>().raycastTarget = true;
@@ -23,13 +24,14 @@ public class MenuUIHandler
         Orchestrator.singleton.RegisterAction("Dismiss Tab", () => SetTabVisibility(false));
     }
 
-    public void SummonModal(string _modalScreenName){
+    public Transform SummonModal(string _modalScreenName){
         ClearModal();
         DebugLogger.SourcedPrint("Modal", "Bringing up " + _modalScreenName + " screen");
-        GameObject skel = Resources.Load(String.Format("ModalScreens/{0}", _modalScreenName)) as GameObject;
+        GameObject skel = Resources.Load(String.Format("DeployableScreens/{0}", _modalScreenName)) as GameObject;
         GameObject.Instantiate(skel, modalWrapper).name = _modalScreenName;
         modalTransform.gameObject.SetActive(true);
         animator.SetBool("Modal Summoned", true);
+        return modalWrapper.transform;
     }
 
     void ClearModal(){

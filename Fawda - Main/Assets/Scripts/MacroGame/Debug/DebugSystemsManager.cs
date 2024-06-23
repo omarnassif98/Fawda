@@ -86,10 +86,5 @@ public class DebugSystemsManager : MonoBehaviour
             debugBar.SetActive(!debugBar.activeInHierarchy);
             logger.SetActive(!logger.activeInHierarchy);
         }
-        # if UNITY_EDITOR
-            NetMessage msg = new NetMessage(OpCode.UDP_GAMEPAD_INPUT, new GamepadData(Input.GetAxis("Horizontal"),Input.GetAxis("Vertical"), Input.GetButtonDown("Action")).Encode());
-            DirectedNetMessage dirMsg = new DirectedNetMessage(msg,0);
-            ConnectionManager.singleton.QueueRPC(dirMsg);
-        #endif
     }
 }

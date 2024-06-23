@@ -27,7 +27,7 @@ public class ScreenManager
             elements = new List<subscreenElement>();
             foreach(TMP_Text txt in textElements) elements.Add(new subscreenElement(txt));
             foreach(Image img in images) elements.Add(new subscreenElement(img));
-            DebugLogger.SourcedPrint("GameScreenManager", _transform.name + " has " + elements.Count.ToString() + " elements");
+            DebugLogger.SourcedPrint("GameScreenManager", _transform.name + " has " + elements.Count.ToString() + " elements", "FF00FF");
 
         }
     }
