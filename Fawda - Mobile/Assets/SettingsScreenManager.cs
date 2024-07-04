@@ -13,7 +13,7 @@ public class SettingsScreenManager : ScreenManager
         _transform.Find("DebugSubscreen/BackButton").GetComponent<Button>().onClick.AddListener(() => SwitchSubscreens(0));
         _transform.Find("DebugSubscreen/ResetButton").GetComponent<Button>().onClick.AddListener(() => {
             Transform modal = Orchestrator.singleton.menuUIHandler.SummonModal("ResetDataModalScreen");
-            modal.Find("ResetDataModalScreen/RESET").GetComponent<Button>().onClick.AddListener(Orchestrator.singleton.ResetData);
+            modal.Find("RESET").GetComponent<Button>().onClick.AddListener(Orchestrator.singleton.ResetData);
             });
     }
 }

@@ -5,54 +5,51 @@ using UnityEngine;
 
 public class HauntGameSetupBehaviour : GameSetupBehaviour
 {
-    List<int> readyOrder;
-    int readyOrderIdx = 0;
     IEnumerator currentPromptAction;
+    int promptIdx = 0;
     public HauntGameSetupBehaviour() : base(){
-        DebugLogger.SourcedPrint("GameSetup", "Now waiting for readies");
-        readyOrder = new List<int>();
+        DebugLogger.SourcedPrint("HauntGameSetup", "Now waiting for readies");
+        currentPromptAction = PromptPlayerForGhost();
+        LobbyManager.singleton.StartCoroutine(currentPromptAction);
+        ConnectionManager.singleton.RegisterRPC(OpCode.PROMPT_RESPONSE, promptAnswer);
     }
     public override void ReadyUp()
     {
-        ConnectionManager.singleton.RegisterRPC(OpCode.PROMPT_RESPONSE, promptAnswer);
-        currentPromptAction = PromptPlayerForGhost();
-        LobbyManager.singleton.StartCoroutine(currentPromptAction);
+
     }
 
     void pushPromptForward(){
-        readyOrderIdx = (readyOrderIdx + 1) % readyOrder.Count;
+        promptIdx = (promptIdx + 1) % LobbyManager.singleton.GetLobbySize();
         currentPromptAction = PromptPlayerForGhost();
         LobbyManager.singleton.StartCoroutine(currentPromptAction);
     }
 
 
     IEnumerator PromptPlayerForGhost(){
-        DebugLogger.SourcedPrint("HauntGameSetup","Sending prompt to client " + readyOrder[readyOrderIdx]);
+        DebugLogger.SourcedPrint("HauntGameSetup","Sending prompt to client " + promptIdx);
         //BOOKMARK: PROMPT
-        ConnectionManager.singleton.SendMessageToClients(OpCode.PROMPT_RESPONSE, new SimpleBooleanMessage(true).Encode(), readyOrder[readyOrderIdx]);
-        yield return new WaitForSeconds(2.5f);
+        ConnectionManager.singleton.SendMessageToClients(OpCode.PROMPT_RESPONSE, new SimpleBooleanMessage(true).Encode(), promptIdx);
+        yield return new WaitForSeconds(7.5f);
         pushPromptForward();
     }
 
     void promptAnswer(byte[] _data, int _idx){
+        DebugLogger.SourcedPrint("HauntGameSetup","Client " + promptIdx + " response", "FF0000");
         LobbyManager.singleton.StopCoroutine(currentPromptAction);
         bool accepted = new SimpleBooleanMessage(_data).ready;
         if (!accepted){
-            DebugLogger.SourcedPrint("HauntGameSetup","Client " + readyOrder[readyOrderIdx] + " said no... the dumbass", "FF0000");
+            DebugLogger.SourcedPrint("HauntGameSetup","Client " + promptIdx + " said no... the dumbass", "FF0000");
             pushPromptForward();
             return;
         }
-        DebugLogger.SourcedPrint("HauntGameSetup","Ghost is client #" + readyOrder[readyOrderIdx], "00FF00");
+        DebugLogger.SourcedPrint("HauntGameSetup","Ghost is client #" + promptIdx, "00FF00");
         //BOOKMARK: INFORMING PLAYERS
-        foreach(int i in readyOrder) ConnectionManager.singleton.SendMessageToClients(OpCode.CONTROL_SCHEME, new SimpleBooleanMessage(i == readyOrder[readyOrderIdx]).Encode(), i);
+        for(int i = 0; i < LobbyManager.singleton.GetLobbySize(); i++) ConnectionManager.singleton.SendMessageToClients(OpCode.READYUP, new SimpleBooleanMessage(i == promptIdx).Encode(), i);
         ConnectionManager.singleton.VacateRPC(OpCode.PROMPT_RESPONSE);
     }
 
     protected override void OnReadyStatusChange(int _idx, bool _newVal)
     {
-        DebugLogger.SourcedPrint("GameSetup", "logic trip");
-        if(_newVal && !readyOrder.Contains(_idx)) readyOrder.Add(_idx);
-        else if (!_newVal && readyOrder.Contains(_idx)) readyOrder.Remove(_idx);
-        else DebugLogger.SourcedPrint("GameSetup", "Something seriously wrong ");
+        DebugLogger.SourcedPrint("HauntGameSetup", "readyup logic trip idx: " + _idx);
     }
 }

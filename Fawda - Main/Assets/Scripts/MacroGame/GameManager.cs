@@ -31,6 +31,7 @@ public class GameManager
         Tuple<Type,Type> gameInfo = minigameLookup[_gamecode];
         activeMinigame = (DeployableMinigame)Activator.CreateInstance(gameInfo.Item1);
         activeMinigameSetup = (GameSetupBehaviour)Activator.CreateInstance(gameInfo.Item2);
+        ConnectionManager.singleton.SendMessageToClients(OpCode.GAMESETUP, (int)GameCodes.HAUNT);
         DebugLogger.SourcedPrint("GameManager",string.Format("Minigame Loaded - {0}",Enum.GetName(typeof(GameCodes),_gamecode)));
     }
 

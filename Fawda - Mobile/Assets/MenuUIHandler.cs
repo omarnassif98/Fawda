@@ -28,19 +28,17 @@ public class MenuUIHandler
         ClearModal();
         DebugLogger.SourcedPrint("Modal", "Bringing up " + _modalScreenName + " screen");
         GameObject skel = Resources.Load(String.Format("DeployableScreens/{0}", _modalScreenName)) as GameObject;
-        GameObject.Instantiate(skel, modalWrapper).name = _modalScreenName;
+        GameObject newModal = GameObject.Instantiate(skel, modalWrapper);
+        newModal.name = _modalScreenName;
         modalTransform.gameObject.SetActive(true);
         animator.SetBool("Modal Summoned", true);
-        return modalWrapper.transform;
+        return newModal.transform;
     }
 
     void ClearModal(){
         for(int i = 0; i < modalWrapper.childCount; i++) GameObject.Destroy(modalWrapper.GetChild(i).gameObject);
     }
 
-    public void AddDismissalListener(UnityAction _caller){
-        dismissEvent.AddListener(_caller);
-    }
 
     public void DismissModal(){
         DebugLogger.SourcedPrint("Modal", "Dismissing");
@@ -51,6 +49,18 @@ public class MenuUIHandler
 
     public void SetTabVisibility(bool _visible){
         animator.SetBool("Tab Summoned", _visible);
+    }
+
+    public void AttachEphimeralToDismissEvent(UnityAction _action){
+        UnityAction ephimeral = null;
+        ephimeral = () => {
+            _action();
+            dismissEvent.RemoveListener(ephimeral);
+        };
+        dismissEvent.AddListener(ephimeral);
+    }
+    public void ClearDismissListeners(){
+        dismissEvent.RemoveAllListeners();
     }
     public void FadeBackgroundColor(Color _newColor){
     DebugLogger.SourcedPrint("MenuUI", "COLOR");

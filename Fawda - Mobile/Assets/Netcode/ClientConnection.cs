@@ -84,6 +84,7 @@ public class ClientConnection : MonoBehaviour
     //TCP
 
     public void SendMessageToServer(OpCode _opCode, byte[] _val){
+        DebugLogger.SourcedPrint("Sy", "SENDING", "FF0000");
         NetMessage msg = new NetMessage(_opCode, _val);
         client.QueueMessage(msg);
     }
@@ -127,6 +128,11 @@ public class ClientConnection : MonoBehaviour
         string opCode = Enum.GetName(typeof(OpCode), _opCode);
         PrintWrap("Registering RPC - " + opCode);
         remoteProcCalls[opCode] = _func;
+    }
+
+    public void ClearRPC(OpCode _opCode){
+        remoteProcCalls.Remove(Enum.GetName(typeof(OpCode), _opCode));
+        PrintWrap("Cleared " + Enum.GetName(typeof(OpCode), _opCode));
     }
 
     //Flushes all RPCs, executing them all in FIFO order

@@ -18,32 +18,32 @@ public class SynapseClient
     // Unified
     ////////
     public void QueueMessage(NetMessage _netMessage){
-        DebugLogger.singleton.Log("Message Queued - " + Enum.GetName(typeof(OpCode), _netMessage.opCode));
-        messageQueue.Enqueue(_netMessage);    
+        DebugLogger.SourcedPrint("Synapse core","Message Queued - " + Enum.GetName(typeof(OpCode), _netMessage.opCode));
+        messageQueue.Enqueue(_netMessage);
         ClientConnection.singleton.PrintWrap(String.Format("Queue size: {0}", messageQueue.Count));
     }
-    
+
     void ConnectToServer(){
         while(connected){
             UpdateTCPStream();
         }
-        DebugLogger.singleton.Log("Client exited");
+        DebugLogger.SourcedPrint("Synapse core","Client exited");
     }
 
     public void kickoff(string _address)
     {
         addr = _address;
         client = new TcpClient(_address, 23722);
-        DebugLogger.singleton.Log("Connected!");
+        DebugLogger.SourcedPrint("Synapse core","Connected!");
         connected = true;
         ClientConnection.singleton.TriggerServerEvent("connect");
         ThreadStart kickoff = new ThreadStart(ConnectToServer);
         clientThread= new Thread(kickoff);
-        clientThread.Start();        
+        clientThread.Start();
     }
 
     public void Kill(){
-        DebugLogger.singleton.Log("Disconected!");
+        DebugLogger.SourcedPrint("Synapse core","Disconected!");
         connected = false;
     }
 
@@ -56,28 +56,28 @@ public class SynapseClient
             NetworkStream stream = client.GetStream();
             if(stream.CanRead && stream.CanWrite){
                 if(messageQueue.Count > 0){
-                    DebugLogger.singleton.Log("Message in Queue. Maybe clogged?");
+                    DebugLogger.SourcedPrint("Synapse core","Message in Queue. Maybe clogged?");
                     NetMessage msg;
                     messageQueue.TryDequeue(out msg);
-                    DebugLogger.singleton.Log(string.Format("{0} Message Sending, not clogged", Enum.GetName(typeof(OpCode), msg.opCode)));
+                    DebugLogger.SourcedPrint("Synapse core",string.Format("{0} Message Sending, not clogged", Enum.GetName(typeof(OpCode), msg.opCode)));
                     byte[] sendBytes = SynapseMessageFormatter.EncodeMessage(msg);
                     stream.Write(sendBytes,0,sendBytes.Length);
                 }
                 if(stream.DataAvailable){
                     int size = stream.ReadByte();
                     OpCode code = (OpCode)stream.ReadByte();
-                    DebugLogger.singleton.Log(string.Format("{0} Message Received", Enum.GetName(typeof(OpCode), code)));
+                    DebugLogger.SourcedPrint("Synapse core",string.Format("{0} Message Received", Enum.GetName(typeof(OpCode), code)));
                     byte[] recievedBytes = new byte[size];
                     stream.Read(recievedBytes, 0, size);
                     NetMessage msg = new NetMessage(code, recievedBytes);
                     if(code == OpCode.INDEX) idx = recievedBytes[0];
                     ClientConnection.singleton.QueueRPC(msg);
-                }                
+                }
             }else if (!stream.CanRead){
-                DebugLogger.singleton.Log("Cannot Read, closing connection");
+                DebugLogger.SourcedPrint("Synapse core","Cannot Read, closing connection");
                 client.Close();
-            }else if (!stream.CanWrite){             
-                DebugLogger.singleton.Log("Cannot Write, closing connection");
+            }else if (!stream.CanWrite){
+                DebugLogger.SourcedPrint("Synapse core","Cannot Write, closing connection");
                 client.Close();
             }
     }

@@ -23,7 +23,11 @@ public class LobbyMenuScreenBehaviour : MonoBehaviour
         customButtonActions = new Dictionary<string, UnityAction>();
         customButtonActions["Shake"] = () => LobbyMenuManager.singleton.ShakeSnowGlobe();
         buttonActions[ActionType.SCREEN_LOAD] = PrepareScreenLoadEphimeral;
-        buttonActions[ActionType.GAME_SETUP] = (string _code) => LobbyManager.gameManager.LoadMinigame((GameCodes)Enum.Parse(typeof(GameCodes), _code));
+        buttonActions[ActionType.GAME_SETUP] = (string _code) => {
+            LobbyManager.gameManager.LoadMinigame((GameCodes)Enum.Parse(typeof(GameCodes), _code));
+            ClearScreen();
+            LobbyMenuManager.singleton.PoofPlayers(false);
+            };
         buttonActions[ActionType.CUSTOM_ACTION] = (string _str) => customButtonActions[_str]();
     }
 

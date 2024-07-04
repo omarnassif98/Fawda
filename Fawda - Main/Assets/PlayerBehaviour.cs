@@ -33,8 +33,7 @@ public abstract class PlayerBehaviour : MonoBehaviour
     }
 
     void Update(){
-        if (isMobile)
-        Move();
+        if (isMobile) Move();
         Tick();
     }
     // Update is called once per frame

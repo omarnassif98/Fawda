@@ -66,6 +66,10 @@ public class LobbyMenuManager : MonoBehaviour
     }
 
     public void ShakeEnd(){
+        PoofPlayers(true);
+    }
+
+    public void PoofPlayers(bool _val){
         foreach(LobbyMenuPlayerBehaviour lobbyMenuPlayerBehaviour in lobbyMenuPlayerInstances) if(lobbyMenuPlayerBehaviour != null) lobbyMenuPlayerBehaviour.PoofPlayer(true);
     }
 

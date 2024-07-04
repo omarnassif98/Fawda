@@ -23,7 +23,6 @@ public class Orchestrator : MonoBehaviour
         menuUIHandler = new MenuUIHandler();
         SafeAreaFitter safeAreaFitter = new SafeAreaFitter();
         InitializeProfile();
-        for (int i = 1; i<50;i++) DebugLogger.SourcedPrint("Orchestrator","DM: " + i.ToString(), "FFFF00");
     }
 
     public void RegisterAction(string _key, UnityAction _action) => actionMap[_key] = _action;

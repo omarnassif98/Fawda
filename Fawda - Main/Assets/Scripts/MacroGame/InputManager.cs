@@ -25,7 +25,6 @@ public class InputManager
     }
 
     public void ReceivePoll(byte[] _data, int _idx){
-        DebugLogger.SourcedPrint("Input Manager", "FlASHED");
         GamepadData gamepadData = new GamepadData(_data);
         joypadStates[_idx] = new JoypadState(gamepadData);
         heartbeatEvents[_idx].Invoke();
