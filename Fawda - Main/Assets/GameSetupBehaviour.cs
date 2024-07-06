@@ -9,21 +9,19 @@ public abstract class GameSetupBehaviour
 
     public GameSetupBehaviour(){
         readies = new bool[5];
-        DebugLogger.SourcedPrint("Game Setup (grandfather logic)", "Now accepting readies");
-        ConnectionManager.singleton.RegisterRPC(OpCode.READYUP, ChangeReadyStatus);
+        DebugLogger.SourcedPrint("GameSetup (grandfather logic)", "Now accepting readies");
     }
 
     public abstract void ReadyUp();
 
-    protected abstract void OnReadyStatusChange(int _idx, bool _newVal);
 
     protected void ChangeReadyStatus(byte[] _data, int _idx){
         DebugLogger.SourcedPrint("Game Setup (grandfather logic)", "logic tripped");
         bool newVal = new SimpleBooleanMessage(_data).ready;
         readies[_idx] = newVal;
+        UIManager.RosterManager.SetPlayerRosterBadgeVisibility(_idx, newVal);
         int cumCount = 0;
         foreach(bool r in readies) if (r) cumCount += 1;
-        OnReadyStatusChange(_idx, newVal);
         if (cumCount == LobbyManager.singleton.GetLobbySize()) ReadyUp();
     }
 

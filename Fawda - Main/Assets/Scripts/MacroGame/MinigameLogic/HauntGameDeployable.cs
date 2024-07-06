@@ -2,40 +2,34 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class HauntGameDeployable : DeployableMinigame
+public class HauntGameDeployable : DeployableAsymetricMinigame
 {
-    public HauntHiddenPlayerBehaviour ghostPlayerInstance{get; private set;}
-    public HauntHunterPlayerBehaviour[] hunterPlayerInstances{get; private set;}
     private GameObject hunterPlayerPrefab, ghostPlayerPrefab;
-    int ghostIdx = -1;
-
+    
 
     public HauntGameDeployable(){
-        DebugLogger.singleton.Log("Booyah");
+        DebugLogger.SourcedPrint("HauntGameDeployable","Deployed", "00FFFF");
         hunterPlayerPrefab = Resources.Load("MinigameAssets/Haunt/Prefabs/HunterPlayer") as GameObject;
         ghostPlayerPrefab = Resources.Load("MinigameAssets/Haunt/Prefabs/GhostPlayer") as GameObject;
     }
 
-    public override void SetupGame(Transform _mapWrapper, Dictionary<string, int> _additionalConfig = null)
+
+    public override void SetupGame(Transform _mapWrapper, int _specialityPlayer)
     {
-        DebugLogger.SourcedPrint("Haunt Game Deployable","Deploying", ColorUtility.ToHtmlStringRGB(Color.cyan));
-        int specialityPlayer = _additionalConfig["specialityPlayer"];
-        ghostIdx = specialityPlayer;
+        DebugLogger.SourcedPrint("HauntDeployableInstance", "Setup");
+        base.SetupGame(_mapWrapper, _specialityPlayer);
         ProfileData[] playerProfiles = LobbyManager.players;
-        hunterPlayerInstances = new HauntHunterPlayerBehaviour[LobbyManager.singleton.GetLobbySize() - 1];
+        DebugLogger.SourcedPrint("HauntGameDeployable","Map Generating", ColorUtility.ToHtmlStringRGB(Color.cyan));
         HauntGameMapGenerator waveCollapse = new HauntGameMapGenerator(_mapWrapper);
-        DebugLogger.SourcedPrint("Haunt Game Deployable","Map Generating", ColorUtility.ToHtmlStringRGB(Color.cyan));
         waveCollapse.GenerateFloormap();
-        DebugLogger.SourcedPrint("Haunt Game Deployable","Map Generated", ColorUtility.ToHtmlStringRGB(Color.cyan));
-        DebugLogger.SourcedPrint("Haunt Game Deployable","Special " + specialityPlayer.ToString(), ColorUtility.ToHtmlStringRGB(Color.cyan));
         int currentHunterSpawnPointIdx = 0;
         for(int i = 0; i < playerProfiles.Length; i++){
             if(playerProfiles[i] == null) continue;
-            DebugLogger.SourcedPrint("Haunt Game Deployable","Spawning player " + i.ToString(), ColorUtility.ToHtmlStringRGB(Color.cyan));
-            if(i == specialityPlayer){
-                ghostPlayerInstance = GameObject.Instantiate(ghostPlayerPrefab, waveCollapse.ghostSpawnPoint.position + Vector3.up * (HauntGameMapGenerator.FLOOR_THICKNESS + 0.1f), waveCollapse.ghostSpawnPoint.rotation, _mapWrapper).GetComponent<HauntHiddenPlayerBehaviour>();
+            DebugLogger.SourcedPrint("HauntGameDeployable","Spawning player " + i.ToString(), ColorUtility.ToHtmlStringRGB(Color.cyan));
+            if(i == asymetricPlayerIdx){
+                playerInstances[i] = GameObject.Instantiate(ghostPlayerPrefab, waveCollapse.ghostSpawnPoint.position + Vector3.up * (HauntGameMapGenerator.FLOOR_THICKNESS + 0.1f), waveCollapse.ghostSpawnPoint.rotation, _mapWrapper).GetComponent<HauntHiddenPlayerBehaviour>();
             } else{
-                hunterPlayerInstances[currentHunterSpawnPointIdx] = GameObject.Instantiate(hunterPlayerPrefab, waveCollapse.hunterSpawnPoints[currentHunterSpawnPointIdx].position + Vector3.up * (HauntGameMapGenerator.FLOOR_THICKNESS + 0.1f), waveCollapse.hunterSpawnPoints[currentHunterSpawnPointIdx].rotation, _mapWrapper).GetComponent<HauntHunterPlayerBehaviour>();
+                playerInstances[i] = GameObject.Instantiate(hunterPlayerPrefab, waveCollapse.hunterSpawnPoints[currentHunterSpawnPointIdx].position + Vector3.up * (HauntGameMapGenerator.FLOOR_THICKNESS + 0.1f), waveCollapse.hunterSpawnPoints[currentHunterSpawnPointIdx].rotation, _mapWrapper).GetComponent<HauntHunterPlayerBehaviour>();
                 currentHunterSpawnPointIdx += 1;
             }
             gameInPlay = true;

@@ -4,31 +4,44 @@ using UnityEngine;
 using UnityEngine.Events;
 using TMPro;
 using UnityEngine.UI;
+
 public class RosterUIBehaviour
 {
+
+    //Struct for the actual slot, one per player
     struct PlayerLobbyRosterSlot{
         public TMP_Text playerNameText;
         public Image playerColorImage;
         public Animator rosterAnimator;
+        public Image badge;
         public bool occupied;
+        public int lobbyIdx;
         public PlayerLobbyRosterSlot(Transform _rosterSlot){
             playerColorImage = _rosterSlot.Find("Backdrop").Find("Player Color").GetComponent<Image>();
             playerNameText = playerColorImage.transform.Find("Player Name").GetComponent<TMP_Text>();
             rosterAnimator = _rosterSlot.GetComponent<Animator>();
+            badge = _rosterSlot.Find("Badge").GetComponent<Image>();
+            badge.gameObject.SetActive(false);
             occupied = false;
+            lobbyIdx = -1;
         }
     }
 
-    IEnumerator roulettePlaying;
 
     private PlayerLobbyRosterSlot[] rosterPlayers;
     private short occupationCount = 0;
+
+
+    //The roullete is this randomized way of selecting one random player
+    //It's randomized with a variable length
+    //It has a callback... somewhere 
     private TMP_Text rosterRoulleteTicker;
+    IEnumerator roulettePlaying;
+
+    //Context setting + ticker spawn
     public RosterUIBehaviour(Transform _rosterParent){
         rosterPlayers = new PlayerLobbyRosterSlot[_rosterParent.childCount];
-        for(int i = 0; i <rosterPlayers.Length; i++){
-            rosterPlayers[i] = new PlayerLobbyRosterSlot(_rosterParent.GetChild(i));
-        }
+        for(int i = 0; i <rosterPlayers.Length; i++) rosterPlayers[i] = new PlayerLobbyRosterSlot(_rosterParent.GetChild(i));
         GameObject roulette = new GameObject();
         roulette.transform.parent = _rosterParent;
         rosterRoulleteTicker = roulette.AddComponent<TextMeshProUGUI>();
@@ -40,6 +53,7 @@ public class RosterUIBehaviour
         TidyRoster();
     }
 
+    //Add to first available roster, which will always be the idx of the size of the lobby
     public void AddPlayerToRoster(int _idx){
         if(occupationCount == rosterPlayers.Length){
             DebugLogger.singleton.Log("EYYO Trying to add player when roster is full");
@@ -48,6 +62,7 @@ public class RosterUIBehaviour
         rosterPlayers[occupationCount].occupied = true;
         rosterPlayers[occupationCount].playerColorImage.color = ResourceManager.namedColors[LobbyManager.players[_idx].colorSelection].color;
         rosterPlayers[occupationCount].playerNameText.text = LobbyManager.players[_idx].name;
+        rosterPlayers[occupationCount].lobbyIdx = _idx;
         occupationCount += 1;
         TidyRoster();
     }
@@ -63,10 +78,10 @@ public class RosterUIBehaviour
     }
 
 
-    public Transform GetRosterTransform(int _index){
-        return rosterPlayers[_index].rosterAnimator.transform;
-    }
+    //The roster is ALWAYS gonna be continous from left to right
 
+    //This process will make it so that even if in the lobby players 2 and 3 are in
+    // the roster would show slots 1 and 2 taken respectively (lobbyIdx is important) 
     private void TidyRoster(){
         short[] newIdxs = new short[occupationCount];
         short currIdx = 0;
@@ -81,6 +96,7 @@ public class RosterUIBehaviour
             rosterPlayers[i].occupied = true;
             rosterPlayers[i].playerColorImage.color = rosterPlayers[newIdxs[i]].playerColorImage.color;
             rosterPlayers[i].playerNameText.text = rosterPlayers[newIdxs[i]].playerNameText.text;
+            rosterPlayers[i].lobbyIdx = rosterPlayers[newIdxs[i]].lobbyIdx;
             SetRosterSlotOccupationStatus(i, true);
             SetRosterSlotVisibility(i,true);
         }
@@ -90,8 +106,6 @@ public class RosterUIBehaviour
             SetRosterSlotOccupationStatus(i, false);
             SetRosterSlotVisibility(i,i == occupationCount);
         }
-        DebugLogger.singleton.Log(string.Format("Tidied roster, occCount is {0}", occupationCount));
-
     }
 
     private void SetRosterSlotVisibility(int _idx, bool _visibility){
@@ -101,6 +115,11 @@ public class RosterUIBehaviour
     private void SetRosterSlotOccupationStatus(int _idx, bool _occupationStatus){
         rosterPlayers[_idx].rosterAnimator.SetBool("Occupied", _occupationStatus);
         rosterPlayers[_idx].occupied = _occupationStatus;
+    }
+
+    public void SetPlayerRosterBadgeVisibility(int _idx, bool _visibility)
+    {
+        rosterPlayers[_idx].badge.gameObject.SetActive(_visibility);
     }
 
     public void StartRoulette(){

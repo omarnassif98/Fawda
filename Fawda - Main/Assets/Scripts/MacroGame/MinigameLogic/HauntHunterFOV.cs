@@ -8,9 +8,10 @@ public class HauntHunterFOVHelper {
     const int FOV_RAYS = (int)(FOV_ANGLES * 1.5f);
     MeshFilter playerFOVMesh;
     HauntHunterPlayerBehaviour hauntHunterPlayerBehaviour;
+    HauntGameDeployable deployableInstance;
 
     public HauntHunterFOVHelper(MeshFilter _mesh, HauntHunterPlayerBehaviour _hauntHunterPlayerBehaviour){
-
+        deployableInstance = (HauntGameDeployable)LobbyManager.gameManager.activeMinigame;
         playerFOVMesh = _mesh;
         playerFOVMesh.name = "FOV Mesh";
         playerFOVMesh.mesh = new Mesh();
@@ -21,9 +22,11 @@ public class HauntHunterFOVHelper {
     public IEnumerator FlashFOV(UnityAction _callback){
         playerFOVMesh.gameObject.SetActive(true);
         DrawFOV();
-        if(Vector3.Angle(hauntHunterPlayerBehaviour.transform.forward, ((HauntGameDeployable)(LobbyManager.gameManager.activeMinigame)).ghostPlayerInstance.transform.position - hauntHunterPlayerBehaviour.transform.position) < FOV_ANGLES/2) ((HauntGameDeployable)(LobbyManager.gameManager.activeMinigame)).ghostPlayerInstance.Stun();
+        if(Vector3.Angle(hauntHunterPlayerBehaviour.transform.forward, deployableInstance.playerInstances[deployableInstance.asymetricPlayerIdx].transform.position - hauntHunterPlayerBehaviour.transform.position) < FOV_ANGLES/2) ((HauntHiddenPlayerBehaviour)(deployableInstance.playerInstances[deployableInstance.asymetricPlayerIdx])).Stun();
 
-        foreach(HauntHunterPlayerBehaviour hauntHunter in ((HauntGameDeployable)(LobbyManager.gameManager.activeMinigame)).hunterPlayerInstances){
+        foreach(PlayerBehaviour player in deployableInstance.playerInstances){
+            if (player is HauntHiddenPlayerBehaviour) continue;
+            HauntHunterPlayerBehaviour hauntHunter = (HauntHunterPlayerBehaviour)player;
             if(hauntHunter == hauntHunterPlayerBehaviour || !hauntHunter.isPetrified) continue;
             //DRAW LINE
             if(Vector3.Angle(hauntHunterPlayerBehaviour.transform.forward, hauntHunter.transform.position - hauntHunterPlayerBehaviour.transform.position) < FOV_ANGLES) hauntHunter.StartCoroutine(hauntHunter.Revive());

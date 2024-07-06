@@ -23,6 +23,7 @@ public class GameManager
 
 
     public GameManager(Transform _maptransform){
+        DebugLogger.SourcedPrint("GaameManager", "Awake");
         mapWrapper = _maptransform;
     }
 
@@ -40,9 +41,11 @@ public class GameManager
         DebugLogger.SourcedPrint("GameManager", "Minigame Killed");
     }
 
-    public void ConfigureGame(Dictionary<string,int> _additionalConfig = null){
+    public void ConfigureGame(int _playerIdx = -1)
+    {
         DebugLogger.SourcedPrint("GameManager", "Reset map");
-        activeMinigame.SetupGame(mapWrapper, _additionalConfig);
+        if(activeMinigame is DeployableAsymetricMinigame) ((DeployableAsymetricMinigame)activeMinigame).SetupGame(mapWrapper, _playerIdx);
+        else activeMinigame.SetupGame(mapWrapper);
     }
 
 

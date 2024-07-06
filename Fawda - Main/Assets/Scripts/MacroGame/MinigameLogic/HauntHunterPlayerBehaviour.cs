@@ -64,7 +64,7 @@ public class HauntHunterPlayerBehaviour : PlayerBehaviour
     }
 
     void UpdateStressCondition(){
-        bool isNearGhost = Vector3.Distance(transform.position, ((HauntGameDeployable)LobbyManager.gameManager.activeMinigame).ghostPlayerInstance.transform.position) < 5;
+        bool isNearGhost = Vector3.Distance(transform.position, ((HauntGameDeployable)LobbyManager.gameManager.activeMinigame).playerInstances[((HauntGameDeployable)LobbyManager.gameManager.activeMinigame).asymetricPlayerIdx].transform.position) < 5;
         if(isNearGhost != wasNearGhostLastFrame) HandleStressShift(isNearGhost);
         wasNearGhostLastFrame = isNearGhost;
         if(!isNearGhost) return;
@@ -80,7 +80,7 @@ public class HauntHunterPlayerBehaviour : PlayerBehaviour
 
     void FlushStressMaterial(){
         DebugLogger.SourcedPrint(gameObject.name, "Flushing stress");
-        Material newPlayerMaterial = Vector3.Distance(transform.position, ((HauntGameDeployable)LobbyManager.gameManager.activeMinigame).ghostPlayerInstance.transform.position) < 5?playerStressedMaterial:playerDefaultMaterial;
+        Material newPlayerMaterial = Vector3.Distance(transform.position, ((HauntGameDeployable)LobbyManager.gameManager.activeMinigame).playerInstances[((HauntGameDeployable)LobbyManager.gameManager.activeMinigame).asymetricPlayerIdx].transform.position) < 5?playerStressedMaterial:playerDefaultMaterial;
         playerRenderer.material = newPlayerMaterial;
     }
 

@@ -13,14 +13,24 @@ public class ConnectionManagerTester : Editor
 
         EditorGUILayout.BeginVertical("helpbox");
 
-        if(GUILayout.Button("Add New User")){
-            for(int i = 0; i < LobbyManager.players.Length; i++){
-                if(LobbyManager.players[i] != null) continue;
+        if (GUILayout.Button("Add New User"))
+        {
+            for (int i = 0; i < LobbyManager.players.Length; i++)
+            {
+                if (LobbyManager.players[i] != null) continue;
                 ConnectionManager.singleton.HandlePlayerConnect(i);
                 NetMessage msg = new NetMessage(OpCode.PROFILE_PAYLOAD, new ProfileData("Omar", i).Encode());
-                singleton.QueueRPC(new DirectedNetMessage(msg,i));
+                singleton.QueueRPC(new DirectedNetMessage(msg, i));
                 return;
-                }
+            }
+        }
+        GUILayout.Space(5);
+        EditorGUILayout.EndVertical();
+        EditorGUILayout.BeginVertical("helpbox");
+
+        if (GUILayout.Button("Begin Haunt"))
+        {
+            LobbyManager.gameManager.LoadMinigame(GameCodes.HAUNT);
         }
         GUILayout.Space(5);
         EditorGUILayout.EndVertical();

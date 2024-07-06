@@ -16,6 +16,7 @@ public class HauntGameMapGenerator
     public Transform ghostSpawnPoint;
 
     public HauntGameMapGenerator(Transform _mapTransform){
+        DebugLogger.SourcedPrint("MapGenerator", "Awake");
         mapTransform = _mapTransform;
         floorMats = Resources.LoadAll("MinigameAssets/Haunt/FloorMaterials", typeof(Material));
         wallmat = Resources.Load("MinigameAssets/Haunt/WallMat") as Material;
@@ -23,7 +24,9 @@ public class HauntGameMapGenerator
 
     public void GenerateFloormap(){
         //Wave-like collapse for generation
+        DebugLogger.SourcedPrint("MapGenerator", "Generating");
         mapTransform.eulerAngles = Vector3.zero;
+        DebugLogger.SourcedPrint("MapGenerator", "Go for it");
         int[,] rooms = new int[ROWS,COLS];
         bool[,] explored = new bool[ROWS,COLS];
         int roomNum = 0;

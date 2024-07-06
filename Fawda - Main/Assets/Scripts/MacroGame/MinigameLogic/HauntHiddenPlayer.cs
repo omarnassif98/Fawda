@@ -19,10 +19,12 @@ public class HauntHiddenPlayerBehaviour : PlayerBehaviour
     private Vector2 PullCoord(Vector3 _vec3) => new Vector2(_vec3.x,_vec3.z);
     void CheckForKill(){
         if(isStunned || !isMobile) return;
-        foreach(HauntHunterPlayerBehaviour player in ((HauntGameDeployable)LobbyManager.gameManager.activeMinigame).hunterPlayerInstances){
-            if(player.isPetrified || Vector2.Distance(PullCoord(player.transform.position), PullCoord(transform.position)) > killRadius) continue;
+        foreach(PlayerBehaviour player in ((HauntGameDeployable)LobbyManager.gameManager.activeMinigame).playerInstances){
+            if (player is HauntHiddenPlayerBehaviour) continue;
+            HauntHunterPlayerBehaviour hauntPlayer = (HauntHunterPlayerBehaviour)player;
+            if (hauntPlayer.isPetrified || Vector2.Distance(PullCoord(player.transform.position), PullCoord(transform.position)) > killRadius) continue;
                 print("KILL");
-                StartCoroutine(PetrifyHunter(player));
+                StartCoroutine(PetrifyHunter(hauntPlayer));
         }
     }
 
