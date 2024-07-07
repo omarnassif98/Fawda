@@ -11,8 +11,14 @@ public abstract class PromptedGameSetupBehaviour : GameSetupBehaviour
     public PromptedGameSetupBehaviour() : base()
     {
         DebugLogger.SourcedPrint("PromptedGameSetup (grandfather logic)", "Now waiting for readies");
-        PushPromptForward();
-        ConnectionManager.singleton.RegisterRPC(OpCode.PROMPT_RESPONSE, PromptAnswer);
+        UIManager.RosterManager.rosterEvent.AddListener((val) =>
+        {
+            promptIdx = val;
+            ConnectionManager.singleton.RegisterRPC(OpCode.PROMPT_RESPONSE, PromptAnswer);
+            currentPromptAction = PromptPlayer();
+            LobbyManager.singleton.StartCoroutine(currentPromptAction);
+        });
+        UIManager.RosterManager.StartRoulette();
     }
    
     void PushPromptForward()

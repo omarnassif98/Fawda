@@ -30,6 +30,7 @@ public class RosterUIBehaviour
 
     private PlayerLobbyRosterSlot[] rosterPlayers;
     private short occupationCount = 0;
+    public UnityEvent<int> rosterEvent;
 
 
     //The roullete is this randomized way of selecting one random player
@@ -40,6 +41,7 @@ public class RosterUIBehaviour
 
     //Context setting + ticker spawn
     public RosterUIBehaviour(Transform _rosterParent){
+        rosterEvent = new UnityEvent<int>();
         rosterPlayers = new PlayerLobbyRosterSlot[_rosterParent.childCount];
         for(int i = 0; i <rosterPlayers.Length; i++) rosterPlayers[i] = new PlayerLobbyRosterSlot(_rosterParent.GetChild(i));
         GameObject roulette = new GameObject();
@@ -48,8 +50,9 @@ public class RosterUIBehaviour
         rosterRoulleteTicker.text = "▼";
         rosterRoulleteTicker.rectTransform.sizeDelta = new Vector2(15,15);
         rosterRoulleteTicker.color = Color.red;
+        rosterRoulleteTicker.alignment = TextAlignmentOptions.Center;
         roulette.name = "Ticker";
-        rosterRoulleteTicker.enabled = false;
+        rosterRoulleteTicker.rectTransform.localScale = Vector3.one;
         TidyRoster();
     }
 
@@ -137,6 +140,8 @@ public class RosterUIBehaviour
             SetTickerPosition(rosterPlayers[0].rosterAnimator.transform);
             DebugLogger.SourcedPrint("Roster Roulette", "Just 1?");
             rosterRoulleteTicker.color = Color.yellow;
+            rosterEvent.Invoke(0);
+            DismissRoulette();
             yield break;
         }
 
@@ -157,12 +162,14 @@ public class RosterUIBehaviour
         rosterRoulleteTicker.color = Color.yellow;
         yield return new WaitForSeconds(0.2f);
 
-        roulettePlaying = null;
+        rosterEvent.Invoke(idx);
+        DismissRoulette();
     }
 
     public void DismissRoulette(){
         FlushRoulette();
         rosterRoulleteTicker.enabled = false;
+        rosterEvent.RemoveAllListeners();
     }
 
     private void FlushRoulette(){
@@ -174,7 +181,6 @@ public class RosterUIBehaviour
     }
 
     private void SetTickerPosition(Transform slotTransform){
-        rosterRoulleteTicker.rectTransform.position = slotTransform.position + (Vector3.up * 90);
+        rosterRoulleteTicker.rectTransform.position = slotTransform.position + (Vector3.up * 37.5f);
     }
-
 }
