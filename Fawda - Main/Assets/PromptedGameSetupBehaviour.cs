@@ -53,7 +53,9 @@ public abstract class PromptedGameSetupBehaviour : GameSetupBehaviour
         DebugLogger.SourcedPrint("PromptedGameSetup", "Ghost is client #" + promptIdx, "00FF00");
         //BOOKMARK: INFORMING PLAYERS
         for (int i = 0; i < LobbyManager.singleton.GetLobbySize(); i++) ConnectionManager.singleton.SendMessageToClients(OpCode.READYUP, new SimpleBooleanMessage(i == promptIdx).Encode(), i);
+        LobbyManager.gameManager.ConfigureGame(promptIdx);
         ConnectionManager.singleton.RegisterRPC(OpCode.READYUP, ChangeReadyStatus);
         ConnectionManager.singleton.VacateRPC(OpCode.PROMPT_RESPONSE);
     }
+
 }

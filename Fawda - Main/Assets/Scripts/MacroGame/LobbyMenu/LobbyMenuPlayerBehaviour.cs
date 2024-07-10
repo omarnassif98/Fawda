@@ -13,7 +13,15 @@ public class LobbyMenuPlayerBehaviour : PlayerBehaviour
         hotseat = this;
         playerDefaultMaterial = Resources.Load("Global/Materials/PlayerMat") as Material;
         base.Awake();
+        DioramaControllerBehaviour.singleton.TrackTransform(transform);
     }
+
+    private void OnDestroy()
+    {
+        UntrackCamera();
+    }
+
+    private void UntrackCamera() => DioramaControllerBehaviour.singleton.StopTrackTransform(transform);
 
     // Start is called before the first frame update
     void Start()

@@ -86,5 +86,8 @@ public class DebugSystemsManager : MonoBehaviour
             debugBar.SetActive(!debugBar.activeInHierarchy);
             logger.SetActive(!logger.activeInHierarchy);
         }
+        if (PlayerBehaviour.hotseat == null) return; 
+        NetMessage inp = new NetMessage(OpCode.UDP_GAMEPAD_INPUT, new GamepadData(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")).Encode());
+        ConnectionManager.singleton.QueueRPC(new DirectedNetMessage(inp, PlayerBehaviour.hotseat.idx));
     }
 }

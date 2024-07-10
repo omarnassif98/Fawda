@@ -13,9 +13,12 @@ public abstract class DeployableMinigame
     public Dictionary<string, int> additionalConfig;
     public PlayerBehaviour[] playerInstances;
     public virtual void SetupGame(Transform _mapWrapper){
-        DebugLogger.SourcedPrint("DeployableInstance (grandfather logic)", "Setup");
 
     }
+
+    public virtual void StartGame() => LobbyManager.singleton.StartCoroutine(ShowTutorialIntro());
+
+    protected abstract IEnumerator ShowTutorialIntro();
 
     public virtual void EndGame(){
 

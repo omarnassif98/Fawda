@@ -48,5 +48,7 @@ public class GameManager
         else activeMinigame.SetupGame(mapWrapper);
     }
 
+    public void StartGame() => activeMinigame.StartGame();
+
 
 }

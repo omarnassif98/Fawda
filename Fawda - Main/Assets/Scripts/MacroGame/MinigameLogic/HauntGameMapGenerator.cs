@@ -19,7 +19,7 @@ public class HauntGameMapGenerator
         DebugLogger.SourcedPrint("MapGenerator", "Awake");
         mapTransform = _mapTransform;
         floorMats = Resources.LoadAll("MinigameAssets/Haunt/FloorMaterials", typeof(Material));
-        wallmat = Resources.Load("MinigameAssets/Haunt/WallMat") as Material;
+        wallmat = Resources.Load("MinigameAssets/Haunt/Materials/WallMat") as Material;
     }
 
     public void GenerateFloormap(){
@@ -49,6 +49,7 @@ public class HauntGameMapGenerator
         //Also sets up the spawn points
         for(int i = 0; i < rooms.GetLength(0); i++){ //Down to Up
             for(int j = 0; j < rooms.GetLength(1); j++){//Left to Right
+
                 List<GameObject> walls = SetupRoomWalls(rooms, new Vector2Int(j,i)); //Set up walls, each room handles their lower and right walls
                 if(rooms[i,j] == -1) continue; //Empty rooms technically have walls, but no floor, so skip
                 GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
@@ -107,18 +108,14 @@ public class HauntGameMapGenerator
                 GenerateWall(_coordinate, Vector2Int.left, false);
                 break;
             case ROWS - 1: //Add right wall if it's periphery
-                foreach(GameObject wall in GenerateWall(_coordinate, Vector2Int.right, false)){
-                    roomWalls.Add(wall);
-                }
+                foreach (GameObject wall in GenerateWall(_coordinate, Vector2Int.right, false)) roomWalls.Add(wall);
                 break;
         }
 
         switch (_coordinate.y)
         {
             case 0: //Add bottom wall if it's a periphery
-                foreach(GameObject wall in GenerateWall(_coordinate, Vector2Int.down, false)){
-                    roomWalls.Add(wall);
-                }
+                foreach (GameObject wall in GenerateWall(_coordinate, Vector2Int.down, false)) roomWalls.Add(wall);
                 break;
             case COLS - 1:
                 GenerateWall(_coordinate, Vector2Int.up, false);
@@ -126,6 +123,9 @@ public class HauntGameMapGenerator
         }
         return roomWalls;
     }
+
+
+
 
     List<GameObject> GenerateWall(Vector2Int _coordinate, Vector2Int _dir, bool _doored = true){
         List<GameObject> wallParts = new List<GameObject>();//if doors have walls, it's 2 game objects
@@ -158,7 +158,7 @@ public class HauntGameMapGenerator
                 wallParts.Add(wallPartR);
 
                 break;
-            case false: //door does not exist, it is a periphery wall
+            case false: //door does not exist
                 GameObject wall = GameObject.CreatePrimitive(PrimitiveType.Cube);
                 wall.transform.localScale = new Vector3(_dir.x == 0?ROOM_SIZE:WALL_THICKNESS, 3, _dir.y ==0?ROOM_SIZE:WALL_THICKNESS);
                 wall.transform.position = new Vector3(ROOM_SIZE * (_coordinate.x-1) + (_dir.x * ROOM_SIZE/2), 1.5f, ROOM_SIZE * (_coordinate.y-1) + (_dir.y * ROOM_SIZE/2));
@@ -173,6 +173,9 @@ public class HauntGameMapGenerator
         }
         return wallParts;
     }
+
+
+
     int GetHighestNeighbor(ref bool[,] _explorationMap, ref int[,] roomMap, ref Stack<Vector2Int> _stack, Vector2Int _coordinate){
         Vector2Int[] potential = new Vector2Int[]{
             _coordinate + Vector2Int.left,

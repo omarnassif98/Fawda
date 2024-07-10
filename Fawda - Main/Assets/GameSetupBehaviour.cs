@@ -12,7 +12,7 @@ public abstract class GameSetupBehaviour
         DebugLogger.SourcedPrint("GameSetup (grandfather logic)", "Now accepting readies");
     }
 
-    public abstract void ReadyUp();
+    public virtual void ReadyUp() => LobbyManager.gameManager.StartGame();
 
 
     protected void ChangeReadyStatus(byte[] _data, int _idx){

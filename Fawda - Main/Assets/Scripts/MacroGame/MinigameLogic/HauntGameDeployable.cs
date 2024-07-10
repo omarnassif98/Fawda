@@ -32,8 +32,13 @@ public class HauntGameDeployable : DeployableAsymetricMinigame
                 playerInstances[i] = GameObject.Instantiate(hunterPlayerPrefab, waveCollapse.hunterSpawnPoints[currentHunterSpawnPointIdx].position + Vector3.up * (HauntGameMapGenerator.FLOOR_THICKNESS + 0.1f), waveCollapse.hunterSpawnPoints[currentHunterSpawnPointIdx].rotation, _mapWrapper).GetComponent<HauntHunterPlayerBehaviour>();
                 currentHunterSpawnPointIdx += 1;
             }
-            gameInPlay = true;
         }
     }
 
+    protected override IEnumerator ShowTutorialIntro()
+    {
+        DebugLogger.SourcedPrint("HauntGameDeployable", "Tutorial start");
+        yield return new WaitForSecondsRealtime(1.5f);
+        DebugLogger.SourcedPrint("HauntGameDeployable", "Tutorial end");
+    }
 }

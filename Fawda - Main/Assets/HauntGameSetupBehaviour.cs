@@ -9,6 +9,6 @@ public class HauntGameSetupBehaviour : PromptedGameSetupBehaviour
     {
         DebugLogger.SourcedPrint("HauntGameSetup","All Ready");
         ConnectionManager.singleton.VacateRPC(OpCode.READYUP);
-        LobbyManager.gameManager.ConfigureGame(promptIdx);
+        base.ReadyUp();
     }
 }

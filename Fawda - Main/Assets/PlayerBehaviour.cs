@@ -12,12 +12,13 @@ public abstract class PlayerBehaviour : MonoBehaviour
     protected Material playerDefaultMaterial;
     protected Renderer playerRenderer;
     private ParticleSystem smokeEmitter;
-    private int idx;
+    public int idx { get; private set; }
 
     protected virtual void Awake(){
         playerDefaultMaterial = Resources.Load("Global/Materials/PlayerMat") as Material;
         playerRenderer = transform.Find("PlayerRenderer").GetComponent<Renderer>();
         smokeEmitter = transform.Find("Smoke Particles").GetComponent<ParticleSystem>();
+
     }
 
     public void Initialize(int _idx){

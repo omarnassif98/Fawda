@@ -60,6 +60,7 @@ public class GamepadData : SynapseDatastruct{
     public GamepadData(float _xInput, float _yInput){
         this.xInput = _xInput;
         this.yInput = _yInput;
+        this.additionalInfo = BitConverter.GetBytes(false);
     }
 
     public GamepadData(float _xInput, float _yInput, bool _action){
