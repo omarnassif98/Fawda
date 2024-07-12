@@ -20,19 +20,23 @@ public class DioramaControllerBehaviour : MonoBehaviour
         }
     }
     private bool dioramaMode = true;
+    
     RigidCamPos restingCamPos = new RigidCamPos(new Vector3(0, 20, -40), new Vector3(25, 0, 0), 34),
         dioramaCamPos = new RigidCamPos(new Vector3(0, 15, -15), new Vector3(40, 0, 0), 25),
         idealCamPos;
 
     private List<Transform> trackedTransforms = new List<Transform>();
+    Transform checkerboardCanvas;
     public static DioramaControllerBehaviour singleton;
     private Camera cam;
+    const float MIN_ZOOM = 7.5f, ZOOM_BUFFER = 2.5f;
 
     public void Awake()
     {
         if (singleton != null) Destroy(gameObject);
         singleton = this;
         cam = GetComponent<Camera>();
+        checkerboardCanvas = GameObject.Find("Checkerboard").transform;
     }
 
     public void Start()
@@ -60,8 +64,8 @@ public class DioramaControllerBehaviour : MonoBehaviour
     {
         Bounds bounds = new Bounds(trackedTransforms[0].position, Vector3.zero);
         foreach (Transform t in trackedTransforms) bounds.Encapsulate(t.position);
-        float maxDist = MathF.Max(bounds.size.x, bounds.size.z) + 5;
-        UpdateIdealPos(new RigidCamPos(bounds.center + new Vector3(0,5,-5), new Vector3(40, 0, 0), maxDist));
+        float bufferedZoom = MathF.Max(bounds.size.x, bounds.size.z) + ZOOM_BUFFER;
+        UpdateIdealPos(new RigidCamPos(bounds.center + new Vector3(0,5,-5), new Vector3(40, 0, 0), Mathf.Max(bufferedZoom, MIN_ZOOM)));
     }
 
     void LateUpdate(){

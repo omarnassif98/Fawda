@@ -38,7 +38,7 @@ public class BackgroundBehaviour : MonoBehaviour
         realDriftAngle = idealDriftAngle;
         driftDir = new Vector2(Mathf.Cos(Mathf.Deg2Rad * realDriftAngle), Mathf.Sin(Mathf.Deg2Rad * realDriftAngle));
         center = images[4].GetComponent<RectTransform>();
-        posOffset = transform.parent.GetComponent<CanvasScaler>().referenceResolution;
+        posOffset =GetComponent <CanvasScaler>().referenceResolution;
         for(int i = 0; i < images.Length; i++){
             images[i].sprite = backgroundImage;
             images[i].GetComponent<RectTransform>().sizeDelta = posOffset;
@@ -117,13 +117,12 @@ public class BackgroundBehaviour : MonoBehaviour
 
         realDriftAngle = idealDriftAngle + Mathf.Sin(Time.time/4) * 30;
         driftDir = new Vector2(Mathf.Cos(Mathf.Deg2Rad * realDriftAngle), Mathf.Sin(Mathf.Deg2Rad * realDriftAngle));
-        Vector2 right = center.right;
-        Vector2 up = center.up;
         center.anchoredPosition += driftDir * realDriftSpeed * Time.deltaTime;
 
         for(int i = 0; i < images.Length; i++){
             images[i].color = new Color(images[i].color.r, images[i].color.g, images[i].color.b, realCheckerboardOpacity);
-            images[i].GetComponent<RectTransform>().anchoredPosition = center.anchoredPosition + right * Vector2.Scale(offsetMultipliers[i],posOffset).x + up * Vector2.Scale(offsetMultipliers[i],posOffset).y;
+            DebugLogger.SourcedPrint("Checkerboard", String.Format("x: {0} y: {1}", center.sizeDelta.x, center.sizeDelta.y));
+            images[i].GetComponent<RectTransform>().anchoredPosition = center.anchoredPosition + Vector2.right * Vector2.Scale(offsetMultipliers[i],center.sizeDelta).x + Vector2.up * Vector2.Scale(offsetMultipliers[i],center.sizeDelta).y;
         }
         RestructureScreens();
     }
