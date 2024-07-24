@@ -18,11 +18,14 @@ public abstract class DeployableMinigame
 
     public virtual void StartGame() => LobbyManager.singleton.StartCoroutine(ShowTutorialIntro());
 
+    public virtual void EndGame() => LobbyManager.singleton.StartCoroutine(WindDownGame());
+
     protected abstract IEnumerator ShowTutorialIntro();
 
-    public virtual void EndGame(){
+    protected abstract IEnumerator WindDownGame();
 
-    }
+
+
 
 
 }

@@ -168,7 +168,6 @@ public class RosterUIBehaviour
 
     public void DismissRoulette(){
         FlushRoulette();
-        rosterRoulleteTicker.enabled = false;
         rosterEvent.RemoveAllListeners();
     }
 
@@ -180,7 +179,13 @@ public class RosterUIBehaviour
 
     }
 
-    private void SetTickerPosition(Transform slotTransform){
+    private void SetTickerPosition(Transform slotTransform)
+    {
         rosterRoulleteTicker.rectTransform.position = slotTransform.position + (Vector3.up * 37.5f);
+    }
+
+    public void SetTickerPosition(int _idx)
+    {
+        SetTickerPosition(rosterPlayers[_idx].rosterAnimator.transform);
     }
 }

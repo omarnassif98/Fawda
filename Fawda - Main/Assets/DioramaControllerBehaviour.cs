@@ -22,14 +22,14 @@ public class DioramaControllerBehaviour : MonoBehaviour
     private bool dioramaMode = true;
     
     RigidCamPos restingCamPos = new RigidCamPos(new Vector3(0, 20, -40), new Vector3(25, 0, 0), 34),
-        dioramaCamPos = new RigidCamPos(new Vector3(0, 15, -15), new Vector3(40, 0, 0), 25),
+        dioramaCamPos = new RigidCamPos(new Vector3(0, 15, -15), new Vector3(35, 0, 0), 25),
         idealCamPos;
 
     private List<Transform> trackedTransforms = new List<Transform>();
     Transform checkerboardCanvas;
     public static DioramaControllerBehaviour singleton;
     private Camera cam;
-    const float MIN_ZOOM = 7.5f, ZOOM_BUFFER = 2.5f;
+    const float MIN_ZOOM = 12.5f, ZOOM_BUFFER = 2.5f;
 
     public void Awake()
     {
@@ -70,8 +70,8 @@ public class DioramaControllerBehaviour : MonoBehaviour
 
     void LateUpdate(){
         UpdateCameraPosition();
-        if (dioramaMode || trackedTransforms.Count == 0) return;
-        CalculateTrackPos();
+        if (dioramaMode || trackedTransforms.Count == 0) idealCamPos = dioramaCamPos;
+        else CalculateTrackPos();
     }
 
    

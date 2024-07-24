@@ -55,14 +55,14 @@ public class FloorButtonBehaviour : MonoBehaviour
     }
 
     void OnTriggerEnter(Collider _obj){
-        if(_obj.tag != "playerCollider") return;
+        if(!_obj.GetComponent<PlayerBehaviour>()) return;
         activations ++;
         OnOccupancy();
         ResetTime();
     }
 
     void OnTriggerExit(Collider _obj){
-        if(_obj.tag != "playerCollider") return;
+        if(!_obj.GetComponent<PlayerBehaviour>()) return;
         activations --;
         OnOccupancy();
         ResetTime();

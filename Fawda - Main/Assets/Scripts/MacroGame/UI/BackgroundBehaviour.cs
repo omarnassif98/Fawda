@@ -121,7 +121,6 @@ public class BackgroundBehaviour : MonoBehaviour
 
         for(int i = 0; i < images.Length; i++){
             images[i].color = new Color(images[i].color.r, images[i].color.g, images[i].color.b, realCheckerboardOpacity);
-            DebugLogger.SourcedPrint("Checkerboard", String.Format("x: {0} y: {1}", center.sizeDelta.x, center.sizeDelta.y));
             images[i].GetComponent<RectTransform>().anchoredPosition = center.anchoredPosition + Vector2.right * Vector2.Scale(offsetMultipliers[i],center.sizeDelta).x + Vector2.up * Vector2.Scale(offsetMultipliers[i],center.sizeDelta).y;
         }
         RestructureScreens();

@@ -39,6 +39,15 @@ public class HauntGameDeployable : DeployableAsymetricMinigame
     {
         DebugLogger.SourcedPrint("HauntGameDeployable", "Tutorial start");
         yield return new WaitForSecondsRealtime(1.5f);
+        gameInPlay = true;
         DebugLogger.SourcedPrint("HauntGameDeployable", "Tutorial end");
+    }
+
+    protected override IEnumerator WindDownGame()
+    {
+        gameInPlay = false;
+        DebugLogger.SourcedPrint("Haunt", "END");
+        yield return new WaitForSecondsRealtime(2.3f);
+        DioramaControllerBehaviour.singleton.SetCameraMode(false);
     }
 }

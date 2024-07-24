@@ -24,8 +24,10 @@ public abstract class PromptedGameSetupBehaviour : GameSetupBehaviour
     void PushPromptForward()
     {
         promptIdx = (promptIdx + 1) % LobbyManager.singleton.GetLobbySize();
+        UIManager.RosterManager.SetTickerPosition(promptIdx);
         currentPromptAction = PromptPlayer();
         LobbyManager.singleton.StartCoroutine(currentPromptAction);
+
     }
 
 

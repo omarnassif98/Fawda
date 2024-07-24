@@ -50,5 +50,7 @@ public class GameManager
 
     public void StartGame() => activeMinigame.StartGame();
 
+    public void EndMinigame() => activeMinigame.EndGame();
+
 
 }

@@ -70,7 +70,8 @@ public class LobbyMenuManager : MonoBehaviour
     }
 
     public void PoofPlayers(bool _val){
-        foreach(LobbyMenuPlayerBehaviour lobbyMenuPlayerBehaviour in lobbyMenuPlayerInstances) if(lobbyMenuPlayerBehaviour != null) lobbyMenuPlayerBehaviour.PoofPlayer(true);
+        foreach(LobbyMenuPlayerBehaviour lobbyMenuPlayerBehaviour in lobbyMenuPlayerInstances) if(lobbyMenuPlayerBehaviour != null) lobbyMenuPlayerBehaviour.PoofPlayer(_val);
+        DioramaControllerBehaviour.singleton.SetCameraMode(_val);
     }
 
 }
