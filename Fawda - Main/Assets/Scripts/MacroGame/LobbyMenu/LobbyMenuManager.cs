@@ -7,6 +7,7 @@ using UnityEngine.Events;
 public class LobbyMenuManager : MonoBehaviour
 {
     GameObject lobbyMenuPlayerPrefab;
+    ParticleSystem bigPoof;
     LobbyMenuPlayerBehaviour[] lobbyMenuPlayerInstances;
     Animator snowglobeAnimator;
     Transform buttonParent;
@@ -33,6 +34,7 @@ public class LobbyMenuManager : MonoBehaviour
         lobbyMenuPlayerPrefab = Resources.Load("Global/Prefabs/LobbyMenuPlayer") as GameObject;
         buttonParent = transform.Find("LobbyUIManager");
         gustEvent = new UnityEvent();
+        bigPoof = transform.Find("Big Poof").GetComponent<ParticleSystem>();
         DebugLogger.SourcedPrint("LobbyMenuManager","Awake");
 
     }
@@ -72,6 +74,12 @@ public class LobbyMenuManager : MonoBehaviour
     public void PoofPlayers(bool _val){
         foreach(LobbyMenuPlayerBehaviour lobbyMenuPlayerBehaviour in lobbyMenuPlayerInstances) if(lobbyMenuPlayerBehaviour != null) lobbyMenuPlayerBehaviour.PoofPlayer(_val);
         DioramaControllerBehaviour.singleton.SetCameraMode(_val);
+    }
+
+    public void PoofLobby()
+    {
+        bigPoof.Clear();
+        bigPoof.Play();
     }
 
 }

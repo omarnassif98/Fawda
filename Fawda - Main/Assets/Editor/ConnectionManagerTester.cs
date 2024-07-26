@@ -19,7 +19,7 @@ public class ConnectionManagerTester : Editor
             {
                 if (LobbyManager.players[i] != null) continue;
                 ConnectionManager.singleton.HandlePlayerConnect(i);
-                NetMessage msg = new NetMessage(OpCode.PROFILE_PAYLOAD, new ProfileData("Omar", i).Encode());
+                NetMessage msg = new NetMessage(OpCode.PROFILE_PAYLOAD, new ProfileData("Chloe", i).Encode());
                 singleton.QueueRPC(new DirectedNetMessage(msg, i));
                 return;
             }

@@ -4,7 +4,7 @@ using TMPro;
 using System.Collections.Generic;
 using UnityEngine.UI;
 using System.Collections;
-
+using System.Linq;
 public class UIManager : MonoBehaviour
 {
 
@@ -15,9 +15,9 @@ public class UIManager : MonoBehaviour
     public static RosterUIBehaviour RosterManager;
     public static BlackoutBehaviour blackoutBehaviour;
     private TMP_Text countdownText, bannerText;
-    List<string> bannerMessages;
     int bannerMessageIdx = -1;
-    IEnumerator messageCycle;
+    IEnumerator messageCycle, flashEvent;
+    Dictionary<string, bannerWord> bannerMessages = new Dictionary<string, bannerWord>();
 
     void Awake(){
         if(singleton != null){
@@ -29,7 +29,6 @@ public class UIManager : MonoBehaviour
         countdownText = transform.Find("Countdown").GetComponent<TMP_Text>();
         blackoutBehaviour = GameObject.FindObjectOfType<BlackoutBehaviour>();
         bannerText = transform.Find("Banner").Find("Text").GetComponent<TMP_Text>();
-        bannerMessages = new List<string>();
 
     }
     // Start is called before the first frame update
@@ -38,6 +37,7 @@ public class UIManager : MonoBehaviour
         ConnectionManager.singleton.RegisterServerEventListener("listen", () => { AddBannerMessage(ConnectionManager.singleton.GetRoomCode()); });
         ConnectionManager.singleton.RegisterServerEventListener("listen", () => { AddBannerMessage("Join Now"); });
         LobbyManager.singleton.playerJoinEvent.AddListener(RosterManager.AddPlayerToRoster);
+        ConnectionManager.singleton.RegisterServerEventListener("wakeup", () => FlashMessage("Lets Get This Party Started", 0.25f));
 
     }
 
@@ -47,13 +47,9 @@ public class UIManager : MonoBehaviour
         countdownText.text = _digits.ToString();
     }
 
-
-
-
-
-    public void AddBannerMessage(string _message)
+    public void AddBannerMessage(string _message, float _flashTime = 3)
     {
-        bannerMessages.Add(_message);
+        bannerMessages[_message] = new bannerWord(_message, _flashTime);
         RecalculateBannerVisibility();
     }
 
@@ -77,7 +73,7 @@ public class UIManager : MonoBehaviour
             StopCoroutine(messageCycle);
             messageCycle = null;
             return;
-        }else if(messageCycle == null)
+        }else if(messageCycle == null && flashEvent == null)
         {
             messageCycle = CycleBannerMessageIdx();
             StartCoroutine(messageCycle);
@@ -89,10 +85,51 @@ public class UIManager : MonoBehaviour
     {
         DebugLogger.SourcedPrint("Banner", "cycle");
         bannerMessageIdx = (bannerMessageIdx + 1) % bannerMessages.Count;
-        bannerText.text = bannerMessages[bannerMessageIdx];
-        yield return new WaitForSeconds(3);
+        bannerText.text = bannerMessages.ElementAt(bannerMessageIdx).Value.word;
+        yield return new WaitForSeconds(bannerMessages.ElementAt(bannerMessageIdx).Value.flashTime);
         messageCycle = CycleBannerMessageIdx();
         StartCoroutine(messageCycle);
+    }
+
+    Queue<bannerWord> flashQueue = new Queue<bannerWord>();
+
+    public void FlashMessage(string _message, float _flashTime = 5)
+    {
+        foreach (string word in _message.Split(' ')) flashQueue.Enqueue(new bannerWord(word, _flashTime));
+        if (flashEvent != null) return;
+        flashEvent = EmptyFlashQueue();
+        StartCoroutine(flashEvent);
+    }
+
+    struct bannerWord
+    {
+        public string word;
+        public float flashTime;
+        public bannerWord(string _word, float _flashTime)
+        {
+            word = _word;
+            flashTime = _flashTime;
+        }
+
+    }
+    IEnumerator EmptyFlashQueue()
+    {
+        if (messageCycle != null)
+        {
+            StopCoroutine(messageCycle);
+            messageCycle = null;
+        }
+
+        while(flashQueue.Count > 0)
+        {
+            bannerWord currentWord = flashQueue.Dequeue();
+            bannerText.text = currentWord.word;
+            yield return new WaitForSeconds(currentWord.flashTime);
+        }
+        flashEvent = null;
+        messageCycle = CycleBannerMessageIdx();
+        StartCoroutine(messageCycle);
+
     }
     // Update is called once per frame
 

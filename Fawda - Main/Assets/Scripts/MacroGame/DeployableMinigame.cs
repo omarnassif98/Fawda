@@ -13,7 +13,7 @@ public abstract class DeployableMinigame
     public Dictionary<string, int> additionalConfig;
     public PlayerBehaviour[] playerInstances;
     public virtual void SetupGame(Transform _mapWrapper){
-
+        LobbyMenuManager.singleton.PoofLobby();
     }
 
     public virtual void StartGame() => LobbyManager.singleton.StartCoroutine(ShowTutorialIntro());

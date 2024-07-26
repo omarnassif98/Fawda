@@ -17,6 +17,7 @@ public class HauntGameDeployable : DeployableAsymetricMinigame
     public override void SetupGame(Transform _mapWrapper, int _specialityPlayer)
     {
         DebugLogger.SourcedPrint("HauntDeployableInstance", "Setup");
+
         base.SetupGame(_mapWrapper, _specialityPlayer);
         ProfileData[] playerProfiles = LobbyManager.players;
         DebugLogger.SourcedPrint("HauntGameDeployable","Map Generating", ColorUtility.ToHtmlStringRGB(Color.cyan));
