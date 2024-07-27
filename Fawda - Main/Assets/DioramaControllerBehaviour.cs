@@ -42,15 +42,20 @@ public class DioramaControllerBehaviour : MonoBehaviour
     public void Start()
     {
         idealCamPos = restingCamPos;
-        ConnectionManager.singleton.RegisterServerEventListener("wakeup",() => { SetCameraMode(false); });
+        ConnectionManager.singleton.RegisterServerEventListener("wakeup",() =>SetCameraMode(false));
     }
 
     public void TrackTransform(Transform _toTrack) => trackedTransforms.Add(_toTrack);
 
     public void StopTrackTransform(Transform _untrack) => trackedTransforms.Remove(_untrack);
 
-    public void SetCameraMode(bool _diorama) => dioramaMode = _diorama;
+    public void SetCameraMode(bool _diorama)
+    {
+        DebugLogger.SourcedPrint("Camera", "Changing camera mode: " + _diorama.ToString(), "007700");
+        dioramaMode = _diorama;
+        DebugLogger.SourcedPrint("Camera", "Diorama: " + dioramaMode.ToString(), "007700");
 
+    }
     void UpdateIdealPos(RigidCamPos _pos) => idealCamPos = _pos;
 
     void UpdateCameraPosition(){

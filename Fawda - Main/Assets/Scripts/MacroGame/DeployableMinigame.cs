@@ -12,13 +12,18 @@ public abstract class DeployableMinigame
     public bool gameInPlay = false;
     public Dictionary<string, int> additionalConfig;
     public PlayerBehaviour[] playerInstances;
-    public virtual void SetupGame(Transform _mapWrapper){
-        LobbyMenuManager.singleton.PoofLobby();
-    }
+    protected Transform transform;
+
+    public virtual void LoadMap() => LobbyMenuManager.singleton.PoofLobby();
+
+    public abstract void SpawnPlayers();
 
     public virtual void StartGame() => LobbyManager.singleton.StartCoroutine(ShowTutorialIntro());
 
     public virtual void EndGame() => LobbyManager.singleton.StartCoroutine(WindDownGame());
+
+
+    protected void LocateMapTransform() => transform = LobbyManager.gameManager.mapWrapper;
 
     protected abstract IEnumerator ShowTutorialIntro();
 

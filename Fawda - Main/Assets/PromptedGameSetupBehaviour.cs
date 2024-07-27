@@ -10,8 +10,8 @@ public abstract class PromptedGameSetupBehaviour : GameSetupBehaviour
 
     public PromptedGameSetupBehaviour() : base()
     {
-        UIManager.singleton.FlashMessage("One of Y'all is gonna be picked", 0.25f);
-        UIManager.singleton.AddBannerMessage("Who's first?");
+        UIManager.bannerUIBehaviour.FlashMessage("One of Y'all is gonna be picked", 0.25f);
+        UIManager.bannerUIBehaviour.AddBannerMessage("Who's first?");
         DebugLogger.SourcedPrint("PromptedGameSetup (grandfather logic)", "Now waiting for readies");
         UIManager.RosterManager.rosterEvent.AddListener((val) =>
         {
@@ -37,12 +37,12 @@ public abstract class PromptedGameSetupBehaviour : GameSetupBehaviour
     {
         DebugLogger.SourcedPrint("PromptedGameSetup", "Sending prompt to client " + promptIdx);
         //BOOKMARK: PROMPT
-        UIManager.singleton.ClearBannerMessage();
+        UIManager.bannerUIBehaviour.ClearBannerMessage();
         string name = LobbyManager.players[promptIdx].name;
-        UIManager.singleton.AddBannerMessage(name, 1);
-        UIManager.singleton.AddBannerMessage("Check", 0.25f);
-        UIManager.singleton.AddBannerMessage("Your", 0.25f);
-        UIManager.singleton.AddBannerMessage("Phone", 1);
+        UIManager.bannerUIBehaviour.AddBannerMessage(name, 1);
+        UIManager.bannerUIBehaviour.AddBannerMessage("Check", 0.25f);
+        UIManager.bannerUIBehaviour.AddBannerMessage("Your", 0.25f);
+        UIManager.bannerUIBehaviour.AddBannerMessage("Phone", 1);
 
         ConnectionManager.singleton.SendMessageToClients(OpCode.PROMPT_RESPONSE, new SimpleBooleanMessage(true).Encode(), promptIdx);
         yield return new WaitForSeconds(7.5f);
@@ -63,8 +63,8 @@ public abstract class PromptedGameSetupBehaviour : GameSetupBehaviour
         promptIdx = _idx; //I mean just in case a race condition happens
         DebugLogger.SourcedPrint("PromptedGameSetup", "Ghost is client #" + promptIdx, "00FF00");
         //BOOKMARK: INFORMING PLAYERS
-        UIManager.singleton.ClearBannerMessage();
-        UIManager.singleton.AddBannerMessage("Ready?", 0.5f);
+        UIManager.bannerUIBehaviour.ClearBannerMessage();
+        UIManager.bannerUIBehaviour.AddBannerMessage("Ready?", 0.5f);
         for (int i = 0; i < LobbyManager.singleton.GetLobbySize(); i++) ConnectionManager.singleton.SendMessageToClients(OpCode.READYUP, new SimpleBooleanMessage(i == promptIdx).Encode(), i);
         LobbyManager.gameManager.ConfigureGame(promptIdx);
         ConnectionManager.singleton.RegisterRPC(OpCode.READYUP, ChangeReadyStatus);

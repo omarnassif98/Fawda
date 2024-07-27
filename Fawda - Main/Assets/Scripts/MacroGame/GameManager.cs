@@ -14,7 +14,7 @@ public class GameManager
 
     public GameSetupBehaviour activeMinigameSetup {get; private set;}
     public DeployableMinigame activeMinigame {get; private set;}
-    Transform mapWrapper;
+    public Transform mapWrapper { get; private set; }
 
     [HideInInspector]
     public UnityEvent GameStartEvent = new UnityEvent(), GameEndEvent = new UnityEvent(), GamePauseEvent = new UnityEvent();
@@ -23,16 +23,20 @@ public class GameManager
 
 
     public GameManager(Transform _maptransform){
-        DebugLogger.SourcedPrint("GaameManager", "Awake");
+        DebugLogger.SourcedPrint("GameManager", "Awake");
         mapWrapper = _maptransform;
     }
 
     public void LoadMinigame(GameCodes _gamecode){
         if(activeMinigame != null) return;
+
+        DioramaControllerBehaviour.singleton.SetCameraMode(true);
         Tuple<Type,Type> gameInfo = minigameLookup[_gamecode];
         activeMinigame = (DeployableMinigame)Activator.CreateInstance(gameInfo.Item1);
+        activeMinigame.LoadMap();
         activeMinigameSetup = (GameSetupBehaviour)Activator.CreateInstance(gameInfo.Item2);
         ConnectionManager.singleton.SendMessageToClients(OpCode.GAMESETUP, (int)GameCodes.HAUNT);
+
         DebugLogger.SourcedPrint("GameManager",string.Format("Minigame Loaded - {0}",Enum.GetName(typeof(GameCodes),_gamecode)));
     }
 
@@ -44,8 +48,8 @@ public class GameManager
     public void ConfigureGame(int _playerIdx = -1)
     {
         DebugLogger.SourcedPrint("GameManager", "Reset map");
-        if(activeMinigame is DeployableAsymetricMinigame) ((DeployableAsymetricMinigame)activeMinigame).SetupGame(mapWrapper, _playerIdx);
-        else activeMinigame.SetupGame(mapWrapper);
+        if(activeMinigame is DeployableAsymetricMinigame) ((DeployableAsymetricMinigame)activeMinigame).RegisterAsymetricPlayer(_playerIdx);
+        activeMinigame.SpawnPlayers();
     }
 
     public void StartGame() => activeMinigame.StartGame();

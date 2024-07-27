@@ -47,13 +47,11 @@ public class LobbyMenuManager : MonoBehaviour
         ConnectionManager.singleton.RegisterEphemeralServerEvent("wakeup", () => snowfallParticles.Stop());
     }
 
-    public void ShakeSnowGlobe(){
-        foreach(LobbyMenuPlayerBehaviour playerBehaviour in lobbyMenuPlayerInstances) if(playerBehaviour != null) playerBehaviour.PoofPlayer(false);
-        snowglobeAnimator.SetTrigger("Shake");
-    }
+    
 
     [ContextMenu("Gust")]
     public void TriggerSnowGust(){
+
         gustEvent.Invoke();
         snowgustParticles.Clear();
         snowgustParticles.Play();
@@ -71,9 +69,17 @@ public class LobbyMenuManager : MonoBehaviour
         PoofPlayers(true);
     }
 
-    public void PoofPlayers(bool _val){
-        foreach(LobbyMenuPlayerBehaviour lobbyMenuPlayerBehaviour in lobbyMenuPlayerInstances) if(lobbyMenuPlayerBehaviour != null) lobbyMenuPlayerBehaviour.PoofPlayer(_val);
-        DioramaControllerBehaviour.singleton.SetCameraMode(_val);
+    public void PoofPlayers(bool _val)
+    {
+        foreach (LobbyMenuPlayerBehaviour lobbyMenuPlayerBehaviour in lobbyMenuPlayerInstances) if (lobbyMenuPlayerBehaviour != null)
+            {
+                lobbyMenuPlayerBehaviour.PoofPlayer(_val);
+                if (!_val)
+                {
+                    DioramaControllerBehaviour.singleton.StopTrackTransform(lobbyMenuPlayerBehaviour.transform);
+                    continue;
+                }
+            }
     }
 
     public void PoofLobby()

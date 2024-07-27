@@ -10,7 +10,7 @@ public abstract class GameSetupBehaviour
     public GameSetupBehaviour(){
         readies = new bool[5];
         DebugLogger.SourcedPrint("GameSetup (grandfather logic)", "Now accepting readies");
-        UIManager.singleton.ClearBannerMessage();
+        UIManager.bannerUIBehaviour.ClearBannerMessage();
     }
 
     public virtual void ReadyUp() => LobbyManager.gameManager.StartGame();
@@ -26,8 +26,8 @@ public abstract class GameSetupBehaviour
         foreach(bool r in readies) if (r) cumCount += 1;
         if (cumCount != LobbyManager.singleton.GetLobbySize())
             return;
-        UIManager.singleton.ClearBannerMessage();
-        UIManager.singleton.AddBannerMessage("Lets play", 0.5f);
+        UIManager.bannerUIBehaviour.ClearBannerMessage();
+        UIManager.bannerUIBehaviour.AddBannerMessage("Lets play", 0.5f);
         ReadyUp();
     }
 
