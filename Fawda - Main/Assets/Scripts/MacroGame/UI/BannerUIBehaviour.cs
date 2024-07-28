@@ -57,7 +57,7 @@ public class BannerUIBehaviour
             messageCycle = null;
             return;
         }
-        else if (messageCycle == null && flashEvent == null)
+        else if (messageCycle == null && flashEvent == null && bannerMessages.Count > 0)
         {
             messageCycle = CycleBannerMessageIdx();
             UIManager.singleton.StartCoroutine(messageCycle);
@@ -79,6 +79,7 @@ public class BannerUIBehaviour
 
     public void FlashMessage(string _message, float _flashTime = 5)
     {
+        bannerText.transform.parent.GetComponent<Animator>().SetBool("visibility", true);
         foreach (string word in _message.Split(' ')) flashQueue.Enqueue(new bannerWord(word, _flashTime));
         if (flashEvent != null) return;
         flashEvent = EmptyFlashQueue();
@@ -100,8 +101,7 @@ public class BannerUIBehaviour
             yield return new WaitForSeconds(currentWord.flashTime);
         }
         flashEvent = null;
-        messageCycle = CycleBannerMessageIdx();
-        UIManager.singleton.StartCoroutine(messageCycle);
+        RecalculateBannerVisibility();
 
     }
 }

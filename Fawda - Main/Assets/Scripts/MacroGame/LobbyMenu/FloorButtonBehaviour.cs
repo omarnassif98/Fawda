@@ -46,7 +46,7 @@ public class FloorButtonBehaviour : MonoBehaviour
     public void Start(){
         maxTime = ((LobbyManager.singleton.GetLobbySize()) * BASE_TIME) - (activations * BASE_TIME);
         timeLeft = BASE_TIME;
-        screen = transform.parent.parent.GetComponent<LobbyMenuScreenBehaviour>();
+        screen = transform.parent.GetComponent<LobbyMenuScreenBehaviour>();
         buttonIdx = screen.FeedButton(this);
     }
 

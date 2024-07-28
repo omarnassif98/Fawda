@@ -6,66 +6,34 @@ using UnityEngine.Events;
 
 public class LobbyMenuScreenBehaviour : MonoBehaviour
 {
-    public bool isInteractable { get; private set; }
     List<FloorButtonBehaviour> floorButtons;
     UnityAction screenloadAction;
     Dictionary<string, UnityAction> customButtonActions;
     float lowestTimeRemaining;
-    Transform currentFloorPlan;
     public Dictionary<ActionType, UnityAction<string>> buttonActions;
 
     void Awake()
     {
         floorButtons = new List<FloorButtonBehaviour>();
-        isInteractable = true;
         DebugLogger.SourcedPrint("LobbyMenuScreen","Awake");
         buttonActions = new Dictionary<ActionType, UnityAction<string>>();
         customButtonActions = new Dictionary<string, UnityAction>();
-        buttonActions[ActionType.SCREEN_LOAD] = PrepareScreenLoadEphimeral;
+        buttonActions[ActionType.SCREEN_LOAD] = LobbyMenuManager.singleton.LoadScreen;
         buttonActions[ActionType.GAME_SETUP] = (string _code) => {
             LobbyManager.gameManager.LoadMinigame((GameCodes)Enum.Parse(typeof(GameCodes), _code));
-            ClearScreen();
+            LobbyMenuManager.singleton.ClearScreen();
             LobbyMenuManager.singleton.PoofPlayers(false);
             };
     }
 
     void Start(){
-        ConnectionManager.singleton.RegisterServerEventListener("wakeup", () => LoadScreen("GameSelectionScreen"));
-        LobbyMenuManager.gustEvent.AddListener(TripScreenTransitionAction);
+        ConnectionManager.singleton.RegisterServerEventListener("wakeup", () => LobbyMenuManager.singleton.LoadScreen("GameSelectionScreen"));
     }
 
-    public void PrepareScreenLoadEphimeral(string _screenName){
-        ClearScreen();
-        screenloadAction = () => LoadScreen(_screenName);
-    }
 
-    public void TripScreenTransitionAction(){
-        screenloadAction();
-        screenloadAction = null;
-    }
 
-    public void LoadScreen(string _screenName){
-        isInteractable = true;
 
-        try
-        {
-            GameObject floorPlan = Resources.Load("LobbyMenuScreens/" + _screenName) as GameObject;
-            currentFloorPlan = GameObject.Instantiate(floorPlan,transform).transform;
-            currentFloorPlan.transform.localPosition = Vector3.zero;
-        }
-        catch (System.Exception)
-        {
-            DebugLogger.SourcedPrint("LobbyMenuManager","Could not load screen " + _screenName, "FF0000");
-        }
-    }
 
-    public void ClearScreen(){
-        if(currentFloorPlan == null) return;
-        foreach(FloorButtonBehaviour floorButton in floorButtons) floorButton.SetVisibility(false);
-        Destroy(currentFloorPlan.gameObject,2);
-        floorButtons.Clear();
-        currentFloorPlan = null;
-    }
 
 
     public int FeedButton(FloorButtonBehaviour _floorButton){
@@ -76,12 +44,11 @@ public class LobbyMenuScreenBehaviour : MonoBehaviour
 
 
     void Update(){
-        if(!isInteractable) return;
+        if(!LobbyMenuManager.singleton.isInteractive) return;
         foreach(FloorButtonBehaviour floorButton in floorButtons){
             float timeLeft = floorButton.Tick();
             if(timeLeft < FloorButtonBehaviour.maxTime) UIManager.singleton.SetCountdown(Mathf.CeilToInt(timeLeft));
             if(floorButton.IsFinished()) {
-                isInteractable = false;
                 return;
             }
         }

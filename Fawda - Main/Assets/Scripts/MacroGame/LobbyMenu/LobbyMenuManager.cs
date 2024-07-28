@@ -3,9 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using System.IO;
 
 public class LobbyMenuManager : MonoBehaviour
 {
+    public bool isInteractive { get; private set; }
     GameObject lobbyMenuPlayerPrefab;
     ParticleSystem bigPoof;
     LobbyMenuPlayerBehaviour[] lobbyMenuPlayerInstances;
@@ -14,19 +16,15 @@ public class LobbyMenuManager : MonoBehaviour
     public static LobbyMenuManager singleton;
     ParticleSystem snowfallParticles, snowgustParticles;
     public static UnityEvent gustEvent;
-
+    Transform currentFloorPlan;
+    public Dictionary<string, UnityEvent> screenloadEvents { get; private set; }
     // Start is called before the first frame update
 
-    void InferLobbySetup(){
-        DebugLogger.SourcedPrint("LobbyMenu", "Inferring player data", ColorUtility.ToHtmlStringRGB(Color.cyan));
-        ProfileData[] players = LobbyManager.players;
-        for(int i = 0; i < players.Length; i++){
-            if(players[i] != null && lobbyMenuPlayerInstances[i] == null) SpawnPlayer(i,players[i]);
-        }
-    }
+
 
     void Awake(){
         if (singleton != null) Destroy(gameObject);
+        isInteractive = false;
         singleton = this;
         snowglobeAnimator = transform.GetComponent<Animator>();
         snowfallParticles = transform.Find("Snowfall").GetComponent<ParticleSystem>();
@@ -36,8 +34,13 @@ public class LobbyMenuManager : MonoBehaviour
         gustEvent = new UnityEvent();
         bigPoof = transform.Find("Big Poof").GetComponent<ParticleSystem>();
         DebugLogger.SourcedPrint("LobbyMenuManager","Awake");
+        string resourcePath = Path.Combine(Application.dataPath, "Resources/LobbyMenuScreens");
+        screenloadEvents = new Dictionary<string, UnityEvent>();
+        foreach (string fname in Directory.GetFiles(resourcePath, "*.prefab")) screenloadEvents[new FileInfo(fname).Name.Split(".")[0]] = new UnityEvent();
+        
 
     }
+
 
     void Start(){
         lobbyMenuPlayerInstances = new LobbyMenuPlayerBehaviour[LobbyManager.players.Length];
@@ -45,8 +48,34 @@ public class LobbyMenuManager : MonoBehaviour
         LobbyManager.singleton.playerJoinEvent.AddListener((idx) => SpawnPlayer(idx, LobbyManager.players[idx]));
         ConnectionManager.singleton.RegisterEphemeralServerEvent("wakeup", () => snowglobeAnimator.SetBool("capped",false));
         ConnectionManager.singleton.RegisterEphemeralServerEvent("wakeup", () => snowfallParticles.Stop());
+        ConnectionManager.singleton.RegisterEphemeralServerEvent("wakeup", () => LoadScreen("GameSelectionScreen"));
+
     }
 
+    public void ClearScreen()
+    {
+        if (currentFloorPlan == null) return;
+        Destroy(currentFloorPlan.gameObject);
+    }
+
+
+    public void LoadScreen(string _screenName)
+    {
+        isInteractive = true;
+
+        try
+        {
+            GameObject floorPlan = Resources.Load("LobbyMenuScreens/" + _screenName) as GameObject;
+            currentFloorPlan = GameObject.Instantiate(floorPlan, transform).transform;
+            currentFloorPlan.name = "LobbyMenuScreen";
+            currentFloorPlan.transform.localPosition = Vector3.zero + Vector3.up  * 0.01f;
+            screenloadEvents[_screenName].Invoke();
+        }
+        catch (System.Exception)
+        {
+            DebugLogger.SourcedPrint("LobbyMenuManager", "Could not load screen " + _screenName, "FF0000");
+        }
+    }
     
 
     [ContextMenu("Gust")]
@@ -88,4 +117,13 @@ public class LobbyMenuManager : MonoBehaviour
         bigPoof.Play();
     }
 
+    void InferLobbySetup()
+    {
+        DebugLogger.SourcedPrint("LobbyMenu", "Inferring player data", ColorUtility.ToHtmlStringRGB(Color.cyan));
+        ProfileData[] players = LobbyManager.players;
+        for (int i = 0; i < players.Length; i++)
+        {
+            if (players[i] != null && lobbyMenuPlayerInstances[i] == null) SpawnPlayer(i, players[i]);
+        }
+    }
 }
