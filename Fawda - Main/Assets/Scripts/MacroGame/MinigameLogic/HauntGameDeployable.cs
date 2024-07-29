@@ -52,10 +52,18 @@ public class HauntGameDeployable : DeployableAsymetricMinigame
 
     protected override IEnumerator ShowTutorialIntro()
     {
-        DebugLogger.SourcedPrint("HauntGameDeployable", "Tutorial start");
+        DebugLogger.SourcedPrint("HauntGameDeployable", "Tutorial start", "00FF00");
+        GameObject tutorialHunter = GameObject.Instantiate(hunterPlayerPrefab, generator.hunterSpawnPoints[0].position, Quaternion.identity);
+        GameObject tutorialGhost = GameObject.Instantiate(ghostPlayerPrefab, generator.ghostSpawnPoint.position, Quaternion.identity);
+        tutorialHunter.GetComponent<HauntHunterPlayerBehaviour>().puppetMode = true;
+        tutorialGhost.GetComponent<HauntHiddenPlayerBehaviour>().puppetMode = true;
+        tutorialGhost.GetComponent<HauntHiddenPlayerBehaviour>().currentJoypadState = new JoypadState(new GamepadData(1, 1, true));
         yield return new WaitForSecondsRealtime(1.5f);
+        tutorialGhost.GetComponent<HauntHiddenPlayerBehaviour>().currentJoypadState = new JoypadState(new GamepadData(1, 0, true));
+        yield return new WaitForSecondsRealtime(0.8f);
+        tutorialGhost.GetComponent<HauntHiddenPlayerBehaviour>().currentJoypadState = new JoypadState(new GamepadData(0, 0, true));
         gameInPlay = true;
-        DebugLogger.SourcedPrint("HauntGameDeployable", "Tutorial end");
+        DebugLogger.SourcedPrint("HauntGameDeployable", "Tutorial end", "FF0000");
     }
 
     protected override IEnumerator WindDownGame()

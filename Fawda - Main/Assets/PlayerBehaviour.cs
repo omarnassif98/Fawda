@@ -8,17 +8,19 @@ public abstract class PlayerBehaviour : MonoBehaviour
 {
     public static PlayerBehaviour hotseat; //Debug var
     protected bool isMobile = false;
-    const float speed =  4.5f;
+    public bool puppetMode = false;
+    protected float baseSpeed =  4.5f, speed;
     protected Material playerDefaultMaterial;
     protected Renderer playerRenderer;
     private ParticleSystem smokeEmitter;
     public int idx { get; private set; }
+    public JoypadState currentJoypadState = JoypadState.NEUTRAL;
 
     protected virtual void Awake(){
         playerDefaultMaterial = Resources.Load("Global/Materials/PlayerMat") as Material;
         playerRenderer = transform.Find("PlayerRenderer").GetComponent<Renderer>();
         smokeEmitter = transform.Find("Smoke Particles").GetComponent<ParticleSystem>();
-
+        speed = baseSpeed;
     }
 
     public void Initialize(int _idx){
@@ -34,16 +36,14 @@ public abstract class PlayerBehaviour : MonoBehaviour
     }
 
     void Update(){
-        if (isMobile) Move();
+        if (!puppetMode) currentJoypadState = isMobile?InputManager.joypadStates[idx]:JoypadState.NEUTRAL;
         Tick();
     }
     // Update is called once per frame
-    protected void Move()
-    {
-        JoypadState joypadState = InputManager.joypadStates[idx];
-        transform.position += new Vector3(joypadState.analog.x, 0, joypadState.analog.y) * Time.deltaTime * speed;
-    }
 
-    protected abstract void Tick();
+    protected virtual void Move() => transform.position += new Vector3(currentJoypadState.analog.x, 0, currentJoypadState.analog.y) * Time.deltaTime * speed;
+    
+
+    public abstract void Tick();
 
 }

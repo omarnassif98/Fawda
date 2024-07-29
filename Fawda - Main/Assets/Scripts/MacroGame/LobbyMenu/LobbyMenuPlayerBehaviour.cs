@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class LobbyMenuPlayerBehaviour : PlayerBehaviour
 {
-    protected override void Tick()
+    public override void Tick()
     {
         return;
     }

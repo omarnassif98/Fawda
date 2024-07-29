@@ -49,7 +49,6 @@ public class GameManager
     {
         DebugLogger.SourcedPrint("GameManager", "Reset map");
         if(activeMinigame is DeployableAsymetricMinigame) ((DeployableAsymetricMinigame)activeMinigame).RegisterAsymetricPlayer(_playerIdx);
-        activeMinigame.SpawnPlayers();
     }
 
     public void StartGame() => activeMinigame.StartGame();

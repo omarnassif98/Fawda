@@ -1,7 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Numerics;
+using UnityEngine;
 
 public abstract class SynapseDatastruct
 {
@@ -57,15 +57,21 @@ public class GamepadData : SynapseDatastruct{
     public byte[] additionalInfo = new byte[0];
 
 
-    public GamepadData(float _xInput, float _yInput){
-        this.xInput = _xInput;
-        this.yInput = _yInput;
+    public GamepadData(float _xInput, float _yInput)
+    {
+        Vector2 norm = new Vector2(_xInput, _yInput);
+        norm = norm.magnitude >= 1 ? norm.normalized : norm;
+        this.xInput = norm.x;
+        this.yInput = norm.y;
         this.additionalInfo = BitConverter.GetBytes(false);
     }
 
-    public GamepadData(float _xInput, float _yInput, bool _action){
-        this.xInput = _xInput;
-        this.yInput = _yInput;
+    public GamepadData(float _xInput, float _yInput, bool _action)
+    {
+        Vector2 norm = new Vector2(_xInput, _yInput);
+        norm = norm.magnitude >= 1 ? norm.normalized : norm;
+        this.xInput = norm.x;
+        this.yInput = norm.y;
         this.additionalInfo = BitConverter.GetBytes(_action);
     }
 
@@ -133,9 +139,9 @@ public class GamepadData : SynapseDatastruct{
         {
             ArrayList allData = new ArrayList();
             allData.Add(entitySceneID);
-            allData.Add(position.X);
-            allData.Add(position.Y);
-            allData.Add(position.Z);
+            allData.Add(position.x);
+            allData.Add(position.y);
+            allData.Add(position.z);
             allData.Add(yRot);
             return allData;
         }

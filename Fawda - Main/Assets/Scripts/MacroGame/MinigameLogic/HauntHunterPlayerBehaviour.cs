@@ -31,7 +31,7 @@ public class HauntHunterPlayerBehaviour : PlayerBehaviour
         base.Awake();
     }
 
-    protected override void Tick()
+    public override void Tick()
     {
         if(PlayerBehaviour.hotseat != this || !LobbyManager.gameManager.activeMinigame.gameInPlay || isPetrified) return;
         Vector2 rotInput = new Vector2(Input.GetAxisRaw("Debug Horizontal"), Input.GetAxisRaw("Debug Vertical"));

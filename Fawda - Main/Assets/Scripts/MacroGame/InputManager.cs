@@ -5,6 +5,7 @@ using UnityEngine.Events;
 public struct JoypadState{
     public Vector2 analog;
     public bool action;
+    public static JoypadState NEUTRAL = new JoypadState(new GamepadData(0,0,false));
     public JoypadState(GamepadData _gamepadData){
         analog = new Vector2(_gamepadData.xInput, _gamepadData.yInput);
         action = BitConverter.ToBoolean(_gamepadData.additionalInfo);
