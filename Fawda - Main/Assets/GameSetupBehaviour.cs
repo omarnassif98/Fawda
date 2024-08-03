@@ -21,7 +21,7 @@ public abstract class GameSetupBehaviour
 
         bool newVal = new SimpleBooleanMessage(_data).ready;
         readies[_idx] = newVal;
-        UIManager.RosterManager.SetPlayerRosterBadgeVisibility(_idx, newVal);
+        UIManager.RosterManager.SetPlayerRosterBadgeVisibility(_idx, newVal, "", "#00FF00");
         int cumCount = 0;
         foreach(bool r in readies) if (r) cumCount += 1;
         if (cumCount != LobbyManager.singleton.GetLobbySize())

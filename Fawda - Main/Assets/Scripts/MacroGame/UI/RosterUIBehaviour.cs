@@ -8,23 +8,66 @@ using UnityEngine.UI;
 public class RosterUIBehaviour
 {
 
-    //Struct for the actual slot, one per player
-    struct PlayerLobbyRosterSlot{
+    //Self managed class for the actual slot, one per player
+    class PlayerLobbyRosterSlot{
         public TMP_Text playerNameText;
         public Image playerColorImage;
         public Animator rosterAnimator;
         public Image badge;
+        public TMP_Text badgeText;
         public bool occupied;
         public int lobbyIdx;
+
         public PlayerLobbyRosterSlot(Transform _rosterSlot){
             playerColorImage = _rosterSlot.Find("Backdrop").Find("Player Color").GetComponent<Image>();
             playerNameText = playerColorImage.transform.Find("Player Name").GetComponent<TMP_Text>();
             rosterAnimator = _rosterSlot.GetComponent<Animator>();
             badge = _rosterSlot.Find("Badge").GetComponent<Image>();
+            badgeText = badge.transform.Find("Badge Text").GetComponent<TMP_Text>();
             badge.gameObject.SetActive(false);
             occupied = false;
             lobbyIdx = -1;
         }
+
+        public void Import(PlayerLobbyRosterSlot _rosterSlot){
+            playerColorImage.color = _rosterSlot.playerColorImage.color;
+            playerNameText.text = _rosterSlot.playerNameText.text;
+            rosterAnimator.SetBool("Revealed", _rosterSlot.rosterAnimator.GetBool("Revealed"));
+            badge.gameObject.SetActive(_rosterSlot.badge.IsActive());
+            badgeText.text = _rosterSlot.badgeText.text;
+            occupied = _rosterSlot.occupied;
+            rosterAnimator.SetBool("Occupied", occupied);
+            lobbyIdx = _rosterSlot.lobbyIdx;
+        }
+
+        public void Occupy(int _idx)
+        {
+            SetRosterSlotOccupationStatus(true);
+            playerColorImage.color = ResourceManager.namedColors[LobbyManager.players[_idx].colorSelection].color;
+            playerNameText.text = LobbyManager.players[_idx].name;
+            lobbyIdx = _idx;
+        }
+
+        public void Relieve() => SetRosterSlotOccupationStatus(false);
+
+        public void SetRosterStatus(bool _visibility, string _txt, string _colorHex)
+        {
+            badge.gameObject.SetActive(_visibility);
+            badgeText.text = _txt;
+            Color badgeColor = new Color();
+            ColorUtility.TryParseHtmlString(_colorHex, out badgeColor);
+            DebugLogger.SourcedPrint("Roster Slot", string.Format("IN = {0} | OUT = {1}", _colorHex, ColorUtility.ToHtmlStringRGB(badgeColor)));
+            badge.color = badgeColor;
+        }
+
+        private void SetRosterSlotOccupationStatus(bool _occupationStatus)
+        {
+            rosterAnimator.SetBool("Occupied", _occupationStatus);
+            occupied = _occupationStatus;
+        }
+
+        public void SetRosterSlotVisibility(bool _visibility) => rosterAnimator.SetBool("Revealed", _visibility);
+
     }
 
 
@@ -58,15 +101,15 @@ public class RosterUIBehaviour
 
     //Add to first available roster, which will always be the idx of the size of the lobby
     public void AddPlayerToRoster(int _idx){
-        if(occupationCount == rosterPlayers.Length){
-            DebugLogger.singleton.Log("EYYO Trying to add player when roster is full");
-            return;
+        foreach(PlayerLobbyRosterSlot lobbyRosterSlot in rosterPlayers)
+        {
+            if (!lobbyRosterSlot.occupied)
+            {
+                lobbyRosterSlot.Occupy(_idx);
+                occupationCount += 1;
+                break;
+            }
         }
-        rosterPlayers[occupationCount].occupied = true;
-        rosterPlayers[occupationCount].playerColorImage.color = ResourceManager.namedColors[LobbyManager.players[_idx].colorSelection].color;
-        rosterPlayers[occupationCount].playerNameText.text = LobbyManager.players[_idx].name;
-        rosterPlayers[occupationCount].lobbyIdx = _idx;
-        occupationCount += 1;
         TidyRoster();
     }
 
@@ -80,50 +123,35 @@ public class RosterUIBehaviour
         TidyRoster();
     }
 
+    public void SetPlayerRosterBadgeVisibility(int _idx, bool _visibility, string _txt = "", string _colorHex = "FFFFFF") => rosterPlayers[_idx].SetRosterStatus(_visibility, _txt, _colorHex);
 
     //The roster is ALWAYS gonna be continous from left to right
 
     //This process will make it so that even if in the lobby players 2 and 3 are in
     // the roster would show slots 1 and 2 taken respectively (lobbyIdx is important) 
     private void TidyRoster(){
+        DebugLogger.SourcedPrint("Roster", string.Format("occupation count - {0}", occupationCount));
         short[] newIdxs = new short[occupationCount];
         short currIdx = 0;
-        for(short i = 0; i < rosterPlayers.Length && currIdx < newIdxs.Length; i++){
+        for(short i = 0; i < rosterPlayers.Length; i++){
             if(rosterPlayers[i].occupied){
                 newIdxs[currIdx] = i;
                 currIdx += 1;
             }
         }
 
-        for(short i = 0; i < occupationCount; i++){
-            rosterPlayers[i].occupied = true;
-            rosterPlayers[i].playerColorImage.color = rosterPlayers[newIdxs[i]].playerColorImage.color;
-            rosterPlayers[i].playerNameText.text = rosterPlayers[newIdxs[i]].playerNameText.text;
-            rosterPlayers[i].lobbyIdx = rosterPlayers[newIdxs[i]].lobbyIdx;
-            SetRosterSlotOccupationStatus(i, true);
-            SetRosterSlotVisibility(i,true);
-        }
+        for (short i = 0; i < occupationCount; i++) rosterPlayers[i].Import(rosterPlayers[newIdxs[i]]);
 
         for(short i = occupationCount; i < rosterPlayers.Length; i++){
-            rosterPlayers[i].occupied = false;
-            SetRosterSlotOccupationStatus(i, false);
-            SetRosterSlotVisibility(i,i == occupationCount);
+            rosterPlayers[i].Relieve();
+            rosterPlayers[i].SetRosterSlotVisibility(i == occupationCount);
         }
     }
 
-    private void SetRosterSlotVisibility(int _idx, bool _visibility){
-        rosterPlayers[_idx].rosterAnimator.SetBool("Revealed", _visibility);
-    }
 
-    private void SetRosterSlotOccupationStatus(int _idx, bool _occupationStatus){
-        rosterPlayers[_idx].rosterAnimator.SetBool("Occupied", _occupationStatus);
-        rosterPlayers[_idx].occupied = _occupationStatus;
-    }
 
-    public void SetPlayerRosterBadgeVisibility(int _idx, bool _visibility)
-    {
-        rosterPlayers[_idx].badge.gameObject.SetActive(_visibility);
-    }
+
+    // # Roulette
 
     public void StartRoulette(){
         DebugLogger.SourcedPrint("Roster Roulette", "Preprocessing");
