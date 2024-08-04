@@ -61,7 +61,7 @@ public class DioramaControllerBehaviour : MonoBehaviour
     void UpdateCameraPosition(){
         transform.position = Vector3.Lerp(transform.position, idealCamPos.pos, 0.1f);
         transform.eulerAngles = Vector3.Lerp(transform.eulerAngles, idealCamPos.eulerAngles, 0.1f);
-        cam.orthographicSize = Mathf.Lerp(cam.orthographicSize, idealCamPos.zoom, 0.01f);
+        cam.orthographicSize = Mathf.Lerp(cam.orthographicSize, idealCamPos.zoom, 0.1f);
 
     }
 

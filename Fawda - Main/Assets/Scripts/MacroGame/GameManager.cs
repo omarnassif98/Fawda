@@ -29,11 +29,10 @@ public class GameManager
 
     public void LoadMinigame(GameCodes _gamecode){
         if(activeMinigame != null) return;
-
+        LobbyMenuManager.singleton.PoofPlayers(false,true);
         DioramaControllerBehaviour.singleton.SetCameraMode(true);
         Tuple<Type,Type> gameInfo = minigameLookup[_gamecode];
         activeMinigame = (DeployableMinigame)Activator.CreateInstance(gameInfo.Item1);
-        activeMinigame.LoadMap();
         activeMinigameSetup = (GameSetupBehaviour)Activator.CreateInstance(gameInfo.Item2);
         ConnectionManager.singleton.SendMessageToClients(OpCode.GAMESETUP, (int)GameCodes.HAUNT);
 

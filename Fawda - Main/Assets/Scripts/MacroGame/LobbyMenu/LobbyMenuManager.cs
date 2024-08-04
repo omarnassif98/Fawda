@@ -98,17 +98,26 @@ public class LobbyMenuManager : MonoBehaviour
         PoofPlayers(true);
     }
 
-    public void PoofPlayers(bool _val)
+    public void PoofPlayers(bool _val, bool _kill = false)
     {
-        foreach (LobbyMenuPlayerBehaviour lobbyMenuPlayerBehaviour in lobbyMenuPlayerInstances) if (lobbyMenuPlayerBehaviour != null)
-            {
-                lobbyMenuPlayerBehaviour.PoofPlayer(_val);
-                if (!_val)
-                {
-                    DioramaControllerBehaviour.singleton.StopTrackTransform(lobbyMenuPlayerBehaviour.transform);
-                    continue;
-                }
-            }
+        IEnumerator killer(GameObject gameObject)
+        {
+            yield return new WaitForSeconds(2);
+            Destroy(gameObject);
+        }
+        for (int i = 0; i < lobbyMenuPlayerInstances.Length; i++) { 
+            LobbyMenuPlayerBehaviour lobbyMenuPlayerBehaviour = lobbyMenuPlayerInstances[i];
+            if (lobbyMenuPlayerBehaviour == null) continue; //Player doesn't exist
+            
+            lobbyMenuPlayerBehaviour.PoofPlayer(_val);
+            if (_val) DioramaControllerBehaviour.singleton.TrackTransform(lobbyMenuPlayerBehaviour.transform); //Poof in
+            else DioramaControllerBehaviour.singleton.StopTrackTransform(lobbyMenuPlayerBehaviour.transform); //Poof out
+
+            if (!_kill) continue; //We're not killing the menu players yet
+            IEnumerator killEvent = killer(lobbyMenuPlayerBehaviour.gameObject);
+            StartCoroutine(killEvent);
+            lobbyMenuPlayerInstances[i] = null;
+        }
     }
 
     public void PoofLobby()

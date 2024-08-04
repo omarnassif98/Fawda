@@ -14,6 +14,7 @@ public class RosterUIBehaviour
         public Image playerColorImage;
         public Animator rosterAnimator;
         public Image badge;
+        public Image badgeGlyph;
         public TMP_Text badgeText;
         public bool occupied;
         public int lobbyIdx;
@@ -24,7 +25,10 @@ public class RosterUIBehaviour
             rosterAnimator = _rosterSlot.GetComponent<Animator>();
             badge = _rosterSlot.Find("Badge").GetComponent<Image>();
             badgeText = badge.transform.Find("Badge Text").GetComponent<TMP_Text>();
+            badgeGlyph = badge.transform.Find("Glyph").GetComponent<Image>();
             badge.gameObject.SetActive(false);
+            badgeText.gameObject.SetActive(false);
+            badgeGlyph.gameObject.SetActive(false);
             occupied = false;
             lobbyIdx = -1;
         }
@@ -50,15 +54,31 @@ public class RosterUIBehaviour
 
         public void Relieve() => SetRosterSlotOccupationStatus(false);
 
-        public void SetRosterStatus(bool _visibility, string _txt, string _colorHex)
+        public void SetRosterStatus(bool _visibility, string _colorHex)
         {
             badge.gameObject.SetActive(_visibility);
-            badgeText.text = _txt;
             Color badgeColor = new Color();
             ColorUtility.TryParseHtmlString(_colorHex, out badgeColor);
-            DebugLogger.SourcedPrint("Roster Slot", string.Format("IN = {0} | OUT = {1}", _colorHex, ColorUtility.ToHtmlStringRGB(badgeColor)));
             badge.color = badgeColor;
+            badgeText.gameObject.SetActive(false);
+            badgeGlyph.gameObject.SetActive(false);
         }
+
+        public void SetRosterStatus(bool _visibility, string _txt, string _colorHex)
+        {
+            SetRosterStatus(_visibility, _colorHex);
+            badgeText.text = _txt;
+            badgeText.gameObject.SetActive(true);
+        }
+
+        public void SetRosterStatus(bool _visibility, Sprite _sprite, string _colorHex)
+        {
+            DebugLogger.SourcedPrint("Roster", "Trying Glyph");
+            SetRosterStatus(_visibility, _colorHex);
+            badgeGlyph.sprite = _sprite;
+            badgeGlyph.gameObject.SetActive(true);
+        }
+
 
         private void SetRosterSlotOccupationStatus(bool _occupationStatus)
         {
@@ -123,7 +143,11 @@ public class RosterUIBehaviour
         TidyRoster();
     }
 
-    public void SetPlayerRosterBadgeVisibility(int _idx, bool _visibility, string _txt = "", string _colorHex = "FFFFFF") => rosterPlayers[_idx].SetRosterStatus(_visibility, _txt, _colorHex);
+    public void SetPlayerRosterBadgeVisibility(int _idx, bool _visibility, Sprite _sprite = null, string _txt = "", string _colorHex = "#FFFFFF") {
+        if (_sprite != null) rosterPlayers[_idx].SetRosterStatus(_visibility, _sprite, _colorHex);
+        else if (_txt.Length > 0) rosterPlayers[_idx].SetRosterStatus(_visibility, _txt, _colorHex);
+        else rosterPlayers[_idx].SetRosterStatus(_visibility, _colorHex);
+    }
 
     //The roster is ALWAYS gonna be continous from left to right
 
@@ -209,7 +233,7 @@ public class RosterUIBehaviour
 
     private void SetTickerPosition(Transform slotTransform)
     {
-        rosterRoulleteTicker.rectTransform.position = slotTransform.position + (Vector3.up * 37.5f);
+        rosterRoulleteTicker.rectTransform.position = slotTransform.position + (Vector3.up * 37.5f * UIManager.singleton.GetScale());
     }
 
     public void SetTickerPosition(int _idx)

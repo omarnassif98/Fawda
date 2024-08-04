@@ -63,12 +63,15 @@ public abstract class PromptedGameSetupBehaviour : GameSetupBehaviour
         promptIdx = _idx; //I mean just in case a race condition happens
         DebugLogger.SourcedPrint("PromptedGameSetup", "Ghost is client #" + promptIdx, "00FF00");
         //BOOKMARK: INFORMING PLAYERS
+        for (int i = 0; i < LobbyManager.singleton.GetLobbySize(); i++) UpdateGlyphs(i, false);
+
         UIManager.bannerUIBehaviour.ClearBannerMessage();
         UIManager.bannerUIBehaviour.AddBannerMessage("Ready?", 0.5f);
         for (int i = 0; i < LobbyManager.singleton.GetLobbySize(); i++) ConnectionManager.singleton.SendMessageToClients(OpCode.READYUP, new SimpleBooleanMessage(i == promptIdx).Encode(), i);
         LobbyManager.gameManager.ConfigureGame(promptIdx);
         ConnectionManager.singleton.RegisterRPC(OpCode.READYUP, ChangeReadyStatus);
         ConnectionManager.singleton.VacateRPC(OpCode.PROMPT_RESPONSE);
+        TriggerMapLoad();
     }
 
 }

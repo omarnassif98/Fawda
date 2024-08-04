@@ -3,8 +3,7 @@ using UnityEngine.Events;
 using TMPro;
 using System.Collections.Generic;
 using UnityEngine.UI;
-using System.Collections;
-using System.Linq;
+
 public class UIManager : MonoBehaviour
 {
 
@@ -43,5 +42,9 @@ public class UIManager : MonoBehaviour
         countdownText.text = _digits.ToString();
     }
 
+    public float GetScale()
+    {
+        return Screen.width / transform.parent.GetComponent<CanvasScaler>().referenceResolution.x;
+    }
   
 }
