@@ -1,27 +1,32 @@
+using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.Events;
 
+[RequireComponent(typeof(Image))]
 public class BlackoutBehaviour : MonoBehaviour
 {
-    public UnityEvent blackoutHiddenEvent {get; private set;}
-    public UnityEvent blackoutFinishEvent {get; private set;}
+    Image foreground;
+    Animator animator;
 
-    void Awake(){
-        blackoutFinishEvent = new UnityEvent();
-        blackoutHiddenEvent = new UnityEvent();
+    public void Awake()
+    {
+        foreground = GetComponent<Image>();
+        animator = GetComponent<Animator>();
+    }
+    UnityAction callback = null;
+
+    public void Pulse(UnityAction _callback = null)
+    {
+        callback = _callback;
+        animator.SetTrigger("pulse");
     }
 
-    public void TriggerBlackoutEndEvent(){
-        blackoutFinishEvent.Invoke();
-        blackoutFinishEvent.RemoveAllListeners();
+    public void EndPulse()
+    {
+        if (callback != null) callback();
+        callback = null;
     }
 
-    public void TriggerBlackoutHiddenEvent(){
-        blackoutHiddenEvent.Invoke();
-        blackoutHiddenEvent.RemoveAllListeners();
-    }
 
-    public void Pulse(){
-        GetComponent<Animator>().SetTrigger("Pulse");
-    }
 }

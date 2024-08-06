@@ -18,14 +18,16 @@ public abstract class DeployableMinigame
 
     public abstract void SpawnPlayers();
 
-    public virtual void StartGame() => LobbyManager.singleton.StartCoroutine(ShowTutorialIntro());
+
+    public virtual void ShowTutorialLoop() => LobbyManager.singleton.StartCoroutine(TutorialLoop());
 
     public virtual void EndGame() => LobbyManager.singleton.StartCoroutine(WindDownGame());
 
 
+
     protected void LocateMapTransform() => transform = LobbyManager.gameManager.mapWrapper;
 
-    protected abstract IEnumerator ShowTutorialIntro();
+    protected abstract IEnumerator TutorialLoop();
 
     protected abstract IEnumerator WindDownGame();
 

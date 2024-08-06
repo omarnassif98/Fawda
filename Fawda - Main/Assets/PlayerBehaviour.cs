@@ -12,15 +12,16 @@ public abstract class PlayerBehaviour : MonoBehaviour
     protected float baseSpeed =  4.5f, speed;
     protected Material playerDefaultMaterial;
     protected Renderer playerRenderer;
-    private ParticleSystem smokeEmitter;
+    private GameObject smokeEmitterPrefab;
     public int idx { get; private set; }
     public JoypadState currentJoypadState = JoypadState.NEUTRAL;
 
     protected virtual void Awake(){
         playerDefaultMaterial = Resources.Load("Global/Materials/PlayerMat") as Material;
         playerRenderer = transform.Find("PlayerRenderer").GetComponent<Renderer>();
-        smokeEmitter = transform.Find("Smoke Particles").GetComponent<ParticleSystem>();
+        smokeEmitterPrefab = Resources.Load("Global/Prefabs/Smoke Particles") as GameObject;
         speed = baseSpeed;
+        PoofPlayer(true);
     }
 
     public void Initialize(int _idx){
@@ -30,8 +31,7 @@ public abstract class PlayerBehaviour : MonoBehaviour
 
     public void PoofPlayer(bool _activityStatus){
         playerRenderer.enabled = _activityStatus;
-        smokeEmitter.Clear();
-        smokeEmitter.Play();
+        GameObject.Instantiate(smokeEmitterPrefab, transform.position, Quaternion.identity);
         isMobile = _activityStatus;
     }
 
@@ -43,7 +43,11 @@ public abstract class PlayerBehaviour : MonoBehaviour
 
     protected virtual void Move() => transform.position += new Vector3(currentJoypadState.analog.x, 0, currentJoypadState.analog.y) * Time.deltaTime * speed;
     
-
+    public void Terminate()
+    {
+        PoofPlayer(false);
+        Destroy(gameObject);
+    }
     public abstract void Tick();
 
 }

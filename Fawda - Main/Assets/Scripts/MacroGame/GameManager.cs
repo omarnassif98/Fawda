@@ -50,9 +50,5 @@ public class GameManager
         if(activeMinigame is DeployableAsymetricMinigame) ((DeployableAsymetricMinigame)activeMinigame).RegisterAsymetricPlayer(_playerIdx);
     }
 
-    public void StartGame() => activeMinigame.StartGame();
-
-    public void EndMinigame() => activeMinigame.EndGame();
-
 
 }

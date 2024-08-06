@@ -5,15 +5,21 @@ public abstract class GameSetupBehaviour
     private bool[] readies;
     protected UnityAction<int, bool> rosterAction = null;
 
-    public GameSetupBehaviour(){
+    public GameSetupBehaviour() {
         readies = new bool[5];
         DebugLogger.SourcedPrint("GameSetup (grandfather logic)", "Now accepting readies");
         UIManager.bannerUIBehaviour.ClearBannerMessage();
     }
 
-    public virtual void ReadyUp() => LobbyManager.gameManager.StartGame();
+    public virtual void ReadyUp() { }
 
     protected void TriggerMapLoad() => LobbyManager.gameManager.activeMinigame.LoadMap();
+
+    protected void BeginReady()
+    {
+        ConnectionManager.singleton.RegisterRPC(OpCode.READYUP, ChangeReadyStatus);
+        LobbyManager.gameManager.activeMinigame.ShowTutorialLoop();
+    }
 
     protected void ChangeReadyStatus(byte[] _data, int _idx){
         DebugLogger.SourcedPrint("Game Setup (grandfather logic)", "logic tripped");

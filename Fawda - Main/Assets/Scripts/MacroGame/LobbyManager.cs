@@ -11,7 +11,7 @@ public class LobbyManager : MonoBehaviour
     public static GameManager gameManager;
     private InputManager inputManager;
     public static ProfileData[] players {get;private set;}
-
+    Transform lobbyTransform;
     public UnityEvent<int> playerJoinEvent;
     public UnityEvent<int> playerRemoveEvent;
 

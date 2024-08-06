@@ -46,7 +46,7 @@ public class LobbyMenuManager : MonoBehaviour
         lobbyMenuPlayerInstances = new LobbyMenuPlayerBehaviour[LobbyManager.players.Length];
         InferLobbySetup();
         LobbyManager.singleton.playerJoinEvent.AddListener((idx) => SpawnPlayer(idx, LobbyManager.players[idx]));
-        ConnectionManager.singleton.RegisterEphemeralServerEvent("wakeup", () => snowglobeAnimator.SetBool("capped",false));
+        ConnectionManager.singleton.RegisterEphemeralServerEvent("wakeup", () => SetCap(false));
         ConnectionManager.singleton.RegisterEphemeralServerEvent("wakeup", () => snowfallParticles.Stop());
         ConnectionManager.singleton.RegisterEphemeralServerEvent("wakeup", () => LoadScreen("GameSelectionScreen"));
 
@@ -57,6 +57,8 @@ public class LobbyMenuManager : MonoBehaviour
         if (currentFloorPlan == null) return;
         Destroy(currentFloorPlan.gameObject);
     }
+
+    public void SetCap(bool _val) => snowglobeAnimator.SetBool("capped", _val);
 
 
     public void LoadScreen(string _screenName)
@@ -100,11 +102,6 @@ public class LobbyMenuManager : MonoBehaviour
 
     public void PoofPlayers(bool _val, bool _kill = false)
     {
-        IEnumerator killer(GameObject gameObject)
-        {
-            yield return new WaitForSeconds(2);
-            Destroy(gameObject);
-        }
         for (int i = 0; i < lobbyMenuPlayerInstances.Length; i++) { 
             LobbyMenuPlayerBehaviour lobbyMenuPlayerBehaviour = lobbyMenuPlayerInstances[i];
             if (lobbyMenuPlayerBehaviour == null) continue; //Player doesn't exist
@@ -114,16 +111,18 @@ public class LobbyMenuManager : MonoBehaviour
             else DioramaControllerBehaviour.singleton.StopTrackTransform(lobbyMenuPlayerBehaviour.transform); //Poof out
 
             if (!_kill) continue; //We're not killing the menu players yet
-            IEnumerator killEvent = killer(lobbyMenuPlayerBehaviour.gameObject);
-            StartCoroutine(killEvent);
+            lobbyMenuPlayerBehaviour.Terminate();
             lobbyMenuPlayerInstances[i] = null;
         }
     }
 
-    public void PoofLobby()
+    public void PoofLobby(bool _showLobby = false)
     {
         bigPoof.Clear();
         bigPoof.Play();
+        ClearScreen();
+        transform.Find("Floor").gameObject.SetActive(_showLobby);
+        transform.Find("Base").gameObject.SetActive(_showLobby);
     }
 
     void InferLobbySetup()

@@ -50,20 +50,24 @@ public class HauntGameDeployable : DeployableAsymetricMinigame
         }
     }
 
-    protected override IEnumerator ShowTutorialIntro()
+    protected override IEnumerator TutorialLoop()
     {
-        DebugLogger.SourcedPrint("HauntGameDeployable", "Tutorial start", "00FF00");
-        GameObject tutorialHunter = GameObject.Instantiate(hunterPlayerPrefab, generator.hunterSpawnPoints[0].position, Quaternion.identity);
-        GameObject tutorialGhost = GameObject.Instantiate(ghostPlayerPrefab, generator.ghostSpawnPoint.position, Quaternion.identity);
-        tutorialHunter.GetComponent<HauntHunterPlayerBehaviour>().puppetMode = true;
-        tutorialGhost.GetComponent<HauntHiddenPlayerBehaviour>().puppetMode = true;
-        tutorialGhost.GetComponent<HauntHiddenPlayerBehaviour>().currentJoypadState = new JoypadState(new GamepadData(1, 1, true));
+        DebugLogger.SourcedPrint("HauntGameDeployable", "Tutorial loop new iteration", "00FF00");
+        HauntHunterPlayerBehaviour tutorialHunter = GameObject.Instantiate(hunterPlayerPrefab, generator.hunterSpawnPoints[0].position, Quaternion.identity).GetComponent<HauntHunterPlayerBehaviour>();
+        HauntHiddenPlayerBehaviour tutorialGhost = GameObject.Instantiate(ghostPlayerPrefab, generator.ghostSpawnPoint.position, Quaternion.identity).GetComponent<HauntHiddenPlayerBehaviour>();
+        playerInstances = new PlayerBehaviour[2] { tutorialHunter, tutorialGhost };
+        asymetricPlayerIdx = 1;
+        tutorialHunter.puppetMode = true;
+        tutorialGhost.puppetMode = true;
+        tutorialGhost.currentJoypadState = new JoypadState(new GamepadData(1, 1, true));
         yield return new WaitForSecondsRealtime(1.5f);
-        tutorialGhost.GetComponent<HauntHiddenPlayerBehaviour>().currentJoypadState = new JoypadState(new GamepadData(1, 0, true));
+        tutorialGhost.currentJoypadState = new JoypadState(new GamepadData(1, 0, true));
         yield return new WaitForSecondsRealtime(0.8f);
-        tutorialGhost.GetComponent<HauntHiddenPlayerBehaviour>().currentJoypadState = new JoypadState(new GamepadData(0, 0, true));
-        gameInPlay = true;
-        DebugLogger.SourcedPrint("HauntGameDeployable", "Tutorial end", "FF0000");
+        tutorialGhost.currentJoypadState = new JoypadState(new GamepadData(0, 0, true));
+        yield return new WaitForSecondsRealtime(0.8f);
+        foreach (PlayerBehaviour tutPlayer in playerInstances) tutPlayer.Terminate();
+        LobbyManager.singleton.StartCoroutine(TutorialLoop());
+
     }
 
     protected override IEnumerator WindDownGame()
