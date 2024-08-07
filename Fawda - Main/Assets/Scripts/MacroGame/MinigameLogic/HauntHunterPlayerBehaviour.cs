@@ -55,7 +55,7 @@ public class HauntHunterPlayerBehaviour : PlayerBehaviour
         if(Input.GetButtonDown("Action") && currentAmmo > 0){
             currentAmmo -= 1;
             isMobile = false;
-            StartCoroutine(fovHelper.FlashFOV(() => {isMobile = true;}));
+            Flash();
         }
         UpdateStressCondition();
         if(rotInput == Vector2.zero) return;
@@ -68,7 +68,7 @@ public class HauntHunterPlayerBehaviour : PlayerBehaviour
         if(isNearGhost != wasNearGhostLastFrame) HandleStressShift(isNearGhost);
         wasNearGhostLastFrame = isNearGhost;
         if(!isNearGhost) return;
-        //Heartbeat effect goes here
+        //BOOKMARK: Heartbeat effect goes here
     }
 
 
@@ -90,7 +90,7 @@ public class HauntHunterPlayerBehaviour : PlayerBehaviour
         print("Petrified");
         isPetrified = true;
         isMobile = false;
-        //Tell game manager to zoom in ig
+        DioramaControllerBehaviour.singleton.TrackTransform(transform);
         playerRenderer.material = playerPetrifiedMaterial;
     }
 
@@ -115,9 +115,7 @@ public class HauntHunterPlayerBehaviour : PlayerBehaviour
 
     }
 
-    public void DrawFOV(Vector3[] _meshPoints, int[] _trianglePoints){
-
-    }
+    public void Flash() => StartCoroutine(fovHelper.FlashFOV(() => { isMobile = true; }));
 }
 
 

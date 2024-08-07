@@ -58,6 +58,7 @@ public class HauntGameMapGenerator
                 go.transform.position = new Vector3(ROOM_SIZE * (j-1), 0, ROOM_SIZE * (i-1));
                 go.GetComponent<Renderer>().material = (Material)floorMats[rooms[i,j]];
                 go.name = "Room " + (i*3 + j).ToString();
+                go.layer = LayerMask.NameToLayer("Ignore Raycast");
                 BoxCollider roomCollider = go.GetComponent<BoxCollider>();
                 roomCollider.isTrigger = true;
                 roomCollider.center = Vector3.up * FLOOR_THICKNESS * 1.5f;

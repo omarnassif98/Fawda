@@ -29,7 +29,7 @@ public abstract class PlayerBehaviour : MonoBehaviour
         isMobile = true;
     }
 
-    public void PoofPlayer(bool _activityStatus){
+    public virtual void PoofPlayer(bool _activityStatus){
         playerRenderer.enabled = _activityStatus;
         GameObject.Instantiate(smokeEmitterPrefab, transform.position, Quaternion.identity);
         isMobile = _activityStatus;
@@ -48,6 +48,7 @@ public abstract class PlayerBehaviour : MonoBehaviour
         PoofPlayer(false);
         Destroy(gameObject);
     }
+
     public abstract void Tick();
 
 }

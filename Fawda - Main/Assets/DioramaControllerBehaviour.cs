@@ -49,6 +49,10 @@ public class DioramaControllerBehaviour : MonoBehaviour
 
     public void StopTrackTransform(Transform _untrack) => trackedTransforms.Remove(_untrack);
 
+    public void ClearTrackTransform() => trackedTransforms.Clear();
+
+
+
     public void SetCameraMode(bool _diorama)
     {
         DebugLogger.SourcedPrint("Camera", "Changing camera mode: " + _diorama.ToString(), "007700");

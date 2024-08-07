@@ -53,18 +53,39 @@ public class HauntGameDeployable : DeployableAsymetricMinigame
     protected override IEnumerator TutorialLoop()
     {
         DebugLogger.SourcedPrint("HauntGameDeployable", "Tutorial loop new iteration", "00FF00");
-        HauntHunterPlayerBehaviour tutorialHunter = GameObject.Instantiate(hunterPlayerPrefab, generator.hunterSpawnPoints[0].position, Quaternion.identity).GetComponent<HauntHunterPlayerBehaviour>();
+        DioramaControllerBehaviour.singleton.SetCameraMode(false);
+        UIManager.bannerUIBehaviour.ClearBannerMessage();
+        UIManager.bannerUIBehaviour.AddBannerMessage("How to Play");
+        HauntHunterPlayerBehaviour tutorialHunter = GameObject.Instantiate(hunterPlayerPrefab, generator.hunterSpawnPoints[1].position, Quaternion.identity).GetComponent<HauntHunterPlayerBehaviour>();
         HauntHiddenPlayerBehaviour tutorialGhost = GameObject.Instantiate(ghostPlayerPrefab, generator.ghostSpawnPoint.position, Quaternion.identity).GetComponent<HauntHiddenPlayerBehaviour>();
-        playerInstances = new PlayerBehaviour[2] { tutorialHunter, tutorialGhost };
-        asymetricPlayerIdx = 1;
         tutorialHunter.puppetMode = true;
         tutorialGhost.puppetMode = true;
-        tutorialGhost.currentJoypadState = new JoypadState(new GamepadData(1, 1, true));
+        tutorialHunter.transform.LookAt(tutorialGhost.transform, tutorialHunter.transform.up);
+        playerInstances = new PlayerBehaviour[2] { tutorialHunter, tutorialGhost };
+        asymetricPlayerIdx = 1;
         yield return new WaitForSecondsRealtime(1.5f);
-        tutorialGhost.currentJoypadState = new JoypadState(new GamepadData(1, 0, true));
+        UIManager.bannerUIBehaviour.ClearBannerMessage();
+        UIManager.bannerUIBehaviour.AddBannerMessage("Ghosts are invisible");
+        yield return new WaitForSecondsRealtime(1.5f);
+        tutorialHunter.Flash();
+        UIManager.bannerUIBehaviour.ClearBannerMessage();
+        UIManager.bannerUIBehaviour.AddBannerMessage("Until they're not");
         yield return new WaitForSecondsRealtime(0.8f);
-        tutorialGhost.currentJoypadState = new JoypadState(new GamepadData(0, 0, true));
-        yield return new WaitForSecondsRealtime(0.8f);
+        UIManager.bannerUIBehaviour.ClearBannerMessage();
+        UIManager.bannerUIBehaviour.AddBannerMessage("Cameras hurt ghosts");
+        tutorialGhost.currentJoypadState = new JoypadState(new GamepadData(0, -1));
+        yield return new WaitForSecondsRealtime(4.5f);
+        UIManager.bannerUIBehaviour.ClearBannerMessage();
+        UIManager.bannerUIBehaviour.AddBannerMessage("But watch out");
+        yield return new WaitForSeconds(1.5f);
+        UIManager.bannerUIBehaviour.ClearBannerMessage();
+        UIManager.bannerUIBehaviour.AddBannerMessage("They have tricks too");
+        tutorialGhost.currentJoypadState = JoypadState.NEUTRAL;
+        tutorialGhost.transform.position = tutorialHunter.transform.position + Vector3.back;
+        yield return new WaitForSeconds(3);
+
+
+
         foreach (PlayerBehaviour tutPlayer in playerInstances) tutPlayer.Terminate();
         LobbyManager.singleton.StartCoroutine(TutorialLoop());
 
