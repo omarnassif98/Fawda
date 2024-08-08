@@ -91,6 +91,8 @@ public class HauntGameDeployable : DeployableAsymetricMinigame
 
     }
 
+
+
     protected override IEnumerator WindDownGame()
     {
         gameInPlay = false;

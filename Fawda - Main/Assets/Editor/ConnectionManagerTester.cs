@@ -1,9 +1,11 @@
 using UnityEditor;
 using UnityEngine;
+using System.Collections.Generic;
 
 [CustomEditor(typeof(ConnectionManager), true)]
 public class ConnectionManagerTester : Editor
 {
+    List<string> nameList = new List<string>() {"omz","EEward","mirkosmall","7asseen","Wael"};
     // Start is called before the first frame update
     public override void OnInspectorGUI()
     {
@@ -19,7 +21,7 @@ public class ConnectionManagerTester : Editor
             {
                 if (LobbyManager.players[i] != null) continue;
                 ConnectionManager.singleton.HandlePlayerConnect(i);
-                NetMessage msg = new NetMessage(OpCode.PROFILE_PAYLOAD, new ProfileData("omz", i).Encode());
+                NetMessage msg = new NetMessage(OpCode.PROFILE_PAYLOAD, new ProfileData(nameList[i], i).Encode());
                 singleton.QueueRPC(new DirectedNetMessage(msg, i));
                 return;
             }

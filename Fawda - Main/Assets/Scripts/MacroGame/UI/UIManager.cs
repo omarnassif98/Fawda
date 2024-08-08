@@ -14,7 +14,9 @@ public class UIManager : MonoBehaviour
     public static DebugSystemsManager debugSystems;
     public static RosterUIBehaviour RosterManager;
     public static BlackoutBehaviour blackoutBehaviour;
-    private TMP_Text countdownText;
+    private TMP_Text BigText;
+    private Image indicator;
+    private float indicatorLifespan, indicatorExpiry;
 
     void Awake(){
         if(singleton != null){
@@ -23,7 +25,8 @@ public class UIManager : MonoBehaviour
         singleton= this;
         debugSystems = gameObject.GetComponent<DebugSystemsManager>();
         RosterManager = new RosterUIBehaviour(transform.Find("Lobby Roster"));
-        countdownText = transform.Find("Countdown").GetComponent<TMP_Text>();
+        BigText = transform.Find("Overlay/BigText").GetComponent<TMP_Text>();
+        indicator = transform.Find("Overlay/Indicator").GetComponent<Image>();
         blackoutBehaviour = GameObject.FindObjectOfType<BlackoutBehaviour>();
 
     }
@@ -37,9 +40,18 @@ public class UIManager : MonoBehaviour
     }
 
 
+    public void SetCountdown(int _digits) => SetCountdown(_digits.ToString());
 
-    public void SetCountdown(int _digits){
-        countdownText.text = _digits.ToString();
+    public void SetCountdown(string _message, float? _expiry = null, Color? _color = null){
+        BigText.gameObject.SetActive(true);
+        BigText.text = _message;
+        if (_color != null) BigText.color = (Color)_color;
+        if (_expiry == null) return;
+        Vector3 indicatorPos = BigText.textBounds.max;
+        indicator.transform.position = indicatorPos;
+        indicator.gameObject.SetActive(true);
+        indicatorLifespan = (float)_expiry;
+        indicatorExpiry = indicatorLifespan;
     }
 
     public float GetScale()
