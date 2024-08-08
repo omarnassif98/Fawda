@@ -26,6 +26,12 @@ public abstract class DeployableMinigame
         LobbyManager.singleton.StartCoroutine(tutorialEvent);
     }
 
+    void EndTutorialLoop()
+    {
+        LobbyManager.singleton.StopCoroutine(tutorialEvent);
+        tutorialEvent = null;
+    }
+
 
     public virtual void ClearPlayers()
     {
@@ -33,12 +39,7 @@ public abstract class DeployableMinigame
         playerInstances = null;
     }
 
-   public void BeginGame()
-    {
-        ClearPlayers();
-        SpawnPlayers();
-
-    }
+    public void BeginGame() => LobbyManager.singleton.StartCoroutine(EaseGameIn());
 
 
     public virtual void EndGame() => LobbyManager.singleton.StartCoroutine(WindDownGame());
@@ -49,15 +50,21 @@ public abstract class DeployableMinigame
 
     protected abstract IEnumerator TutorialLoop();
 
-
-    private IEnumerator CountGameIn()
+    IEnumerator EaseGameIn()
     {
-
-        yield return new WaitForSeconds(0.8f);
-
-        yield return new WaitForSeconds(0.5f);
-
+        EndTutorialLoop();
+        ClearPlayers();
+        SpawnPlayers();
+        yield return new WaitForSeconds(0.15f);
+        UIManager.singleton.SetCountdown("Ready?", _expiry: 0.8f, _color: new Color(0.6f, 0.05f, 0.02f), _showIndicator: true);
+        UIManager.singleton.SetCountdown("Go!", _expiry: 0.5f, _color: new Color(0.05f, 0.6f, 0.02f), _callback: () =>
+        {
+            UIManager.bannerUIBehaviour.ClearBannerMessage();
+            UIManager.bannerUIBehaviour.AddBannerMessage("Game in play", 1.2f);
+            UIManager.bannerUIBehaviour.AddBannerMessage("BETA build", 1.2f);
+        });
     }
+
 
     protected abstract IEnumerator WindDownGame();
 

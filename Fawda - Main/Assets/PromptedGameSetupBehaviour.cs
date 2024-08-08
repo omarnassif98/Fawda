@@ -72,6 +72,7 @@ public abstract class PromptedGameSetupBehaviour : GameSetupBehaviour
         UIManager.bannerUIBehaviour.AddBannerMessage("Ready?", 0.5f);
         for (int i = 0; i < LobbyManager.singleton.GetLobbySize(); i++) ConnectionManager.singleton.SendMessageToClients(OpCode.READYUP, new SimpleBooleanMessage(i == promptIdx).Encode(), i);
         LobbyManager.gameManager.ConfigureGame(promptIdx);
+
         ConnectionManager.singleton.VacateRPC(OpCode.PROMPT_RESPONSE);
         TriggerMapLoad();
         BeginReady();

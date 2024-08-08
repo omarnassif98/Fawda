@@ -13,10 +13,7 @@ public class HauntHiddenPlayerBehaviour : PlayerBehaviour
     float sprintSpeed = 6;
     Color hurtColor = Color.red, normalColor = Color.gray, scareColor = Color.cyan;
     public override void Tick()
-    {
-
-        if (!isMobile) return;
-        Move();
+    {  
         if (canSprint) Sprint();
         CheckForKill();
     }

@@ -4,6 +4,7 @@ using UnityEngine;
 using TMPro;
 using System;
 using UnityEngine.Events;
+using UnityEngine.UI;
 
 public class DebugSystemsManager : MonoBehaviour
 {
@@ -70,7 +71,14 @@ public class DebugSystemsManager : MonoBehaviour
     private void RefreshDebugInfo(){
         debugServerStatus.text = debugServerStatusValue;
         serverListen.text = serverListenValue;
-        for(int i = 0; i<debugPlayerInfos.Length; i++) debugPlayerInfos[i].playerInputHeartbeat.text = heartBeats[i].Count.ToString() + "Hz";
+        for (int i = 0; i < debugPlayerInfos.Length; i++)
+        {
+            debugPlayerInfos[i].playerInputHeartbeat.text = heartBeats[i].Count.ToString() + "Hz";
+            JoypadState joypadState = InputManager.joypadStates[i];
+            debugPlayerInfos[i].cursor.localPosition = joypadState.analog * 2;
+            debugPlayerInfos[i].cursor.GetComponent<Image>().color = joypadState.action?Color.green:Color.red;
+
+        }
     }
     void CleanHeartbeats(){
         DateTime cutoff = DateTime.Now.AddSeconds(-1);
@@ -87,7 +95,7 @@ public class DebugSystemsManager : MonoBehaviour
             logger.SetActive(!logger.activeInHierarchy);
         }
         if (PlayerBehaviour.hotseat == null) return; 
-        NetMessage inp = new NetMessage(OpCode.UDP_GAMEPAD_INPUT, new GamepadData(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")).Encode());
+        NetMessage inp = new NetMessage(OpCode.UDP_GAMEPAD_INPUT, new GamepadData(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"), Input.GetButton("Action")).Encode());
         ConnectionManager.singleton.QueueRPC(new DirectedNetMessage(inp, PlayerBehaviour.hotseat.idx));
     }
 }

@@ -11,7 +11,7 @@ public abstract class GameSetupBehaviour
         UIManager.bannerUIBehaviour.ClearBannerMessage();
     }
 
-    public virtual void ReadyUp() { }
+    public virtual void ReadyUp() => LobbyManager.gameManager.activeMinigame.BeginGame();
 
     protected void TriggerMapLoad() => LobbyManager.gameManager.activeMinigame.LoadMap();
 
@@ -31,8 +31,6 @@ public abstract class GameSetupBehaviour
         foreach(bool r in readies) if (r) cumCount += 1;
         if (cumCount != LobbyManager.singleton.GetLobbySize())
             return;
-        UIManager.bannerUIBehaviour.ClearBannerMessage();
-        UIManager.bannerUIBehaviour.AddBannerMessage("Lets play", 0.5f);
         ReadyUp();
     }
 

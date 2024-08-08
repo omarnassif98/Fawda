@@ -51,8 +51,7 @@ public class HauntHunterPlayerBehaviour : PlayerBehaviour
             isMobile = true;
         }
 
-        if(!isMobile) return;
-        if(Input.GetButtonDown("Action") && currentAmmo > 0){
+        if(currentJoypadState.action && !lastButtonState && currentAmmo > 0){
             currentAmmo -= 1;
             isMobile = false;
             Flash();

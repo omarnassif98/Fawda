@@ -15,6 +15,7 @@ public abstract class PlayerBehaviour : MonoBehaviour
     private GameObject smokeEmitterPrefab;
     public int idx { get; private set; }
     public JoypadState currentJoypadState = JoypadState.NEUTRAL;
+    protected bool lastButtonState = false;
 
     protected virtual void Awake(){
         playerDefaultMaterial = Resources.Load("Global/Materials/PlayerMat") as Material;
@@ -37,7 +38,12 @@ public abstract class PlayerBehaviour : MonoBehaviour
 
     void Update(){
         if (!puppetMode) currentJoypadState = isMobile?InputManager.joypadStates[idx]:JoypadState.NEUTRAL;
+
+        if (!isMobile) return;
+
+        Move();
         Tick();
+        lastButtonState = currentJoypadState.action;
     }
     // Update is called once per frame
 

@@ -9,9 +9,8 @@ using UnityEngine.Events;
 public abstract class DeployableAsymetricMinigame : DeployableMinigame {
     public int asymetricPlayerIdx;
     public virtual void RegisterAsymetricPlayer(int _specialityPlayer){
-        DebugLogger.SourcedPrint("DeployableAsymetricInstance (grandfather logic)", "Setup");
+        DebugLogger.SourcedPrint("DeployableAsymetricGame", string.Format("Assymetric idx: {0}",_specialityPlayer));
         asymetricPlayerIdx = _specialityPlayer;
-        playerInstances = new PlayerBehaviour[LobbyManager.singleton.GetLobbySize()];
     }
 
 }

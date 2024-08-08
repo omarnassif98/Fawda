@@ -32,21 +32,26 @@ public class HauntGameDeployable : DeployableAsymetricMinigame
 
     public override void SpawnPlayers()
     {
+        playerInstances = new PlayerBehaviour[LobbyManager.singleton.GetLobbySize()];
         int currentHunterSpawnPointIdx = 0;
         ProfileData[] playerProfiles = LobbyManager.players;
         for (int i = 0; i < playerProfiles.Length; i++)
         {
             if (playerProfiles[i] == null) continue;
             DebugLogger.SourcedPrint("HauntGameDeployable", "Spawning player " + i.ToString(), ColorUtility.ToHtmlStringRGB(Color.cyan));
+            DebugLogger.SourcedPrint("HauntGameDeployable", "asym " + asymetricPlayerIdx.ToString(), ColorUtility.ToHtmlStringRGB(Color.cyan));
             if (i == asymetricPlayerIdx)
             {
-                playerInstances[i] = GameObject.Instantiate(ghostPlayerPrefab, generator.ghostSpawnPoint.position + Vector3.up * (HauntGameMapGenerator.FLOOR_THICKNESS + 0.1f), generator.ghostSpawnPoint.rotation, transform).GetComponent<HauntHiddenPlayerBehaviour>();
+                DebugLogger.SourcedPrint("HauntGameDeployable", "Ghost " + i.ToString(), ColorUtility.ToHtmlStringRGB(Color.cyan));
+                playerInstances[i] = GameObject.Instantiate(ghostPlayerPrefab, generator.ghostSpawnPoint.position, generator.ghostSpawnPoint.rotation, transform).GetComponent<HauntHiddenPlayerBehaviour>();
             }
             else
             {
+                DebugLogger.SourcedPrint("HauntGameDeployable", "Hunter " + i.ToString(), ColorUtility.ToHtmlStringRGB(Color.cyan));
                 playerInstances[i] = GameObject.Instantiate(hunterPlayerPrefab, generator.hunterSpawnPoints[currentHunterSpawnPointIdx].position + Vector3.up * (HauntGameMapGenerator.FLOOR_THICKNESS + 0.1f), generator.hunterSpawnPoints[currentHunterSpawnPointIdx].rotation, transform).GetComponent<HauntHunterPlayerBehaviour>();
                 currentHunterSpawnPointIdx += 1;
             }
+            playerInstances[i].Initialize(i);
         }
     }
 

@@ -22,7 +22,8 @@ public class UITester : Editor
 
         if (GUILayout.Button("Overlay"))
         {
-            UIManager.singleton.SetCountdown("Ready", _expiry:0.8f, _color: new Color(0.6f, 0.05f, 0.02f));
+            UIManager.singleton.SetCountdown("Ready?", _expiry: 0.8f, _color: new Color(0.6f, 0.05f, 0.02f), _showIndicator:true);
+            UIManager.singleton.SetCountdown("Go!", _expiry: 0.5f, _color: new Color(0.05f,0.6f,0.02f));
         }
         GUILayout.Space(5);
         EditorGUILayout.EndVertical();
